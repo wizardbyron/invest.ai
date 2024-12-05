@@ -1,0 +1,8 @@
+site_name: Invest.AI
+site_url: https://invest-ai.click
+
+theme:
+  name: material
+  language: zh
+  palette:
+    primary: black
