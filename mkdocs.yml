@@ -1,5 +1,6 @@
 site_name: Invest.AI
 site_url: https://invest-ai.click
+copyright: Copyright &copy; 2024 invest-ai.click
 
 theme:
   name: material
