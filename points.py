@@ -26,7 +26,6 @@ for index, row in df_input.iterrows():
     else:
         continue
 
-    df_output.loc[index, '最新价'] = history_klines['收盘'].iloc()[-1]
     df = history_klines[-offset_days - level: -offset_days]
 
     high = df['最高'].max()
@@ -41,9 +40,9 @@ for index, row in df_input.iterrows():
     df_output.loc[index, f'{level}日支撑位1'] = points['支撑位1']
     df_output.loc[index, f'{level}日支撑位2'] = points['支撑位2']
     df_output.loc[index, f'{level}日支撑位3'] = points['支撑位3']
-    df_output.loc[index, f'{level}日波动预期1'] = points['波动预期1']
-    df_output.loc[index, f'{level}日波动预期2'] = points['波动预期2']
-    df_output.loc[index, f'{level}日波动预期3'] = points['波动预期3']
+    df_output.loc[index, f'{level}日预期波动率1(%)'] = points['预期波动率1']
+    df_output.loc[index, f'{level}日预期波动率2(%)'] = points['预期波动率2']
+    df_output.loc[index, f'{level}日预期波动率3(%)'] = points['预期波动率3']
 
 df_output = df_output.round(3)
 df_output.to_csv(f'docs/points/latest.csv', index=False)
