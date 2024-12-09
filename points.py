@@ -7,12 +7,14 @@ from utils.pivot_points import classic
 level = 5
 today = datetime.today()
 today_str = today.strftime('%Y%m%d')
-offset_days = today.weekday()-1
+offset_days = today.weekday()+1
 us_symbol_dict = ak.stock_us_spot_em()
 
 df_input = pd.read_csv('selected.csv', dtype={'代码': str})
 df_output = df_input.copy()
 for index, row in df_input.iterrows():
+    print(row)
+
     type = row['类型']
     symbol = row['代码']
     if type == 'A股ETF':
@@ -26,7 +28,9 @@ for index, row in df_input.iterrows():
     else:
         continue
 
-    df = history_klines[-offset_days - level: -offset_days]
+    df = history_klines[- offset_days - level: - offset_days]
+
+    print(df)
 
     high = df['最高'].max()
     low = df['最低'].min()
