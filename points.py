@@ -79,7 +79,9 @@ for index, row in df_input.iterrows():
 
     type = row['类型']
     symbol = row['代码']
-    if type == 'A股ETF':
+    if type == 'A股':
+        history_klines = ak.stock_zh_a_hist(symbol)
+    elif type == 'A股ETF':
         history_klines = ak.fund_etf_hist_em(symbol)
     elif type == '港股':
         history_klines = ak.stock_hk_hist(symbol)
