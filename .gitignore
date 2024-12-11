@@ -76,7 +76,7 @@ docs/_build/
 target/
 
 # Jupyter Notebook
-.ipynb_checkpoints
+.ipynb_checkguide
 
 # IPython
 profile_default/
@@ -162,4 +162,7 @@ cython_debug/
 #.idea/
 
 .DS_Store
-docs/points/2*.csv
+docs/guide/*.csv
+docs/guide/cn/*.md
+docs/guide/hk/*.md
+docs/guide/us/*.md

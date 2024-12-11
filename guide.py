@@ -79,16 +79,21 @@ for index, row in df_input.iterrows():
 
     type = row['类型']
     symbol = row['代码']
+    name = row['名称']
     if type == 'A股':
         history_klines = ak.stock_zh_a_hist(symbol)
+        market='cn'
     elif type == 'A股ETF':
         history_klines = ak.fund_etf_hist_em(symbol)
+        market='cn'
     elif type == '港股':
         history_klines = ak.stock_hk_hist(symbol)
+        market='hk'
     elif type == '美股':
         stock = us_symbol_dict[us_symbol_dict["代码"].str.contains(f'.{symbol}')]
         code = stock['代码'].values[0]
         history_klines = ak.stock_us_hist(code)
+        market='us'
     else:
         continue
 
@@ -103,12 +108,27 @@ for index, row in df_input.iterrows():
 
     print(df)
 
+    start_date = df['日期'].iloc[0]
+    end_date = df['日期'].iloc[-1]
     high = df['最高'].max()
     low = df['最低'].min()
     close = df['收盘'].iloc[-1]
 
     c_points = classic(high, low, close)
     f_points = fibonacci(high, low, close)
+
+    item = {'经典': c_points, '斐波那契':f_points}
+    row_index = c_points.keys()
+    df_single = pd.DataFrame(item, index=row_index)
+    output_md = f'# {symbol} - {name}\n## 5日枢轴点\n'
+    output_md += f'取值日期区间: {start_date} 至 {end_date}\n'
+    output_md += f'\n{df_single.round(3).to_markdown()}\n'
+    output_md += f'\n更新日期: {today_str}\n'
+
+    file_path = f"docs/guide/{market}/{symbol}.md"
+    with open(file_path, 'w') as f:
+        f.write(output_md)
+
     df_output.loc[index, f'{level}日经典阻力位3'] = c_points['阻力位3']
     df_output.loc[index, f'{level}日斐波那契阻力位3'] = f_points['阻力位3']
     df_output.loc[index, f'{level}日经典阻力位2'] = c_points['阻力位2']
@@ -130,5 +150,5 @@ for index, row in df_input.iterrows():
     df_output.loc[index, f'{level}日斐波那契预期波动率3'] = f_points['预期波动率3']
 
 df_output = df_output.round(3)
-df_output.to_csv(f'docs/points/latest.csv', index=False)
-df_output.to_csv(f'docs/points/{today_str}.csv', index=False)
+df_output.to_csv(f'docs/guide/latest.csv', index=False)
+df_output.to_csv(f'docs/guide/{today_str}.csv', index=False)
