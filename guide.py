@@ -3,6 +3,8 @@ from datetime import datetime
 import akshare as ak
 import pandas as pd
 
+notice = '本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，\
+    投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。'
 
 def classic(high: float, low: float, close: float) -> dict[str, float]:
     """
@@ -120,12 +122,14 @@ for index, row in df_input.iterrows():
     item = {'经典': c_points, '斐波那契':f_points}
     row_index = c_points.keys()
     df_single = pd.DataFrame(item, index=row_index)
-    output_md = f'# {symbol} - {name}\n## 5日枢轴点\n'
-    output_md += f'取值日期区间: {start_date} 至 {end_date}\n'
-    output_md += f'\n{df_single.round(3).to_markdown()}\n'
+    output_md = f'# {symbol} - {name}\n'
     output_md += f'\n更新日期: {today_str}\n'
+    output_md += f'## 5日枢轴点\n取值日期区间: {start_date} 至 {end_date}\n'
+    output_md += f'\n{df_single.round(3).to_markdown()}\n'
+    output_md += f'\n## 声明\n{notice}\n'
 
     file_path = f"docs/guide/{market}/{symbol}.md"
+
     with open(file_path, 'w') as f:
         f.write(output_md)
 
