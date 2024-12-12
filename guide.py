@@ -92,7 +92,7 @@ for index, row in df_input.iterrows():
         history_klines = ak.stock_hk_hist(symbol)
         market='hk'
     elif type == '美股':
-        stock = us_symbol_dict[us_symbol_dict["代码"].str.contains(f'.{symbol}')]
+        stock = us_symbol_dict[us_symbol_dict["代码"].str.endswith(f'.{symbol}')]
         code = stock['代码'].values[0]
         history_klines = ak.stock_us_hist(code)
         market='us'
