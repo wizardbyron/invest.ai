@@ -7,3 +7,9 @@ theme:
   language: zh
   palette:
     primary: black
+
+plugins:
+  - search:
+      lang:
+        - en
+        - zh
