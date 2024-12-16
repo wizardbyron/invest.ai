@@ -6,6 +6,7 @@ import pandas as pd
 notice = '本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，\
     投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。'
 
+
 def classic(high: float, low: float, close: float) -> dict[str, float]:
     """
     计算经典支撑位和阻力位
@@ -84,23 +85,23 @@ for index, row in df_input.iterrows():
     name = row['名称']
     if type == 'A股':
         history_klines = ak.stock_zh_a_hist(symbol)
-        market='cn'
+        market = 'cn'
     elif type == 'A股ETF':
         history_klines = ak.fund_etf_hist_em(symbol)
-        market='cn'
+        market = 'cn'
     elif type == '港股':
         history_klines = ak.stock_hk_hist(symbol)
-        market='hk'
+        market = 'hk'
     elif type == '美股':
         stock = us_symbol_dict[us_symbol_dict["代码"].str.endswith(f'.{symbol}')]
         code = stock['代码'].values[0]
         history_klines = ak.stock_us_hist(code)
-        market='us'
+        market = 'us'
     else:
         continue
 
     # 获取上周的交易数据
-    if today.weekday() < 5:  # 交易日
+    if today.weekday() < 5 and today.weekday() > 0:  # 交易日
         off_day = today.weekday()
         if history_klines['日期'].iloc[-1] == today.strftime('%Y-%m-%d'):
             off_day += 1  # 当天收盘后，去掉当天数据
@@ -119,9 +120,10 @@ for index, row in df_input.iterrows():
     c_points = classic(high, low, close)
     f_points = fibonacci(high, low, close)
 
-    item = {'经典': c_points, '斐波那契':f_points}
+    item = {'经典': c_points, '斐波那契': f_points}
     row_index = c_points.keys()
     df_single = pd.DataFrame(item, index=row_index)
+    df_single['中间值'] = (df_single['经典'] + df_single['斐波那契'])/2
     output_md = f'# {symbol} - {name}\n'
     output_md += f'\n更新日期: {today_str}\n'
     output_md += f'## 5日枢轴点\n取值日期区间: {start_date} 至 {end_date}\n'
