@@ -128,7 +128,7 @@ for index, row in df_input.iterrows():
     output_md += f'\n更新日期: {today_str}\n'
     output_md += f'## 5日枢轴点\n取值日期区间: {start_date} 至 {end_date}\n'
     output_md += f'\n{df_single.round(3).to_markdown()}\n'
-    output_md += f'\n## 声明\n{notice}\n'
+    output_md += f'\n## 免责声明\n{notice}\n'
 
     file_path = f"docs/guide/{market}/{symbol}.md"
 

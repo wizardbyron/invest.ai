@@ -6,13 +6,16 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_community.document_loaders import DataFrameLoader
 import pandas as pd
 
+notice = '本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，\
+    投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。'
+
 load_dotenv()
 
 os.environ.get("ZHIPUAI_API_KEY")
 
 chat = ChatZhipuAI(
     model="glm-4-plus",
-    temperature=0.1,
+    temperature=0.01,
 )
 
 df = pd.read_csv("selected.csv", dtype={'代码': str})
@@ -64,6 +67,10 @@ output_md = f"""# 投资组合
 ## LLM 提示词
 
 {prompt}
+
+## 免责声明
+
+{notice}
 
 """
 
