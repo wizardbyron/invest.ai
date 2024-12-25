@@ -84,17 +84,21 @@ for index, row in df_input.iterrows():
     symbol = row['代码']
     name = row['名称']
     if type == 'A股':
+        # https://akshare.akfamily.xyz/data/stock/stock.html#id21
         history_klines = ak.stock_zh_a_hist(symbol)
         market = 'cn'
     elif type == 'A股ETF':
+        # https://akshare.akfamily.xyz/data/fund/fund_public.html#id10
         history_klines = ak.fund_etf_hist_em(symbol)
         market = 'cn'
     elif type == '港股':
+        # https://akshare.akfamily.xyz/data/stock/stock.html#id66
         history_klines = ak.stock_hk_hist(symbol)
         market = 'hk'
     elif type == '美股':
         stock = us_symbol_dict[us_symbol_dict["代码"].str.endswith(f'.{symbol}')]
         code = stock['代码'].values[0]
+        # https://akshare.akfamily.xyz/data/stock/stock.html#id56
         history_klines = ak.stock_us_hist(code)
         market = 'us'
     else:
