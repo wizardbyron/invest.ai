@@ -41,6 +41,8 @@ A股,000333,美的集团
 美股,QQQ,Invesco QQQ Trust
 美股,TQQQ,ProShares UltraPro QQQ
 美股,SQQQ,ProShares UltraPro Short QQQ
+美股,JEPI,JPMorgan Equity Premium Income ETF
+美股,JEPQ,JPMorgan Nasdaq Equity Premium Income ETF
 美股,YMAG,YieldMax Magnificent 7 Fund of Option Income ETFs
 美股,OARK,YieldMax ARKK Option Income Strategy ETF
 美股,KWEB,KraneShares CSI China Internet ETF
@@ -48,3 +50,4 @@ A股,000333,美的集团
 美股,ASHR,Xtrackers Harvest CSI 300 China A-Shares ETF
 美股,CHAU,Direxion Daily CSI 300 China A Share Bull 2X Shares
 美股,YINN,Direxion Daily FTSE China Bull 3X Shares
+美股,YANG,Direxion Daily FTSE China Bear 3X Shares
