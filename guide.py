@@ -3,7 +3,7 @@ from datetime import datetime
 import akshare as ak
 import pandas as pd
 
-notice = '本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，\
+disclaimer = '本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，\
     投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。'
 
 
@@ -129,10 +129,10 @@ for index, row in df_input.iterrows():
     df_single = pd.DataFrame(item, index=row_index)
     df_single['中间值'] = (df_single['经典'] + df_single['斐波那契'])/2
     output_md = f'# {symbol} - {name}\n'
-    output_md += f'\n更新日期: {today_str}\n'
+    output_md += f'\n更新日期: {today.strftime('%Y-%m-%d')}\n'
     output_md += f'## 5日枢轴点\n取值日期区间: {start_date} 至 {end_date}\n'
     output_md += f'\n{df_single.round(3).to_markdown()}\n'
-    output_md += f'\n## 免责声明\n{notice}\n'
+    output_md += f'\n## 免责声明\n{disclaimer}\n'
 
     file_path = f"docs/guide/{market}/{symbol}.md"
 

@@ -2,16 +2,14 @@ import os
 
 from dotenv import load_dotenv
 from langchain_community.chat_models import ChatZhipuAI
-from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_community.document_loaders import DataFrameLoader
+from langchain_core.messages import HumanMessage, SystemMessage
 import pandas as pd
 
-notice = '本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，\
+disclaimer = '本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，\
     投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。'
 
 load_dotenv()
-
-os.environ.get("ZHIPUAI_API_KEY")
 
 chat = ChatZhipuAI(
     model="glm-4-plus",
@@ -42,10 +40,15 @@ prompt = f"""
 
 - 包括股票名称和代码
 - 股票在投资组合内的占比
-- 保留或者剔除某个股票的原因
+- 输出股票入选投资组合的原因
 - 以周为单位的交易频率建议
+- 根据投资组合风险等级的低中高顺序输出
+
+最后输出未入选投资组合的股票以及未入选原因。
 
 """
+
+print(prompt)
 
 messages = [
     SystemMessage(
@@ -58,7 +61,7 @@ messages = [
 
 response = chat.invoke(messages)
 
-output_md = f"""# 投资组合
+output_md = f"""# 投资组合 - A股{num}ETF
 
 ## 投资组合参考
 
@@ -70,11 +73,11 @@ output_md = f"""# 投资组合
 
 ## 免责声明
 
-{notice}
+{disclaimer}
 
 """
 
-file_path = f"docs/portfolio/portfolio_{num}.md"
+file_path = f"docs/portfolio/portfolio_cn_etf_{num}.md"
 
 
 with open(file_path, 'w') as f:
