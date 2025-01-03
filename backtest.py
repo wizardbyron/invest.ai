@@ -69,26 +69,14 @@ def fibonacci(high: float, low: float, close: float) -> dict[str, float]:
     }
 
 
-level = 5
-today = datetime.today()
-today_str = today.strftime('%Y%m%d')
-start_date = '20240101'
-end_date = '20241231'
-
-us_symbol_dict = ak.stock_us_spot_em()
-
-df_input = pd.read_csv('backtest.csv', dtype={'代码': str})
-df_output = df_input.copy()
-for idx, row in df_input.iterrows():
-    print(row)
-
-    type = row['类型']
-    symbol = row['代码']
-    name = row['名称']
+def fetch_kline(symbol: str, start_date: str, end_date: str, type: str):
     if type == 'A股':
         # https://akshare.akfamily.xyz/data/stock/stock.html#id21
         history_klines = ak.stock_zh_a_hist(
-            symbol, start_date=start_date, end_date=end_date)
+            symbol=symbol,
+            start_date=start_date,
+            end_date=end_date,
+            period='daily')
         market = 'cn'
     elif type == 'A股ETF':
         # https://akshare.akfamily.xyz/data/fund/fund_public.html#id10
@@ -100,32 +88,65 @@ for idx, row in df_input.iterrows():
         market = 'cn'
     elif type == '港股':
         # https://akshare.akfamily.xyz/data/stock/stock.html#id66
-        history_klines = ak.stock_hk_hist(symbol, start_date, end_date)
+        history_klines = ak.stock_hk_hist(
+            symbol=symbol,
+            start_date=start_date,
+            end_date=end_date,
+            period='daily')
         market = 'hk'
     elif type == '美股':
         stock = us_symbol_dict[us_symbol_dict["代码"].str.endswith(f'.{symbol}')]
         code = stock['代码'].values[0]
         # https://akshare.akfamily.xyz/data/stock/stock.html#id56
-        history_klines = ak.stock_us_hist(code, start_date, end_date)
+        history_klines = ak.stock_us_hist(
+            symbol=code,
+            start_date=start_date,
+            end_date=end_date,
+            period='daily')
         market = 'us'
     else:
+        market = None
+        history_klines = None
+
+    return market, history_klines
+
+
+today = datetime.today()
+today_str = today.strftime('%Y%m%d')
+start_date = '20240101'
+end_date = today_str
+
+us_symbol_dict = ak.stock_us_spot_em()
+df_input = pd.read_csv('backtest.csv', dtype={'代码': str})
+df_output = df_input.copy()
+
+for idx, row in df_input.iterrows():
+    print(row)
+
+    type = row['类型']
+    symbol = row['代码']
+    name = row['名称']
+    market, daily_data = fetch_kline(
+        type=type,
+        symbol=symbol,
+        start_date=start_date,
+        end_date=end_date)
+
+    if market == None:
         continue
 
-    # print(history_klines)
+    df_trade_orders = pd.DataFrame(columns=['日期', '方向', '价格'])
     buy_price = 0.0
     sell_price = 0.0
-    df_trade_orders = pd.DataFrame(
-        columns=['日期', '方向', '价格', '数量', '持仓', '成交额', '剩余资金'])
-    hold = 0
-    init = 100000
-    for index, row in history_klines.iterrows():
-        date_str = row['日期']
-        date = datetime.strptime(date_str, "%Y-%m-%d")
+    level = 5
+    for index, row in daily_data.iterrows():
+        date = row['日期']
+        if isinstance(date, str):
+            date = datetime.strptime(date, "%Y-%m-%d")
 
         # 获取上周的交易数据计算枢轴点
         if date.weekday() == 0:  # 周一
-            off_day = date.weekday()
-            df = history_klines[index-5:index]
+            df = daily_data[index-level:index]
             # print(df)
 
             if df.empty:
@@ -138,53 +159,71 @@ for idx, row in df_input.iterrows():
                 c_points = classic(high, low, close)
                 f_points = fibonacci(high, low, close)
 
-                item = {'经典': c_points, '斐波那契': f_points}
-                row_index = c_points.keys()
-                df_single = pd.DataFrame(item, index=row_index)
-                df_single['中间值'] = (df_single['经典'] + df_single['斐波那契'])/2
+                # print(df_single.round(3))
+                buy_price = (c_points['支撑位1'] + c_points['支撑位1'])/2
+                sell_price = (c_points['阻力位1'] + c_points['阻力位1'])/2
 
-                # print(df_single)
-                buy_price = c_points['支撑位2']
-                sell_price = c_points['阻力位2']
-
-        if row['最低'] <= buy_price and init > buy_price * 10000:
-            hold += 10000
-            init += buy_price * -10000
+        if row['最低'] <= buy_price and buy_price <= row['最高']:
             order = {
-                '日期': date_str,
+                '日期': date,
                 '方向': 'BUY',
-                '价格': buy_price,
-                '数量': 10000,
-                '持仓': hold,
-                '成交额': buy_price * -10000,
-                '剩余资金': init
-            }
-            df_trade_orders.loc[len(df_trade_orders)] = order
-        if row['最高'] >= sell_price and hold >= 10000:
-            hold -= 10000
-            init += sell_price * 10000
-            order = {
-                '日期': date_str,
-                '方向': 'SELL',
-                '价格': sell_price,
-                '数量': -10000,
-                '持仓': hold,
-                '成交额': sell_price * 10000,
-                '剩余资金': init
+                '价格': buy_price
             }
             df_trade_orders.loc[len(df_trade_orders)] = order
 
-    df_trade_orders.to_excel(f'{name}_orders.xlsx')
-    total_profit = df_trade_orders['成交额'].sum()
-    hold_num = df_trade_orders['持仓'].iloc[-1]
-    hold_value = history_klines['收盘'].iloc[-1] * hold_num
-    roi = (init+hold_value-100000.00)/100000.00*100
-    print(f'剩余资金: {init:.2f}, 持有市值:{hold_value:.2f}, 收益率:{roi:.2f}% \n')
-    df_output.loc[idx, '剩余资金'] = init
-    df_output.loc[idx, '持有市值'] = hold_value
-    df_output.loc[idx, '收益率'] = roi
+        if row['最高'] >= sell_price and sell_price >= row['最低']:
+            order = {
+                '日期': date,
+                '方向': 'SELL',
+                '价格': sell_price
+            }
+            df_trade_orders.loc[len(df_trade_orders)] = order
+
+    df_trade_orders = df_trade_orders.round(3)
+    df_trade_orders.to_csv(f'output/{name}_orders.csv', index=False)
+
+    init = 100000
+    hold = 0
+    balance = init
+    trade_unit = 10000
+    df_trade_roi = df_trade_orders.copy()
+    for index, row in df_trade_orders.iterrows():
+        type = row['方向']
+        price = row['价格']
+
+        if type == 'BUY' and trade_unit * price < balance:
+            hold += trade_unit
+            balance -= trade_unit * price
+            df_trade_roi.loc[index, '交易数量'] = trade_unit
+            df_trade_roi.loc[index, '持有数量'] = hold
+            df_trade_roi.loc[index, '成交额'] = -trade_unit * price
+            df_trade_roi.loc[index, '余额'] = balance
+
+        if type == 'SELL' and hold > 0:
+            hold -= trade_unit
+            balance += trade_unit * price
+            df_trade_roi.loc[index, '交易数量'] = -trade_unit
+            df_trade_roi.loc[index, '持有数量'] = hold
+            df_trade_roi.loc[index, '成交额'] = trade_unit * price
+            df_trade_roi.loc[index, '余额'] = balance
+
+    df_trade_roi = df_trade_roi.round(2)
+    df_trade_roi = df_trade_roi[df_trade_roi['成交额'].abs() > 0.0]
+    df_trade_roi.to_csv(f'output/{name}_trade.csv', index=False)
+
+    df_output.loc[idx, '账户余额'] = balance
+    df_output.loc[idx, '持仓数量'] = hold
+    df_output.loc[idx, '最新价格'] = daily_data['收盘'].iloc[-1]
+    df_output.loc[idx, '持仓市值'] = daily_data['收盘'].iloc[-1] * hold
+    df_output.loc[idx, '合计'] = daily_data['收盘'].iloc[-1] * hold + balance
+    trade_roi = (daily_data['收盘'].iloc[-1] * hold + balance - init)/init * 100
+    df_output.loc[idx, '交易收益率'] = f'{trade_roi:.2f}%'
+
+    non_trade_roi = (daily_data['收盘'].iloc[-1] -
+                     daily_data['收盘'].iloc[0])/daily_data['收盘'].iloc[0] * 100
+    df_output.loc[idx, '自然收益率'] = f'{non_trade_roi:.2f}%'
+    df_output.loc[idx, '超额收益率'] = f'{trade_roi - non_trade_roi:.2f}%'
 
 df_output = df_output.round(3)
-df_output.to_csv('roi.csv', index=False)
-roi_avg = df_output['收益率'].mean()
-print(f'平均收益率:{roi_avg:.2f}\n')
+df_output.to_csv(f'回报率测算.csv', index=False)
+print(df_output)
