@@ -76,7 +76,8 @@ def fetch_kline(symbol: str, start_date: str, end_date: str, type: str):
             symbol=symbol,
             start_date=start_date,
             end_date=end_date,
-            period='daily')
+            period='daily',
+            adjust="qfq")
         market = 'cn'
     elif type == 'A股ETF':
         # https://akshare.akfamily.xyz/data/fund/fund_public.html#id10
@@ -84,7 +85,8 @@ def fetch_kline(symbol: str, start_date: str, end_date: str, type: str):
             symbol=symbol,
             start_date=start_date,
             end_date=end_date,
-            period='daily')
+            period='daily',
+            adjust="qfq")
         market = 'cn'
     elif type == '港股':
         # https://akshare.akfamily.xyz/data/stock/stock.html#id66
@@ -92,7 +94,8 @@ def fetch_kline(symbol: str, start_date: str, end_date: str, type: str):
             symbol=symbol,
             start_date=start_date,
             end_date=end_date,
-            period='daily')
+            period='daily',
+            adjust="qfq")
         market = 'hk'
     elif type == '美股':
         stock = us_symbol_dict[us_symbol_dict["代码"].str.endswith(f'.{symbol}')]
@@ -102,7 +105,8 @@ def fetch_kline(symbol: str, start_date: str, end_date: str, type: str):
             symbol=code,
             start_date=start_date,
             end_date=end_date,
-            period='daily')
+            period='daily',
+            adjust="qfq")
         market = 'us'
     else:
         market = None
@@ -213,17 +217,25 @@ for idx, row in df_input.iterrows():
 
     df_output.loc[idx, '账户余额'] = balance
     df_output.loc[idx, '持仓数量'] = hold
+    df_output.loc[idx, '起始价格'] = daily_data['收盘'].iloc[0]
     df_output.loc[idx, '最新价格'] = daily_data['收盘'].iloc[-1]
     df_output.loc[idx, '持仓市值'] = daily_data['收盘'].iloc[-1] * hold
     df_output.loc[idx, '合计'] = daily_data['收盘'].iloc[-1] * hold + balance
-    trade_roi = (daily_data['收盘'].iloc[-1] * hold + balance - init)/init * 100
-    df_output.loc[idx, '交易收益率'] = f'{trade_roi:.2f}%'
+    trade_roi = (daily_data['收盘'].iloc[-1] * hold + balance - init)/init
+    df_output.loc[idx, '交易收益率'] = trade_roi
 
-    non_trade_roi = (daily_data['收盘'].iloc[-1] -
-                     daily_data['收盘'].iloc[0])/daily_data['收盘'].iloc[0] * 100
-    df_output.loc[idx, '自然收益率'] = f'{non_trade_roi:.2f}%'
-    df_output.loc[idx, '超额收益率'] = f'{trade_roi - non_trade_roi:.2f}%'
+    start_close = daily_data['收盘'].iloc[0]
+    end_close = daily_data['收盘'].iloc[-1]
+    non_trade_roi = (end_close - start_close) / start_close
+
+    df_output.loc[idx, '自然收益率'] = non_trade_roi
+    df_output.loc[idx, '超额收益率'] = trade_roi - non_trade_roi
 
 df_output = df_output.round(3)
-df_output.to_csv(f'回报率测算.csv', index=False)
+df_output = df_output.sort_values(by='超额收益率', ascending=False)
+df_output['交易收益率'] = df_output['交易收益率'].apply(lambda x: "{:.2%}".format(x))
+df_output['自然收益率'] = df_output['自然收益率'].apply(lambda x: "{:.2%}".format(x))
+df_output['超额收益率'] = df_output['超额收益率'].apply(lambda x: "{:.2%}".format(x))
+
 print(df_output)
+df_output.to_csv(f'backtest_roi.csv', index=False)
