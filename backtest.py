@@ -115,9 +115,16 @@ def fetch_kline(symbol: str, start_date: str, end_date: str, type: str):
     return market, history_klines
 
 
+def commision(turnover: float) -> float:
+    if turnover * 0.0003 < 5.0:
+        return 5.0
+    else:
+        return turnover * 0.0003
+
+
 today = datetime.today()
 today_str = today.strftime('%Y%m%d')
-start_date = '20240101'
+start_date = '20200101'
 end_date = today_str
 
 us_symbol_dict = ak.stock_us_spot_em()
@@ -164,8 +171,10 @@ for idx, row in df_input.iterrows():
                 f_points = fibonacci(high, low, close)
 
                 # print(df_single.round(3))
-                buy_price = (c_points['支撑位1'] + c_points['支撑位1'])/2
-                sell_price = (c_points['阻力位1'] + c_points['阻力位1'])/2
+                # buy_price = (c_points['支撑位1'] + f_points['支撑位1'])/2
+                # sell_price = (c_points['阻力位1'] + f_points['阻力位1'])/2
+                buy_price = f_points['支撑位1']
+                sell_price = f_points['阻力位1']
 
         if row['最低'] <= buy_price and buy_price <= row['最高']:
             order = {
@@ -198,17 +207,23 @@ for idx, row in df_input.iterrows():
         if type == 'BUY' and trade_unit * price < balance:
             hold += trade_unit
             balance -= trade_unit * price
+            fee = commision(trade_unit * price)
+            balance -= fee
             df_trade_roi.loc[index, '交易数量'] = trade_unit
             df_trade_roi.loc[index, '持有数量'] = hold
             df_trade_roi.loc[index, '成交额'] = -trade_unit * price
+            df_trade_roi.loc[index, '手续费'] = fee
             df_trade_roi.loc[index, '余额'] = balance
 
         if type == 'SELL' and hold > 0:
             hold -= trade_unit
             balance += trade_unit * price
+            fee = commision(trade_unit * price)
+            balance -= fee
             df_trade_roi.loc[index, '交易数量'] = -trade_unit
             df_trade_roi.loc[index, '持有数量'] = hold
             df_trade_roi.loc[index, '成交额'] = trade_unit * price
+            df_trade_roi.loc[index, '手续费'] = fee
             df_trade_roi.loc[index, '余额'] = balance
 
     df_trade_roi = df_trade_roi.round(2)

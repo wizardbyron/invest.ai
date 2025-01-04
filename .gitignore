@@ -166,3 +166,4 @@ docs/guide/*.csv
 docs/guide/cn/*.md
 docs/guide/hk/*.md
 docs/guide/us/*.md
+output/*.csv
