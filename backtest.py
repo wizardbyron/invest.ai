@@ -69,7 +69,7 @@ def fibonacci(high: float, low: float, close: float) -> dict[str, float]:
     }
 
 
-def fetch_kline(symbol: str, start_date: str, end_date: str, type: str):
+def fetch_kline(symbol: str, start_date: str, end_date: str, type: str, adjust_flag: str = ''):
     if type == 'A股':
         # https://akshare.akfamily.xyz/data/stock/stock.html#id21
         history_klines = ak.stock_zh_a_hist(
@@ -77,7 +77,7 @@ def fetch_kline(symbol: str, start_date: str, end_date: str, type: str):
             start_date=start_date,
             end_date=end_date,
             period='daily',
-            adjust="qfq")
+            adjust=adjust_flag)
         market = 'cn'
     elif type == 'A股ETF':
         # https://akshare.akfamily.xyz/data/fund/fund_public.html#id10
@@ -86,7 +86,7 @@ def fetch_kline(symbol: str, start_date: str, end_date: str, type: str):
             start_date=start_date,
             end_date=end_date,
             period='daily',
-            adjust="qfq")
+            adjust=adjust_flag)
         market = 'cn'
     elif type == '港股':
         # https://akshare.akfamily.xyz/data/stock/stock.html#id66
@@ -95,7 +95,7 @@ def fetch_kline(symbol: str, start_date: str, end_date: str, type: str):
             start_date=start_date,
             end_date=end_date,
             period='daily',
-            adjust="qfq")
+            adjust=adjust_flag)
         market = 'hk'
     elif type == '美股':
         stock = us_symbol_dict[us_symbol_dict["代码"].str.endswith(f'.{symbol}')]
@@ -106,7 +106,7 @@ def fetch_kline(symbol: str, start_date: str, end_date: str, type: str):
             start_date=start_date,
             end_date=end_date,
             period='daily',
-            adjust="qfq")
+            adjust=adjust_flag)
         market = 'us'
     else:
         market = None
@@ -122,30 +122,7 @@ def commision(turnover: float) -> float:
         return turnover * 0.0003
 
 
-today = datetime.today()
-today_str = today.strftime('%Y%m%d')
-start_date = '20200101'
-end_date = today_str
-
-us_symbol_dict = ak.stock_us_spot_em()
-df_input = pd.read_csv('backtest.csv', dtype={'代码': str})
-df_output = df_input.copy()
-
-for idx, row in df_input.iterrows():
-    print(row)
-
-    type = row['类型']
-    symbol = row['代码']
-    name = row['名称']
-    market, daily_data = fetch_kline(
-        type=type,
-        symbol=symbol,
-        start_date=start_date,
-        end_date=end_date)
-
-    if market == None:
-        continue
-
+def trade_orders(daily_data):
     df_trade_orders = pd.DataFrame(columns=['日期', '方向', '价格'])
     buy_price = 0.0
     sell_price = 0.0
@@ -170,11 +147,10 @@ for idx, row in df_input.iterrows():
                 c_points = classic(high, low, close)
                 f_points = fibonacci(high, low, close)
 
-                # print(df_single.round(3))
-                # buy_price = (c_points['支撑位1'] + f_points['支撑位1'])/2
-                # sell_price = (c_points['阻力位1'] + f_points['阻力位1'])/2
-                buy_price = f_points['支撑位1']
-                sell_price = f_points['阻力位1']
+                # buy_price = (c_points['支撑位3'] + f_points['支撑位3'])/2
+                # sell_price = (c_points['阻力位3'] + f_points['阻力位3'])/2
+                buy_price = f_points['支撑位2']
+                sell_price = f_points['阻力位2']
 
         if row['最低'] <= buy_price and buy_price <= row['最高']:
             order = {
@@ -193,13 +169,45 @@ for idx, row in df_input.iterrows():
             df_trade_orders.loc[len(df_trade_orders)] = order
 
     df_trade_orders = df_trade_orders.round(3)
+
+    return df_trade_orders
+
+
+today = datetime.today()
+today_str = today.strftime('%Y%m%d')
+start_date = '20200101'
+end_date = today_str
+
+us_symbol_dict = ak.stock_us_spot_em()
+df_input = pd.read_csv('backtest.csv', dtype={'代码': str})
+df_output = df_input.copy()
+
+for idx, row in df_input.iterrows():
+    # print(row)
+
+    type = row['类型']
+    symbol = row['代码']
+    name = row['名称']
+    market, daily_data = fetch_kline(
+        type=type,
+        symbol=symbol,
+        start_date=start_date,
+        end_date=end_date,
+        adjust_flag='qfq')
+
+    if market == None:
+        continue
+
+    df_trade_orders = trade_orders(daily_data)
     df_trade_orders.to_csv(f'output/{name}_orders.csv', index=False)
 
     init = 100000
+    trade_unit = 10000
     hold = 0
     balance = init
-    trade_unit = 10000
+    trade_times = 0
     df_trade_roi = df_trade_orders.copy()
+
     for index, row in df_trade_orders.iterrows():
         type = row['方向']
         price = row['价格']
@@ -214,6 +222,7 @@ for idx, row in df_input.iterrows():
             df_trade_roi.loc[index, '成交额'] = -trade_unit * price
             df_trade_roi.loc[index, '手续费'] = fee
             df_trade_roi.loc[index, '余额'] = balance
+            trade_times += 1
 
         if type == 'SELL' and hold > 0:
             hold -= trade_unit
@@ -225,6 +234,7 @@ for idx, row in df_input.iterrows():
             df_trade_roi.loc[index, '成交额'] = trade_unit * price
             df_trade_roi.loc[index, '手续费'] = fee
             df_trade_roi.loc[index, '余额'] = balance
+            trade_times += 1
 
     df_trade_roi = df_trade_roi.round(2)
     df_trade_roi = df_trade_roi[df_trade_roi['成交额'].abs() > 0.0]
@@ -245,12 +255,14 @@ for idx, row in df_input.iterrows():
 
     df_output.loc[idx, '自然收益率'] = non_trade_roi
     df_output.loc[idx, '超额收益率'] = trade_roi - non_trade_roi
+    df_output.loc[idx, '交易次数'] = trade_times
 
 df_output = df_output.round(3)
 df_output = df_output.sort_values(by='超额收益率', ascending=False)
+
 df_output['交易收益率'] = df_output['交易收益率'].apply(lambda x: "{:.2%}".format(x))
 df_output['自然收益率'] = df_output['自然收益率'].apply(lambda x: "{:.2%}".format(x))
 df_output['超额收益率'] = df_output['超额收益率'].apply(lambda x: "{:.2%}".format(x))
 
 print(df_output)
-df_output.to_csv(f'backtest_roi.csv', index=False)
+df_output.to_csv(f'backtest_roi_{start_date}.csv', index=False)
