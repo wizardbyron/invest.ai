@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from langchain_community.chat_models import ChatZhipuAI
 from langchain_community.document_loaders import DataFrameLoader
+from langchain_openai.chat_models import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 import pandas as pd
 
@@ -11,10 +12,21 @@ disclaimer = '本站用于实验目的，不构成任何投资建议，也不作
 
 load_dotenv()
 
-chat = ChatZhipuAI(
-    model="glm-4-plus",
-    temperature=0.01,
-)
+chat_models = {
+    "glm-4-plus": ChatZhipuAI(
+        model="glm-4-plus",
+        temperature=0.01
+    ),
+    "glm-4-flash": ChatZhipuAI(
+        model="glm-4-flash",
+        temperature=0.01
+    ),
+    "deepseek": ChatOpenAI(
+        model="deepseek-chat",
+        temperature=0.01,
+        base_url="https://api.deepseek.com"
+    )
+}
 
 df = pd.read_csv("selected.csv", dtype={'代码': str})
 
@@ -26,15 +38,11 @@ docs = loader.load()
 
 num = 10
 
-prompt = f"""
-
-{docs}
-
-以上是我选择的股票。请帮我构建一份投资组合，要求如下：
+prompt = f"""{docs}是我选择的股票。请帮我构建一份投资组合，要求如下：
 
 - 投资组合的股票数量为 {num} 个
-- 美股占 40%，港股和A股各占 30%
 - 采用杠铃型配置，兼顾风险和收益
+- A股，美股和港股均衡配置
 
 请以表格的方式输出投资组合，要求如下：
 
@@ -45,23 +53,25 @@ prompt = f"""
 - 根据投资组合风险等级的低中高顺序输出
 
 最后输出未入选投资组合的股票以及未入选原因。
-
 """
 
 print(prompt)
 
 messages = [
     SystemMessage(
-        content="你是一个专业的投资人，可以根据我所给出的投资标的编制出投资组合"
+        content="你是一个专业的投资人，可以根据我所给出的投资标的编制出投资组合，做到风险和收益兼顾。"
     ),
     HumanMessage(
         content=prompt
     )
 ]
 
-response = chat.invoke(messages)
+models = ["glm-4-plus", "deepseek"]
 
-output_md = f"""# 投资组合 - A股{num}ETF
+for model in models:
+    response = chat_models[model].invoke(messages)
+
+    output_md = f"""# 投资组合 - A股{num}ETF - {model}
 
 ## 投资组合参考
 
@@ -74,11 +84,9 @@ output_md = f"""# 投资组合 - A股{num}ETF
 ## 免责声明
 
 {disclaimer}
-
 """
 
-file_path = f"docs/portfolio/portfolio_cn_etf_{num}.md"
+    file_path = f"docs/portfolio/portfolio_cn_etf_{num}_{model}.md"
 
-
-with open(file_path, 'w') as f:
-    f.write(output_md)
+    with open(file_path, 'w') as f:
+        f.write(output_md)
