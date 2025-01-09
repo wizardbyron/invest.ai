@@ -17,10 +17,6 @@ chat_models = {
         model="glm-4-plus",
         temperature=0.01
     ),
-    "glm-4-flash": ChatZhipuAI(
-        model="glm-4-flash",
-        temperature=0.01
-    ),
     "deepseek": ChatOpenAI(
         model="deepseek-chat",
         temperature=0.01,
@@ -38,7 +34,9 @@ docs = loader.load()
 
 num = 10
 
-prompt = f"""{docs}是我选择的股票。请帮我构建一份投资组合，要求如下：
+prompt = f"""{docs}是我选择的股票。
+
+请帮我构建一份投资组合，要求如下：
 
 - 投资组合的股票数量为 {num} 个
 - 采用杠铃型配置，兼顾风险和收益
@@ -49,7 +47,7 @@ prompt = f"""{docs}是我选择的股票。请帮我构建一份投资组合，�
 - 包括股票名称和代码
 - 股票在投资组合内的占比
 - 输出股票入选投资组合的原因
-- 以周为单位的交易频率建议
+- 交易频率或者再平衡周期建议
 - 根据投资组合风险等级的低中高顺序输出
 
 最后输出未入选投资组合的股票以及未入选原因。
@@ -71,20 +69,10 @@ models = ["glm-4-plus", "deepseek"]
 for model in models:
     response = chat_models[model].invoke(messages)
 
-    output_md = f"""# 投资组合 - A股{num}ETF - {model}
-
-## 投资组合参考
-
-{response.content}
-
-## LLM 提示词
-
-{prompt}
-
-## 免责声明
-
-{disclaimer}
-"""
+    output_md = f"# A股{num}ETF投资组合 - {model}\n\n"
+    output_md += f"## 投资组合参考\n\n{response.content}\n\n"
+    output_md += f"## LLM 提示词\n\n{prompt}\n"
+    output_md += f"## 免责声明\n\n{disclaimer}\n"
 
     file_path = f"docs/portfolio/portfolio_cn_etf_{num}_{model}.md"
 
