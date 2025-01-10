@@ -13,7 +13,7 @@ disclaimer = '本站用于实验目的，不构成任何投资建议，也不作
 load_dotenv()
 
 chat_models = {
-    "glm-4-plus": ChatZhipuAI(
+    "glm": ChatZhipuAI(
         model="glm-4-plus",
         temperature=0.01
     ),
@@ -50,8 +50,7 @@ prompt = f"""{docs}是我选择的股票。
 - 交易频率或者再平衡周期建议
 - 根据投资组合风险等级的低中高顺序输出
 
-最后输出未入选投资组合的股票以及未入选原因。
-"""
+最后输出未入选投资组合的股票以及未入选原因。"""
 
 print(prompt)
 
@@ -64,15 +63,26 @@ messages = [
     )
 ]
 
-models = ["glm-4-plus", "deepseek"]
 
-for model in models:
+for model in chat_models.keys():
     response = chat_models[model].invoke(messages)
 
-    output_md = f"# A股{num}ETF投资组合 - {model}\n\n"
-    output_md += f"## 投资组合参考\n\n{response.content}\n\n"
-    output_md += f"## LLM 提示词\n\n{prompt}\n"
-    output_md += f"## 免责声明\n\n{disclaimer}\n"
+    output_md = f"""# A股{num}ETF投资组合 - {model}
+
+    模型:{chat_models[model].model_name}
+
+    ## 投资组合参考
+
+    {response.content}
+
+    ## LLM 提示词
+
+    {prompt}
+
+    ## 免责声明
+
+    {disclaimer}
+    """.replace("    ", "")
 
     file_path = f"docs/portfolio/portfolio_cn_etf_{num}_{model}.md"
 
