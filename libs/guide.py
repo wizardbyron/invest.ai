@@ -1,8 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import akshare as ak
 import pandas as pd
 from libs.utils.indicators import fibonacci, classic
+from libs.utils.data import fetch_klines
 
 disclaimer = "本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，\
     投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。"
@@ -13,8 +14,8 @@ def guide():
     level = 5
     today = datetime.today()
     today_str = today.strftime("%Y%m%d")
-
-    us_symbol_dict = ak.stock_us_spot_em()
+    start_date = today - timedelta(days=100)
+    start_date_str = start_date.strftime("%Y%m%d")
 
     df_input = pd.read_csv("input/selected.csv", dtype={"代码": str})
     df_output = df_input.copy()
@@ -24,27 +25,11 @@ def guide():
         type = row["类型"]
         symbol = row["代码"]
         name = row["名称"]
-        if type == "A股":
-            # https://akshare.akfamily.xyz/data/stock/stock.html#id21
-            history_klines = ak.stock_zh_a_hist(symbol)
-            market = "cn"
-        elif type == "A股ETF":
-            # https://akshare.akfamily.xyz/data/fund/fund_public.html#id10
-            history_klines = ak.fund_etf_hist_em(symbol)
-            market = "cn"
-        elif type == "港股":
-            # https://akshare.akfamily.xyz/data/stock/stock.html#id66
-            history_klines = ak.stock_hk_hist(symbol)
-            market = "hk"
-        elif type == "美股":
-            stock = us_symbol_dict[us_symbol_dict["代码"].str.endswith(f".{
-                                                                     symbol}")]
-            code = stock["代码"].values[0]
-            # https://akshare.akfamily.xyz/data/stock/stock.html#id56
-            history_klines = ak.stock_us_hist(code)
-            market = "us"
-        else:
-            continue
+        market, history_klines = fetch_klines(
+            type=type,
+            symbol=symbol,
+            start_date=start_date_str,
+            end_date=today_str)
 
         # 获取上周的交易数据
         if today.weekday() < 5 and today.weekday() > 0:  # 交易日
