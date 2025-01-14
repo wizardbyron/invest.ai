@@ -22,7 +22,10 @@ jobs:
           python-version: 3.13.0
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
       - run: pip install akshare
-      - run: python guide.py
+      - run: python main.py guide
+        env:
+          ZHIPUAI_API_KEY: ${{ secrets.ZHIPUAI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       - uses: actions/cache@v4
         with:
           key: mkdocs-material-${{ env.cache_id }}
