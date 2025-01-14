@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: 3.13.0
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-      - run: pip install akshare
+      - run: pip install -r requirements.txt
       - run: python main.py guide
         env:
           ZHIPUAI_API_KEY: ${{ secrets.ZHIPUAI_API_KEY }}
