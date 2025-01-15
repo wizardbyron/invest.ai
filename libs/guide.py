@@ -110,6 +110,8 @@ def guide():
 
         ## 交易建议
 
+        模型: {chat_models["deepseek"].model_name}
+
         {response.content}
 
         ## 参考
