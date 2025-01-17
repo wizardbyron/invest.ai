@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-import akshare as ak
 import pandas as pd
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -102,7 +101,7 @@ def guide():
             )
         ]
 
-        response = chat_models["deepseek"].invoke(messages)
+        response = chat_models["glm"].invoke(messages)
 
         output_md = f"""# {symbol} - {name}
 
@@ -110,7 +109,7 @@ def guide():
 
         ## 交易建议
 
-        模型: {chat_models["deepseek"].model_name}
+        模型: {chat_models["glm"].model_name}
 
         {response.content}
 
