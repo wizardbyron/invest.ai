@@ -67,7 +67,7 @@ def guide():
 
         以下是 {name} 上一周的枢轴点数据。计算起止时间为 {start_date} 至 {end_date}
 
-        {df_single.round(3).to_markdown()}
+        {df_single.round(3).to_markdown(index=False)}
 
         以下是 {name} 的均线数据：
 
@@ -118,10 +118,6 @@ def guide():
 
         更新日期: {today.strftime("%Y-%m-%d")}
 
-        ## 最近一个交易日的数据
-
-        {history_klines.iloc[-1]}
-
         ## 交易建议
 
         AI 模型: {chat_model.model_name}
@@ -129,6 +125,10 @@ def guide():
         {response.content}
 
         ## 参考
+
+        ### 最近一个交易日的数据
+
+        {history_klines.iloc[-1].to_markdown(index=False)}
 
         ### 提示词
 
