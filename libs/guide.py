@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 
 import pandas as pd
@@ -18,6 +19,8 @@ def guide():
     today_str = today.strftime("%Y%m%d")
     start_date = today - timedelta(days=100)
     start_date_str = start_date.strftime("%Y%m%d")
+    model = os.environ.get('MODEL', 'glm4')
+    chat_model = chat_models[model]
 
     df_input = pd.read_csv("input/selected.csv", dtype={"代码": str})
     df_output = df_input.copy()
@@ -42,7 +45,7 @@ def guide():
         else:  # 周末
             df = history_klines[-level:]
 
-        print(df)
+        # print(df)
 
         start_date = df["日期"].iloc[0]
         end_date = df["日期"].iloc[-1]
@@ -101,7 +104,7 @@ def guide():
             )
         ]
 
-        response = chat_models["glm"].invoke(messages)
+        response = chat_model.invoke(messages)
 
         output_md = f"""# {symbol} - {name}
 
@@ -109,7 +112,7 @@ def guide():
 
         ## 交易建议
 
-        模型: {chat_models["glm"].model_name}
+        模型: {chat_model.model_name}
 
         {response.content}
 

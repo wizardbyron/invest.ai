@@ -7,8 +7,8 @@ from langchain_openai.chat_models import ChatOpenAI
 load_dotenv()
 
 chat_models = {
-    "glm": ChatZhipuAI(
-        model="glm-4-plus",
+    "glm4": ChatZhipuAI(
+        model="glm-4-flash",
         temperature=0.01
     ),
     "deepseek": ChatOpenAI(
