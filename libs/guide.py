@@ -7,9 +7,9 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from libs.utils.chat_model import chat_models
 from libs.utils.data import fetch_klines
 from libs.utils.indicators import fibonacci, classic
+from libs.utils.tools import remove_leading_spaces
 
-disclaimer = "本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，\
-    投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。"
+disclaimer = """本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。"""
 
 
 def guide():
@@ -61,11 +61,11 @@ def guide():
         df_single = pd.DataFrame(item, index=row_index)
         df_single["中间值"] = (df_single["经典"] + df_single["斐波那契"])/2
 
-        prompt = f"""以下是 {name} 过去 50 日的交易数据：
+        prompt = f"""以下是 {name} 过去 30 个交易日的 K 线数据：
 
-        {history_klines[50:].to_markdown()}
+        {history_klines[-30:].to_markdown(index=False)}
 
-        以下是 {name} 上一周的枢轴点数据。
+        以下是 {name} 上一周的枢轴点数据。计算起止时间为 {start_date} 至 {end_date}
 
         {df_single.round(3).to_markdown()}
 
@@ -75,23 +75,31 @@ def guide():
         * 10 日均线: {history_klines["收盘"][-10:].mean():.3f}
         * 20 日均线: {history_klines["收盘"][-20:].mean():.3f}
         * 30 日均线: {history_klines["收盘"][-30:].mean():.3f}
-        * 60 日均线: {history_klines["收盘"][-60:].mean():.3f}
 
-        请根据以上数据给出股票交易建议，要求：
+        请根据以上数据给出股票交易建议，交易策略如下：
+
+        - 买入点在支撑位上
+        - 卖出点在阻力位上
+        - 如果当前价格下跌低于支撑位，则考虑下一个支撑位的价格，包括中间值
+        - 如果当前价格上涨高于阻力位，则考虑下一个阻力位的价格，包括中间值
+
+        输出要求如下：
 
         - 输出增持，减持，观望三者建议之一，并说明原因
         - 如果是增持或者减持，则需要给出交易价格
         - 不考虑预期波动率的影响
 
-        请按照如下的格式输出：
+        输出格式如下：
 
         ### 交易建议
 
         ### 交易价格
 
-        ### 原因分析
+        ### 交易分析
 
-        """.replace(" "*8, "")
+        """
+
+        prompt = remove_leading_spaces(prompt)
 
         print(prompt)
 
@@ -110,33 +118,29 @@ def guide():
 
         更新日期: {today.strftime("%Y-%m-%d")}
 
+        ## 最近一个交易日的数据
+
+        {history_klines.iloc[-1]}
+
         ## 交易建议
 
-        模型: {chat_model.model_name}
+        AI 模型: {chat_model.model_name}
 
         {response.content}
 
         ## 参考
 
-        ### 均线
+        ### 提示词
 
-        * 5 日均线: {history_klines["收盘"][-5:].mean():.3f}
-        * 10 日均线: {history_klines["收盘"][-10:].mean():.3f}
-        * 20 日均线: {history_klines["收盘"][-20:].mean():.3f}
-        * 30 日均线: {history_klines["收盘"][-30:].mean():.3f}
-        * 60 日均线: {history_klines["收盘"][-60:].mean():.3f}
-
-        ### 5日枢轴点
-
-        取值日期区间: {start_date} 至 {end_date}
-
-        {df_single.round(3).to_markdown()}
+        {prompt}
 
         ## 免责声明
 
         {disclaimer}
 
-        """.replace(" "*8, "")
+        """
+
+        output_md = remove_leading_spaces(output_md)
 
         file_path = f"docs/guide/{market}/{symbol}.md"
 

@@ -3,9 +3,9 @@ from langchain_core.messages import HumanMessage, SystemMessage
 import pandas as pd
 
 from libs.utils.chat_model import chat_models
+from libs.utils.tools import remove_leading_spaces
 
-disclaimer = '本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，\
-    投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。'
+disclaimer = "本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。"
 
 
 def create_portfolio():
@@ -21,7 +21,7 @@ def create_portfolio():
 
     prompt = f"""{docs}是我选择的股票。
 
-    请介绍每一只股票，并且帮我构建一份投资组合，要求如下：
+    帮我构建一份投资组合，要求如下：
 
     - 投资组合的股票数量为 {num} 个
     - 采用杠铃型配置，兼顾风险和收益
@@ -29,13 +29,16 @@ def create_portfolio():
 
     请以表格的方式输出投资组合，要求如下：
 
-    - 包括股票名称和代码
+    - 包括股票名称, 股票代码以及该股票的介绍
     - 股票在投资组合内的占比
     - 输出股票入选投资组合的原因
     - 交易频率或者再平衡周期建议
     - 根据投资组合风险等级的低中高顺序输出
 
-    最后输出未入选投资组合的股票以及未入选原因。"""
+    最后输出未入选投资组合的股票以及未入选原因。
+    """
+
+    prompt = remove_leading_spaces(prompt)
 
     print(prompt)
 
@@ -66,7 +69,9 @@ def create_portfolio():
         ## 免责声明
 
         {disclaimer}
-        """.replace(" "*8, "")
+        """
+
+        output_md = remove_leading_spaces(output_md)
 
         file_path = f"docs/portfolio/portfolio_cn_etf_{num}_{model}.md"
 
