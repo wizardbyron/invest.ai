@@ -11,6 +11,15 @@ from libs.utils.tools import remove_leading_spaces
 
 disclaimer = """本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。"""
 
+output_format_prompt = """输出格式如下：
+
+### 交易建议
+
+### 交易价格
+
+### 交易分析
+"""
+
 
 def guide():
 
@@ -88,15 +97,6 @@ def guide():
         - 输出增持，减持，观望三者建议之一，并说明原因
         - 如果是增持或者减持，则需要给出交易价格
         - 不考虑预期波动率的影响
-
-        输出格式如下：
-
-        ### 交易建议
-
-        ### 交易价格
-
-        ### 交易分析
-
         """
 
         prompt = remove_leading_spaces(prompt)
@@ -108,7 +108,7 @@ def guide():
                 content="你是一个专业的股票交易员，你可以根据股票的各项指标给出最佳交易建议。"
             ),
             HumanMessage(
-                content=prompt
+                content=prompt + output_format_prompt
             )
         ]
 
@@ -128,7 +128,7 @@ def guide():
 
         ### 最近一个交易日的数据
 
-        {history_klines.iloc[-1].to_markdown(index=False)}
+        {history_klines.iloc[-1].to_markdown()}
 
         ### 提示词
 
