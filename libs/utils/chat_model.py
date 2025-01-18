@@ -8,7 +8,7 @@ load_dotenv()
 
 chat_models = {
     "glm4": ChatZhipuAI(
-        model="glm-4-plus",
+        model="glm-4-flash",
         temperature=0.01
     ),
     "deepseek": ChatOpenAI(

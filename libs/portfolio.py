@@ -19,23 +19,30 @@ def create_portfolio():
 
     num = 10
 
-    prompt = f"""{docs}是我选择的股票。
+    prompt = f"""以下是一份用于构建投资组合的候选股票清单：
 
-    帮我构建一份投资组合，要求如下：
+    {docs}
+
+    从上述候选股票清单中帮我构建一份投资组合，要求如下：
 
     - 投资组合的股票数量为 {num} 个
     - 采用杠铃型配置，兼顾风险和收益
+    - 成长风格和价值风格各占一半
     - A股，美股和港股均衡配置
 
     请以表格的方式输出投资组合，要求如下：
 
-    - 包括股票名称, 股票代码以及该股票的介绍
+    - 包括股票名称, 股票代码
+    - 股票是成长型风格还是价值型风格
     - 股票在投资组合内的占比
     - 输出股票入选投资组合的原因
     - 交易频率或者再平衡周期建议
     - 根据投资组合风险等级的低中高顺序输出
 
     最后输出未入选投资组合的股票以及未入选原因。
+
+    如果上述要求超出你能力范围，请列出超出你能力范围的要求。
+    如果上述内容有表述不清楚的地方，请列出需要进一步精确表述的内容。
     """
 
     prompt = remove_leading_spaces(prompt)
@@ -54,7 +61,7 @@ def create_portfolio():
     for model in chat_models.keys():
         response = chat_models[model].invoke(messages)
 
-        output_md = f"""# A股{num}ETF投资组合 - {model}
+        output_md = f"""# A股ETF投资组合(10) - {model}
 
         模型: {chat_models[model].model_name}
 
