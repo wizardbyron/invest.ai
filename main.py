@@ -1,6 +1,6 @@
 import fire
 
-# from libs.backtest import ba
+from libs.backtest import backtest
 from libs.guide import guide
 from libs.portfolio import create_portfolio
 
@@ -11,8 +11,8 @@ def main_hello(program):
             create_portfolio()
         elif program == 'guide':
             guide()
-        # elif program == 'backtest':
-        #     backtest()
+        elif program == 'backtest':
+            backtest()
 
 
 if __name__ == "__main__":

@@ -1,11 +1,10 @@
+from datetime import datetime
 from langchain_community.document_loaders import DataFrameLoader
 from langchain_core.messages import HumanMessage, SystemMessage
 import pandas as pd
 
 from libs.utils.chat_model import chat_models
-from libs.utils.tools import remove_leading_spaces
-
-disclaimer = "本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。"
+from libs.utils.tools import remove_leading_spaces, DISCLIAMER
 
 
 def create_portfolio():
@@ -27,22 +26,19 @@ def create_portfolio():
 
     - 投资组合的股票数量为 {num} 个
     - 采用杠铃型配置，兼顾风险和收益
-    - 成长风格和价值风格各占一半
-    - A股，美股和港股均衡配置
+    - A股，美股和港股占比均衡
 
     请以表格的方式输出投资组合，要求如下：
 
     - 包括股票名称, 股票代码
-    - 股票是成长型风格还是价值型风格
     - 股票在投资组合内的占比
     - 输出股票入选投资组合的原因
     - 交易频率或者再平衡周期建议
     - 根据投资组合风险等级的低中高顺序输出
+    - 输出未入选投资组合的股票以及未入选原因。
 
-    最后输出未入选投资组合的股票以及未入选原因。
-
-    如果上述要求超出你能力范围，请列出超出你能力范围的要求。
-    如果上述内容有表述不清楚的地方，请列出需要进一步精确表述的内容。
+    如果上述要求超出你能力范围，请列出超出你能力范围的要求。如果没有则不用列出。
+    如果上述内容有表述不清楚的地方，请列出需要进一步精确表述的内容。如果没有则不用列出。
     """
 
     prompt = remove_leading_spaces(prompt)
@@ -61,7 +57,9 @@ def create_portfolio():
     for model in chat_models.keys():
         response = chat_models[model].invoke(messages)
 
-        output_md = f"""# A股ETF投资组合(10) - {model}
+        output_md = f"""# A股ETF投资组合 - {model}
+
+        更新时间: {datetime.now().replace(microsecond=0)}
 
         模型: {chat_models[model].model_name}
 
@@ -75,7 +73,7 @@ def create_portfolio():
 
         ## 免责声明
 
-        {disclaimer}
+        {DISCLIAMER}
         """
 
         output_md = remove_leading_spaces(output_md)

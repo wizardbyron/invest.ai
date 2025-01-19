@@ -7,18 +7,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from libs.utils.chat_model import chat_models
 from libs.utils.data import fetch_klines
 from libs.utils.indicators import fibonacci, classic
-from libs.utils.tools import remove_leading_spaces
-
-disclaimer = """本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。"""
-
-output_format_prompt = """输出格式如下：
-
-### 交易建议
-
-### 交易价格
-
-### 交易分析
-"""
+from libs.utils.tools import remove_leading_spaces, DISCLIAMER
 
 
 def guide():
@@ -28,8 +17,8 @@ def guide():
     today_str = today.strftime("%Y%m%d")
     start_date = today - timedelta(days=100)
     start_date_str = start_date.strftime("%Y%m%d")
-    model = os.environ.get('MODEL', 'glm4')
-    chat_model = chat_models[model]
+    llm_service = os.environ.get('LLM_SERVICE', 'glm4')
+    chat_model = chat_models[llm_service]
 
     df_input = pd.read_csv("input/selected.csv", dtype={"代码": str})
     df_output = df_input.copy()
@@ -76,7 +65,7 @@ def guide():
 
         以下是 {name} 上一周的枢轴点数据。计算起止时间为 {start_date} 至 {end_date}
 
-        {df_single.round(3).to_markdown(index=False)}
+        {df_single.round(3).to_markdown()}
 
         以下是 {name} 的均线数据：
 
@@ -97,6 +86,14 @@ def guide():
         - 输出增持，减持，观望三者建议之一，并说明原因
         - 如果是增持或者减持，则需要给出交易价格
         - 不考虑预期波动率的影响
+
+        输出格式如下：
+
+        ### 交易建议
+
+        ### 交易价格
+
+        ### 交易分析
         """
 
         prompt = remove_leading_spaces(prompt)
@@ -108,7 +105,7 @@ def guide():
                 content="你是一个专业的股票交易员，你可以根据股票的各项指标给出最佳交易建议。"
             ),
             HumanMessage(
-                content=prompt + output_format_prompt
+                content=prompt
             )
         ]
 
@@ -116,7 +113,7 @@ def guide():
 
         output_md = f"""# {symbol} - {name}
 
-        更新日期: {today.strftime("%Y-%m-%d")}
+        更新时间: {datetime.now().replace(microsecond=0)}
 
         ## 交易建议
 
@@ -126,17 +123,13 @@ def guide():
 
         ## 参考
 
-        ### 最近一个交易日的数据
-
-        {history_klines.iloc[-1].to_markdown()}
-
         ### 提示词
 
         {prompt}
 
         ## 免责声明
 
-        {disclaimer}
+        {DISCLIAMER}
 
         """
 

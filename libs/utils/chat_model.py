@@ -8,7 +8,7 @@ load_dotenv()
 
 chat_models = {
     "glm4": ChatZhipuAI(
-        model="glm-4-flash",
+        model=os.environ.get("MODEL", "glm-4-flash"),
         temperature=0.01
     ),
     "deepseek": ChatOpenAI(
@@ -18,7 +18,7 @@ chat_models = {
         base_url="https://api.deepseek.com"
     ),
     "moonshot": ChatOpenAI(
-        model="moonshot-v1-8k",
+        model="moonshot-v1-128k",
         api_key=os.environ.get("MOONSHOT_API_KEY"),
         temperature=0.01,
         base_url="https://api.moonshot.cn/v1"

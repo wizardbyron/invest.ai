@@ -4,10 +4,7 @@ import akshare as ak
 import pandas as pd
 
 from libs.utils.indicators import fibonacci, classic
-from libs.utils.data import fetch_kline
-
-disclaimer = '本站用于实验目的，不构成任何投资建议，也不作为任何法律法规、监管政策的依据，\
-    投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。'
+from libs.utils.data import fetch_klines
 
 
 def commision(turnover: float) -> float:
@@ -68,96 +65,97 @@ def trade_orders(daily_data):
     return df_trade_orders
 
 
-today = datetime.today()
-today_str = today.strftime('%Y%m%d')
-start_date = '20200101'
-end_date = today_str
+def backtest():
+    today = datetime.today()
+    today_str = today.strftime('%Y%m%d')
+    start_date = '20200101'
+    end_date = today_str
 
-us_symbol_dict = ak.stock_us_spot_em()
-df_input = pd.read_csv('input/backtest.csv', dtype={'代码': str})
-df_output = df_input.copy()
+    us_symbol_dict = ak.stock_us_spot_em()
+    df_input = pd.read_csv('input/backtest.csv', dtype={'代码': str})
+    df_output = df_input.copy()
 
-for idx, row in df_input.iterrows():
-    # print(row)
+    for idx, row in df_input.iterrows():
+        # print(row)
 
-    type = row['类型']
-    symbol = row['代码']
-    name = row['名称']
-    market, daily_data = fetch_kline(
-        type=type,
-        symbol=symbol,
-        start_date=start_date,
-        end_date=end_date,
-        adjust_flag='qfq')
+        type = row['类型']
+        symbol = row['代码']
+        name = row['名称']
+        market, daily_data = fetch_klines(
+            type=type,
+            symbol=symbol,
+            start_date=start_date,
+            end_date=end_date,
+            adjust_flag='qfq')
 
-    if market == None:
-        continue
+        if market == None:
+            continue
 
-    df_trade_orders = trade_orders(daily_data)
-    df_trade_orders.to_csv(f'output/{name}_orders.csv', index=False)
+        df_trade_orders = trade_orders(daily_data)
+        df_trade_orders.to_csv(f'output/{name}_orders.csv', index=False)
 
-    init = 100000
-    trade_unit = 10000
-    hold = 0
-    balance = init
-    trade_times = 0
-    df_trade_roi = df_trade_orders.copy()
+        init = 100000
+        trade_unit = 10000
+        hold = 0
+        balance = init
+        trade_times = 0
+        df_trade_roi = df_trade_orders.copy()
 
-    for index, row in df_trade_orders.iterrows():
-        type = row['方向']
-        price = row['价格']
+        for index, row in df_trade_orders.iterrows():
+            type = row['方向']
+            price = row['价格']
 
-        if type == 'BUY' and trade_unit * price < balance:
-            hold += trade_unit
-            balance -= trade_unit * price
-            fee = commision(trade_unit * price)
-            balance -= fee
-            df_trade_roi.loc[index, '交易数量'] = trade_unit
-            df_trade_roi.loc[index, '持有数量'] = hold
-            df_trade_roi.loc[index, '成交额'] = -trade_unit * price
-            df_trade_roi.loc[index, '手续费'] = fee
-            df_trade_roi.loc[index, '余额'] = balance
-            trade_times += 1
+            if type == 'BUY' and trade_unit * price < balance:
+                hold += trade_unit
+                balance -= trade_unit * price
+                fee = commision(trade_unit * price)
+                balance -= fee
+                df_trade_roi.loc[index, '交易数量'] = trade_unit
+                df_trade_roi.loc[index, '持有数量'] = hold
+                df_trade_roi.loc[index, '成交额'] = -trade_unit * price
+                df_trade_roi.loc[index, '手续费'] = fee
+                df_trade_roi.loc[index, '余额'] = balance
+                trade_times += 1
 
-        if type == 'SELL' and hold > 0:
-            hold -= trade_unit
-            balance += trade_unit * price
-            fee = commision(trade_unit * price)
-            balance -= fee
-            df_trade_roi.loc[index, '交易数量'] = -trade_unit
-            df_trade_roi.loc[index, '持有数量'] = hold
-            df_trade_roi.loc[index, '成交额'] = trade_unit * price
-            df_trade_roi.loc[index, '手续费'] = fee
-            df_trade_roi.loc[index, '余额'] = balance
-            trade_times += 1
+            if type == 'SELL' and hold > 0:
+                hold -= trade_unit
+                balance += trade_unit * price
+                fee = commision(trade_unit * price)
+                balance -= fee
+                df_trade_roi.loc[index, '交易数量'] = -trade_unit
+                df_trade_roi.loc[index, '持有数量'] = hold
+                df_trade_roi.loc[index, '成交额'] = trade_unit * price
+                df_trade_roi.loc[index, '手续费'] = fee
+                df_trade_roi.loc[index, '余额'] = balance
+                trade_times += 1
 
-    df_trade_roi = df_trade_roi.round(2)
-    df_trade_roi = df_trade_roi[df_trade_roi['成交额'].abs() > 0.0]
-    df_trade_roi.to_csv(f'output/{name}_trade.csv', index=False)
+        df_trade_roi = df_trade_roi.round(2)
+        df_trade_roi = df_trade_roi[df_trade_roi['成交额'].abs() > 0.0]
+        df_trade_roi.to_csv(f'output/{name}_trade.csv', index=False)
 
-    df_output.loc[idx, '账户余额'] = balance
-    df_output.loc[idx, '持仓数量'] = hold
-    df_output.loc[idx, '起始价格'] = daily_data['收盘'].iloc[0]
-    df_output.loc[idx, '最新价格'] = daily_data['收盘'].iloc[-1]
-    df_output.loc[idx, '持仓市值'] = daily_data['收盘'].iloc[-1] * hold
-    df_output.loc[idx, '合计'] = daily_data['收盘'].iloc[-1] * hold + balance
-    trade_roi = (daily_data['收盘'].iloc[-1] * hold + balance - init)/init
-    df_output.loc[idx, '交易收益率'] = trade_roi
+        df_output.loc[idx, '账户余额'] = balance
+        df_output.loc[idx, '持仓数量'] = hold
+        df_output.loc[idx, '起始价格'] = daily_data['收盘'].iloc[0]
+        df_output.loc[idx, '最新价格'] = daily_data['收盘'].iloc[-1]
+        df_output.loc[idx, '持仓市值'] = daily_data['收盘'].iloc[-1] * hold
+        df_output.loc[idx, '合计'] = daily_data['收盘'].iloc[-1] * hold + balance
+        trade_roi = (daily_data['收盘'].iloc[-1] * hold + balance - init)/init
+        df_output.loc[idx, '交易收益率'] = trade_roi
 
-    start_close = daily_data['收盘'].iloc[0]
-    end_close = daily_data['收盘'].iloc[-1]
-    non_trade_roi = (end_close - start_close) / start_close
+        start_close = daily_data['收盘'].iloc[0]
+        end_close = daily_data['收盘'].iloc[-1]
+        non_trade_roi = (end_close - start_close) / start_close
 
-    df_output.loc[idx, '自然收益率'] = non_trade_roi
-    df_output.loc[idx, '超额收益率'] = trade_roi - non_trade_roi
-    df_output.loc[idx, '交易次数'] = trade_times
+        df_output.loc[idx, '自然收益率'] = non_trade_roi
+        df_output.loc[idx, '超额收益率'] = trade_roi - non_trade_roi
+        df_output.loc[idx, '交易次数'] = trade_times
 
-df_output = df_output.round(3)
-df_output = df_output.sort_values(by='超额收益率', ascending=False)
+    df_output = df_output.round(3)
+    df_output = df_output.sort_values(by='超额收益率', ascending=False)
 
-df_output['交易收益率'] = df_output['交易收益率'].apply(lambda x: "{:.2%}".format(x))
-df_output['自然收益率'] = df_output['自然收益率'].apply(lambda x: "{:.2%}".format(x))
-df_output['超额收益率'] = df_output['超额收益率'].apply(lambda x: "{:.2%}".format(x))
+    df_output['交易收益率'] = df_output['交易收益率'].apply(lambda x: "{:.2%}".format(x))
+    df_output['自然收益率'] = df_output['自然收益率'].apply(lambda x: "{:.2%}".format(x))
+    df_output['超额收益率'] = df_output['超额收益率'].apply(lambda x: "{:.2%}".format(x))
 
-print(df_output)
-df_output.to_csv(f'output/backtest_roi_{start_date}.csv', index=False)
+    print(df_output)
+    df_output.to_csv(f'output/backtest_roi_{start_date}.csv', index=False)
