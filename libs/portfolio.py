@@ -1,10 +1,14 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from langchain_community.document_loaders import DataFrameLoader
 from langchain_core.messages import HumanMessage, SystemMessage
 import pandas as pd
 
 from libs.utils.chat_model import chat_models
 from libs.utils.tools import remove_leading_spaces, DISCLIAMER
+
+timezone = ZoneInfo('Asia/Shanghai')
 
 
 def create_portfolio():
@@ -59,7 +63,7 @@ def create_portfolio():
 
         output_md = f"""# A股ETF投资组合 - {model}
 
-        更新时间: {datetime.now().replace(microsecond=0)}
+        更新时间: {datetime.now(timezone).replace(microsecond=0)}
 
         模型: {chat_models[model].model_name}
 

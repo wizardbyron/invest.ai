@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -8,6 +9,8 @@ from libs.utils.chat_model import chat_models
 from libs.utils.data import fetch_klines
 from libs.utils.indicators import fibonacci, classic
 from libs.utils.tools import remove_leading_spaces, DISCLIAMER
+
+timezone = ZoneInfo('Asia/Shanghai')
 
 
 def guide():
@@ -113,7 +116,7 @@ def guide():
 
         output_md = f"""# {symbol} - {name}
 
-        更新时间: {datetime.now().replace(microsecond=0)}
+        更新时间: {datetime.now(timezone).replace(microsecond=0)}
 
         ## 交易建议
 
