@@ -101,7 +101,7 @@ def guide():
 
         prompt = remove_leading_spaces(prompt)
 
-        print(prompt)
+        # print(prompt)
 
         messages = [
             SystemMessage(
