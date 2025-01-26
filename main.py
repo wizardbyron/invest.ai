@@ -1,26 +1,37 @@
+from datetime import datetime, timedelta
 import time
 
 import fire
 
-from libs.backtest import backtest
-from libs.guide import guide
+from libs.backtest import run_backtest
+from libs.guide import create_guide
 from libs.portfolio import create_portfolio
 
 
-def main_hello(program):
-    start_time = time.time()
+today = datetime.today()
+today_str = today.strftime('%Y%m%d')
+same_day_last_year = today - timedelta(days=365)
+same_day_last_year_str = same_day_last_year.strftime('%Y%m%d')
 
-    if program:
-        if program == 'portfolio':
-            create_portfolio()
-        elif program == 'guide':
-            guide()
-        elif program == 'backtest':
-            backtest()
-    end_time = time.time()
-    duration = end_time - start_time
-    print(f"[生成结果用时：{duration:.2f}秒]")
+
+def portfolio(num=10):
+    print(f'投资组合数量: {num}\n')
+    create_portfolio(num)
+
+
+def guide(level=5):
+    print(f'枢轴点级别: {level}\n')
+    create_guide(level)
+
+
+def backtest(start_date=same_day_last_year_str, end_date=today_str):
+    print(f'回测日期: {start_date} 至 {end_date}\n')
+    run_backtest(start_date, end_date)
 
 
 if __name__ == "__main__":
-    fire.Fire(main_hello)
+    start_time = time.time()
+    fire.Fire()
+    end_time = time.time()
+    duration = end_time - start_time
+    print(f"[生成结果用时：{duration:.2f}秒]")

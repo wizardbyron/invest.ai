@@ -1,7 +1,7 @@
 from datetime import datetime
 
-import akshare as ak
 import pandas as pd
+from pandas import DataFrame
 
 from libs.utils.indicators import fibonacci, classic
 from libs.utils.data import fetch_klines
@@ -14,7 +14,10 @@ def commision(turnover: float) -> float:
         return turnover * 0.0003
 
 
-def trade_orders(daily_data):
+def trade_orders(daily_data: DataFrame,
+                 type: str,
+                 buy_point: int,
+                 sell_point: int) -> DataFrame:
     df_trade_orders = pd.DataFrame(columns=['日期', '方向', '价格'])
     buy_price = 0.0
     sell_price = 0.0
@@ -36,13 +39,13 @@ def trade_orders(daily_data):
                 low = df['最低'].min()
                 close = df['收盘'].iloc[-1]
 
-                c_points = classic(high, low, close)
-                f_points = fibonacci(high, low, close)
+                points = {
+                    '经典': classic(high, low, close),
+                    '斐波那契': fibonacci(high, low, close)
+                }
 
-                # buy_price = (c_points['支撑位3'] + f_points['支撑位3'])/2
-                # sell_price = (c_points['阻力位3'] + f_points['阻力位3'])/2
-                buy_price = f_points['支撑位2']
-                sell_price = f_points['阻力位2']
+                buy_price = points[type][f'支撑位{buy_point}']
+                sell_price = points[type][f'阻力位{sell_point}']
 
         if row['最低'] <= buy_price and buy_price <= row['最高']:
             order = {
@@ -65,13 +68,7 @@ def trade_orders(daily_data):
     return df_trade_orders
 
 
-def backtest():
-    today = datetime.today()
-    today_str = today.strftime('%Y%m%d')
-    start_date = '20200101'
-    end_date = today_str
-
-    us_symbol_dict = ak.stock_us_spot_em()
+def run_backtest(start_date_str: str, end_date_str: str) -> None:
     df_input = pd.read_csv('input/backtest.csv', dtype={'代码': str})
     df_output = df_input.copy()
 
@@ -80,19 +77,19 @@ def backtest():
 
         type = row['类型']
         symbol = row['代码']
-        name = row['名称']
         market, daily_data = fetch_klines(
             type=type,
             symbol=symbol,
-            start_date=start_date,
-            end_date=end_date,
-            adjust_flag='qfq')
+            start_date=start_date_str,
+            end_date=end_date_str,
+            adjust_flag='hfq')
 
         if market == None:
             continue
 
-        df_trade_orders = trade_orders(daily_data)
-        df_trade_orders.to_csv(f'output/{name}_orders.csv', index=False)
+        df_trade_orders = trade_orders(daily_data, '经典', 2, 3)
+        # df_trade_orders = trade_orders(daily_data, '斐波那契', 2, 3)
+        df_trade_orders.to_csv(f'output/{symbol}_orders.csv', index=False)
 
         init = 100000
         trade_unit = 10000
@@ -130,8 +127,11 @@ def backtest():
                 trade_times += 1
 
         df_trade_roi = df_trade_roi.round(2)
-        df_trade_roi = df_trade_roi[df_trade_roi['成交额'].abs() > 0.0]
-        df_trade_roi.to_csv(f'output/{name}_trade.csv', index=False)
+        if '成交额' in df_trade_roi.columns:
+            df_trade_roi = df_trade_roi[df_trade_roi['成交额'].abs() > 0.0]
+        else:
+            continue
+        df_trade_roi.to_csv(f'output/{symbol}_trade.csv', index=False)
 
         df_output.loc[idx, '账户余额'] = balance
         df_output.loc[idx, '持仓数量'] = hold
@@ -153,9 +153,19 @@ def backtest():
     df_output = df_output.round(3)
     df_output = df_output.sort_values(by='超额收益率', ascending=False)
 
+    sum_init = len(df_input) * 100000
+    sum_value = df_output['合计'].sum()
+    sum_roi = (sum_value - sum_init)/sum_init
+
+    win_count = (df_output['超额收益率'] > 0).sum()
+
     df_output['交易收益率'] = df_output['交易收益率'].apply(lambda x: "{:.2%}".format(x))
     df_output['自然收益率'] = df_output['自然收益率'].apply(lambda x: "{:.2%}".format(x))
     df_output['超额收益率'] = df_output['超额收益率'].apply(lambda x: "{:.2%}".format(x))
 
     print(df_output)
-    df_output.to_csv(f'output/backtest_roi_{start_date}.csv', index=False)
+    print(f'总体组合收益率:{sum_roi:.2%}')
+
+    print(f'总体胜率:{win_count/len(df_output):.2%}')
+    roi_file_name = f'output/backtest_{start_date_str}_{end_date_str}.csv'
+    df_output.to_csv(roi_file_name, index=False)

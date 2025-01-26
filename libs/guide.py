@@ -13,9 +13,8 @@ from libs.utils.tools import remove_leading_spaces, DISCLIAMER
 timezone = ZoneInfo('Asia/Shanghai')
 
 
-def guide():
+def create_guide(level: int):
 
-    level = 5
     today = datetime.today()
     today_str = today.strftime("%Y%m%d")
     start_date = today - timedelta(days=100)

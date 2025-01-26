@@ -11,7 +11,7 @@ from libs.utils.tools import remove_leading_spaces, DISCLIAMER
 timezone = ZoneInfo('Asia/Shanghai')
 
 
-def create_portfolio():
+def create_portfolio(num: int):
     df = pd.read_csv("input/selected.csv", dtype={'代码': str})
 
     etf_cn = df[df["类型"] == "A股ETF"]
@@ -19,8 +19,6 @@ def create_portfolio():
     loader = DataFrameLoader(etf_cn, page_content_column="名称")
 
     docs = loader.load()
-
-    num = 10
 
     prompt = f"""以下是一份用于构建投资组合的候选股票清单：
 
