@@ -33,17 +33,19 @@ def create_guide(level: int):
         market, history_klines = fetch_klines(
             type=type,
             symbol=symbol,
+            period='weekly',
             start_date=start_date_str,
             end_date=today_str)
 
         # 获取上周的交易数据
-        if today.weekday() < 5 and today.weekday() > 0:  # 交易日
-            off_day = today.weekday()
-            if history_klines["日期"].iloc[-1] == today.strftime("%Y-%m-%d"):
-                off_day += 1  # 当天收盘后，去掉当天数据
-            df = history_klines[-level-off_day:-off_day]
-        else:  # 周末
-            df = history_klines[-level:]
+        df = history_klines[-1:]
+        # if today.weekday() < 5 and today.weekday() > 0:  # 交易日
+        #     off_day = today.weekday()
+        #     if history_klines["日期"].iloc[-1] == today.strftime("%Y-%m-%d"):
+        #         off_day += 1  # 当天收盘后，去掉当天数据
+        #     df = history_klines[-level-off_day:-off_day]
+        # else:  # 周末
+        #     df = history_klines[-level:]
 
         # print(df)
 
