@@ -19,7 +19,7 @@ def create_guide(level: int):
     today_str = today.strftime("%Y%m%d")
     start_date = today - timedelta(days=100)
     start_date_str = start_date.strftime("%Y%m%d")
-    llm_service = os.environ.get('LLM_SERVICE', 'glm4')
+    llm_service = os.environ.get('LLM_SERVICE', 'zhipuai')
     chat_model = chat_models[llm_service]
 
     df_input = pd.read_csv("input/selected.csv", dtype={"代码": str})

@@ -1,15 +1,14 @@
 import akshare as ak
 
 
-def fetch_klines(type: str, symbol: str, start_date: str = '', end_date: str = '',  adjust_flag: str = ''):
-    us_symbol_dict = ak.stock_us_spot_em()
+def fetch_klines(type: str, symbol: str, period: str = 'daily', start_date: str = '', end_date: str = '',  adjust_flag: str = ''):
     if type == 'A股':
         # https://akshare.akfamily.xyz/data/stock/stock.html#id21
         history_klines = ak.stock_zh_a_hist(
             symbol=symbol,
             start_date=start_date,
             end_date=end_date,
-            period='daily',
+            period=period,
             adjust=adjust_flag)
         market = 'cn'
     elif type == 'A股ETF':
@@ -18,7 +17,7 @@ def fetch_klines(type: str, symbol: str, start_date: str = '', end_date: str = '
             symbol=symbol,
             start_date=start_date,
             end_date=end_date,
-            period='daily',
+            period=period,
             adjust=adjust_flag)
         market = 'cn'
     elif type == '港股':
@@ -27,10 +26,11 @@ def fetch_klines(type: str, symbol: str, start_date: str = '', end_date: str = '
             symbol=symbol,
             start_date=start_date,
             end_date=end_date,
-            period='daily',
+            period=period,
             adjust=adjust_flag)
         market = 'hk'
     elif type == '美股':
+        us_symbol_dict = ak.stock_us_spot_em()
         stock = us_symbol_dict[us_symbol_dict["代码"].str.endswith(f'.{symbol}')]
         code = stock['代码'].values[0]
         # https://akshare.akfamily.xyz/data/stock/stock.html#id56
@@ -38,7 +38,7 @@ def fetch_klines(type: str, symbol: str, start_date: str = '', end_date: str = '
             symbol=code,
             start_date=start_date,
             end_date=end_date,
-            period='daily',
+            period=period,
             adjust=adjust_flag)
         market = 'us'
     else:
