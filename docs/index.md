@@ -1,10 +1,18 @@
 # Invest.AI
 
-Invest.AI 是一个基于大语言模型（LLM）的量化投资研究项目。参考的样本包括中国A股、港股、美股市场上的股票和 ETF 基金。
+Invest.AI 是一个基于大语言模型（LLM）的量化投资研究项目。
 
 ## 参考
 
-- [TradExpert: Revolutionizing Trading with Mixture of Expert LLMs](https://doi.org/10.48550/arXiv.2411.00782)
+Github:
+
+- [AI 投资系统](https://github.com/24mlight/A_Share_investment_Agent)
+
+Papers:
+
+- [TradExpert: Revolutionizing Trading with Mixture of Expert LLMs](https://arxiv.org/abs/2411.00782)
+- [Learning to Generate Explainable Stock Predictions using Self-Reflective Large Language Models](https://arxiv.org/abs/2402.03659)
+-
 
 ## 免责声明
 

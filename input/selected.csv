@@ -6,8 +6,10 @@ A股ETF,510500,中证500ETF
 A股ETF,510880,红利ETF
 A股ETF,511260,十年国债ETF
 A股ETF,512480,半导体ETF
+A股ETF,512890,红利低波ETF
 A股ETF,513050,中概互联网ETF
-A股ETF,513300,纳斯达克ETF
+A股ETF,513100,国泰纳指ETF
+A股ETF,513300,华夏纳斯达克ETF
 A股ETF,513500,标普500ETF
 A股ETF,513820,港股红利ETF
 A股ETF,513880,日经225ETF
@@ -18,14 +20,12 @@ A股ETF,515220,煤炭ETF
 A股ETF,516000,数据ETF
 A股ETF,516010,游戏ETF
 A股ETF,560350,中证A50ETF
-A股ETF,563300,中证2000ETF
 A股ETF,588000,科创50ETF
 A股,600036,招商银行
 A股,600900,长江电力
 A股,601127,赛力斯
 A股,300750,宁德时代
 A股,000333,美的集团
-港股,00386,中国石油化工股份
 港股,00700,腾讯控股
 港股,01810,小米集团-W
 港股,03690,美团-W
@@ -40,7 +40,6 @@ A股,000333,美的集团
 美股,JEPI,JPMorgan Equity Premium Income ETF
 美股,JEPQ,JPMorgan Nasdaq Equity Premium Income ETF
 美股,YMAG,YieldMax Magnificent 7 Fund of Option Income ETFs
-美股,OARK,YieldMax ARKK Option Income Strategy ETF
 美股,CWEB,Direxion Daily CSI China Internet Bull 2X Shares
 美股,CHAU,Direxion Daily CSI 300 China A Share Bull 2X Shares
 美股,YINN,Direxion Daily FTSE China Bull 3X Shares
