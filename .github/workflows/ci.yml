@@ -25,6 +25,7 @@ jobs:
       - run: python main.py guide
         env:
           LLM_SERVICE: ${{ vars.LLM_SERVICE }}
+          MODEL: ${{ vars.MODEL }}
           ZHIPUAI_API_KEY: ${{ secrets.ZHIPUAI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
       - uses: actions/cache@v4
