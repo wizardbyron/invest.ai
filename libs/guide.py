@@ -14,7 +14,7 @@ timezone = ZoneInfo('Asia/Shanghai')
 
 
 def create_guide(level: int):
-
+    now = datetime.now(timezone).replace(microsecond=0).replace(tzinfo=None)
     today = datetime.today()
     today_str = today.strftime("%Y%m%d")
     start_date = today - timedelta(days=100)
@@ -30,24 +30,23 @@ def create_guide(level: int):
         type = row["类型"]
         symbol = row["代码"]
         name = row["名称"]
-        market, history_klines = fetch_klines(
+        market, df_weekly = fetch_klines(
             type=type,
             symbol=symbol,
             period='weekly',
             start_date=start_date_str,
             end_date=today_str)
 
+        market, df_daily = fetch_klines(
+            type=type,
+            symbol=symbol,
+            period='daily',
+            start_date=start_date_str,
+            end_date=today_str)
         # 获取上周的交易数据
-        df = history_klines[-1:]
-        # if today.weekday() < 5 and today.weekday() > 0:  # 交易日
-        #     off_day = today.weekday()
-        #     if history_klines["日期"].iloc[-1] == today.strftime("%Y-%m-%d"):
-        #         off_day += 1  # 当天收盘后，去掉当天数据
-        #     df = history_klines[-level-off_day:-off_day]
-        # else:  # 周末
-        #     df = history_klines[-level:]
+        df = df_weekly[-2:-1]
 
-        # print(df)
+        print(df)
 
         start_date = df["日期"].iloc[0]
         end_date = df["日期"].iloc[-1]
@@ -139,20 +138,20 @@ def create_guide(level: int):
 
         output_md = f"""# {symbol} - {name}
 
-        更新时间: {datetime.now(timezone).replace(microsecond=0)}
+        更新时间: {now}
 
         ## 交易参考
 
-        ### 周线枢轴点
+        ### 周线枢轴点 ({end_date})
 
-        {df_single.round(3).to_markdown()}
+        {df_single.round(2).to_markdown()}
 
         ### 均线
 
-        * 5 日均线: {history_klines["收盘"][-5:].mean():.3f}
-        * 10 日均线: {history_klines["收盘"][-10:].mean():.3f}
-        * 20 日均线: {history_klines["收盘"][-20:].mean():.3f}
-        * 30 日均线: {history_klines["收盘"][-30:].mean():.3f}
+        * 5 日均线: {df_daily["收盘"][-5:].mean():.2f}
+        * 10 日均线: {df_daily["收盘"][-10:].mean():.2f}
+        * 20 日均线: {df_daily["收盘"][-20:].mean():.2f}
+        * 30 日均线: {df_daily["收盘"][-30:].mean():.2f}
 
         ## 免责声明
 
