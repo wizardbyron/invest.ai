@@ -1,12 +1,9 @@
-import os
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 import pandas as pd
-from langchain_core.messages import HumanMessage, SystemMessage
 
-from libs.utils.chat_model import chat_models
-from libs.utils.data import fetch_klines
+from libs.utils.data import history_klines
 from libs.utils.indicators import fibonacci, classic
 from libs.utils.tools import remove_leading_spaces, DISCLIAMER
 
@@ -19,8 +16,6 @@ def create_guide(level: int):
     today_str = today.strftime("%Y%m%d")
     start_date = today - timedelta(days=100)
     start_date_str = start_date.strftime("%Y%m%d")
-    # llm_service = os.environ.get('LLM_SERVICE', 'zhipuai')
-    # chat_model = chat_models[llm_service]
 
     df_input = pd.read_csv("input/selected.csv", dtype={"代码": str})
     df_output = df_input.copy()
@@ -30,14 +25,14 @@ def create_guide(level: int):
         type = row["类型"]
         symbol = row["代码"]
         name = row["名称"]
-        market, df_weekly = fetch_klines(
+        market, df_weekly = history_klines(
             type=type,
             symbol=symbol,
             period='weekly',
             start_date=start_date_str,
             end_date=today_str)
 
-        market, df_daily = fetch_klines(
+        market, df_daily = history_klines(
             type=type,
             symbol=symbol,
             period='daily',
@@ -61,80 +56,6 @@ def create_guide(level: int):
         row_index = c_points.keys()
         df_single = pd.DataFrame(item, index=row_index)
         df_single["中间值"] = (df_single["经典"] + df_single["斐波那契"])/2
-
-        # prompt = f"""以下是 {name} 过去 30 个交易日的 K 线数据：
-
-        # {history_klines[-30:].to_markdown(index=False)}
-
-        # 以下是 {name} 上一周的枢轴点数据。计算起止时间为 {start_date} 至 {end_date}
-
-        # {df_single.round(3).to_markdown()}
-
-        # 以下是 {name} 的均线数据：
-
-        # * 5 日均线: {history_klines["收盘"][-5:].mean():.3f}
-        # * 10 日均线: {history_klines["收盘"][-10:].mean():.3f}
-        # * 20 日均线: {history_klines["收盘"][-20:].mean():.3f}
-        # * 30 日均线: {history_klines["收盘"][-30:].mean():.3f}
-
-        # 请根据以上数据给出股票交易建议，交易策略如下：
-
-        # - 买入点在支撑位上
-        # - 卖出点在阻力位上
-        # - 如果当前价格下跌低于支撑位，则考虑下一个支撑位的价格，包括中间值
-        # - 如果当前价格上涨高于阻力位，则考虑下一个阻力位的价格，包括中间值
-
-        # 输出要求如下：
-
-        # - 输出增持，减持，观望三者建议之一，并说明原因
-        # - 如果是增持或者减持，则需要给出交易价格
-        # - 不考虑预期波动率的影响
-
-        # 输出格式如下：
-
-        # ### 交易建议
-
-        # ### 交易价格
-
-        # ### 交易分析
-        # """
-
-        # prompt = remove_leading_spaces(prompt)
-
-        # # print(prompt)
-
-        # messages = [
-        #     SystemMessage(
-        #         content="你是一个专业的股票交易员，你可以根据股票的各项指标给出最佳交易建议。"
-        #     ),
-        #     HumanMessage(
-        #         content=prompt
-        #     )
-        # ]
-
-        # response = chat_model.invoke(messages)
-
-        # output_md = f"""# {symbol} - {name}
-
-        # 更新时间: {datetime.now(timezone).replace(microsecond=0)}
-
-        # ## 交易建议
-
-        # AI 模型: {chat_model.model_name}
-
-        # {response.content}
-
-        # ## 参考
-
-        # ### 提示词
-
-        # {prompt}
-
-        # ## 免责声明
-
-        # {DISCLIAMER}
-
-        # """
 
         output_md = f"""# {symbol} - {name}
 

@@ -3,7 +3,7 @@ import akshare as ak
 us_symbol_dict = ak.stock_us_spot_em()
 
 
-def fetch_klines(type: str, symbol: str, period: str = 'daily', start_date: str = '', end_date: str = '',  adjust_flag: str = ''):
+def history_klines(type: str, symbol: str, period: str = 'daily', start_date: str = '', end_date: str = '',  adjust_flag: str = ''):
     if type == 'A股':
         # https://akshare.akfamily.xyz/data/stock/stock.html#id21
         history_klines = ak.stock_zh_a_hist(

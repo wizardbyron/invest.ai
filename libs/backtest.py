@@ -4,7 +4,7 @@ import pandas as pd
 from pandas import DataFrame
 
 from libs.utils.indicators import fibonacci, classic
-from libs.utils.data import fetch_klines
+from libs.utils.data import history_klines
 
 
 def commision(turnover: float) -> float:
@@ -77,7 +77,7 @@ def run_backtest(start_date_str: str, end_date_str: str) -> None:
 
         type = row['类型']
         symbol = row['代码']
-        market, daily_data = fetch_klines(
+        market, daily_data = history_klines(
             type=type,
             symbol=symbol,
             start_date=start_date_str,
