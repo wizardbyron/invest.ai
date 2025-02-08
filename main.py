@@ -4,7 +4,7 @@ import time
 import fire
 
 from libs.backtest import run_backtest
-from libs.guide import create_guide
+from libs.guide import weekly_pivot_points
 from libs.portfolio import create_portfolio
 
 
@@ -19,9 +19,8 @@ def portfolio(num=10):
     create_portfolio(num)
 
 
-def guide(level=5):
-    print(f'枢轴点级别: {level}\n')
-    create_guide(level)
+def guide():
+    weekly_pivot_points()
 
 
 def backtest(start_date=same_day_last_year_str, end_date=today_str):
