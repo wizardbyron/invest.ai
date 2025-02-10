@@ -11,7 +11,7 @@ timezone = ZoneInfo('Asia/Shanghai')
 
 
 def weekly_pivot_points():
-    now_str = datetime.now(timezone).strftime("%Y%m%d  %H:%M:%S")
+    now_str = datetime.now(timezone).strftime("%Y-%m-%d  %H:%M:%S")
     today = datetime.today()
     today_str = today.strftime("%Y%m%d")
     start_date = today - timedelta(days=100)
@@ -39,7 +39,7 @@ def weekly_pivot_points():
             end_date=today_str)
 
         # 获取上周的交易数据
-        if (today.weekday() < 5):  # 周内
+        if (today.weekday() < 5 and today.weekday() > 0):  # 周内
             df_last_week = df_weekly[-2:-1]
         else:  # 周末
             df_last_week = df_weekly[-1:]
