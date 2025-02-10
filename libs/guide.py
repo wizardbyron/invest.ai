@@ -39,9 +39,9 @@ def weekly_pivot_points():
             end_date=today_str)
 
         # 获取上周的交易数据
-        if today.weekday() < 5 and today.weekday() > 0:  # 周内
+        if df_weekly.iloc[-1]['日期'] == now_str[:10]:  # 交易日
             df_last_week = df_weekly[-2:-1]
-        else:  # 周末
+        else:  # 非交易日
             df_last_week = df_weekly[-1:]
 
         print(df_last_week)
