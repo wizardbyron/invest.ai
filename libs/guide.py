@@ -39,7 +39,7 @@ def weekly_pivot_points():
             end_date=today_str)
 
         # 获取上周的交易数据
-        if (today.weekday() < 5 and today.weekday() > 0):  # 周内
+        if today.weekday() < 5 and today.weekday() > 0:  # 周内
             df_last_week = df_weekly[-2:-1]
         else:  # 周末
             df_last_week = df_weekly[-1:]
@@ -48,7 +48,8 @@ def weekly_pivot_points():
 
         start_date = df_last_week["日期"].iloc[0]
         end_date = df_last_week["日期"].iloc[-1]
-        df_single = pivot_points(df_last_week)
+
+        df_pivot_points = pivot_points(df_last_week)
 
         output_md = f"""# {symbol} - {name}
 
@@ -58,7 +59,7 @@ def weekly_pivot_points():
 
         ### 周线枢轴点 ({end_date})
 
-        {df_single.to_markdown()}
+        {df_pivot_points.to_markdown()}
 
         ### 均线
 
