@@ -1,3 +1,6 @@
+from pandas import DataFrame
+import pandas as pd
+
 
 def classic(high: float, low: float, close: float) -> dict[str, float]:
     """
@@ -59,3 +62,19 @@ def fibonacci(high: float, low: float, close: float) -> dict[str, float]:
         "预期波动率2": (r2-s2)/p * 100,
         "预期波动率3": (r3-s3)/p * 100
     }
+
+
+def pivot_points(df_input: DataFrame) -> DataFrame:
+    high = df_input["最高"].max()
+    low = df_input["最低"].min()
+    close = df_input["收盘"].iloc[-1]
+
+    c_points = classic(high, low, close)
+    f_points = fibonacci(high, low, close)
+
+    item = {"经典": c_points, "斐波那契": f_points}
+    row_index = c_points.keys()
+    df_output = pd.DataFrame(item, index=row_index)
+    df_output["中间值"] = (df_output["经典"] + df_output["斐波那契"])/2
+    df_output = df_output.round(3)
+    return df_output

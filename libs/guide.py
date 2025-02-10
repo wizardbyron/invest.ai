@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 
 from libs.utils.data import history_klines
-from libs.utils.indicators import fibonacci, classic
+from libs.utils.indicators import pivot_points
 from libs.utils.tools import remove_leading_spaces, DISCLIAMER
 
 timezone = ZoneInfo('Asia/Shanghai')
@@ -48,18 +48,7 @@ def weekly_pivot_points():
 
         start_date = df_last_week["日期"].iloc[0]
         end_date = df_last_week["日期"].iloc[-1]
-        high = df_last_week["最高"].max()
-        low = df_last_week["最低"].min()
-        close = df_last_week["收盘"].iloc[-1]
-
-        c_points = classic(high, low, close)
-        f_points = fibonacci(high, low, close)
-
-        item = {"经典": c_points, "斐波那契": f_points}
-        row_index = c_points.keys()
-        df_single = pd.DataFrame(item, index=row_index)
-        df_single["中间值"] = (df_single["经典"] + df_single["斐波那契"])/2
-        df_single = df_single.round(3)
+        df_single = pivot_points(df_last_week)
 
         output_md = f"""# {symbol} - {name}
 
