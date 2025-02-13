@@ -7,6 +7,12 @@ from langchain_openai.chat_models import ChatOpenAI
 load_dotenv()
 
 chat_models = {
+    "ollama": ChatOpenAI(
+        model=os.environ.get("MODEL", "deepseek-r1"),
+        api_key="ollama",
+        temperature=0.01,
+        base_url="http://localhost:11434/v1/"
+    ),
     "zhipuai": ChatZhipuAI(
         model=os.environ.get("MODEL", "glm-4-flash"),
         temperature=0.01

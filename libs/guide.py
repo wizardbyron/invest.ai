@@ -11,7 +11,8 @@ timezone = ZoneInfo('Asia/Shanghai')
 
 
 def weekly_pivot_points():
-    now_str = datetime.now(timezone).strftime("%Y-%m-%d  %H:%M:%S")
+    now = datetime.now(timezone)
+    now_str = now.strftime("%Y-%m-%d  %H:%M:%S")
     today = datetime.today()
     today_str = today.strftime("%Y%m%d")
     start_date = today - timedelta(days=100)
@@ -24,6 +25,14 @@ def weekly_pivot_points():
         type = row["类型"]
         symbol = row["代码"]
         name = row["名称"]
+
+        market, df_monthly = history_klines(
+            type=type,
+            symbol=symbol,
+            period='monthly',
+            start_date=start_date_str,
+            end_date=today_str)
+
         market, df_weekly = history_klines(
             type=type,
             symbol=symbol,
@@ -39,17 +48,26 @@ def weekly_pivot_points():
             end_date=today_str)
 
         # 获取上周的交易数据
+        if df_daily.iloc[-1]['日期'] == now_str[:10] and now.hour < 15:  # 今天收盘
+            df_last_day = df_daily[-2:-1]
+        else:  # 非交易日
+            df_last_day = df_daily[-1:]
+
+        # 获取上周的交易数据
         if df_weekly.iloc[-1]['日期'] == now_str[:10]:  # 交易日
             df_last_week = df_weekly[-2:-1]
         else:  # 非交易日
             df_last_week = df_weekly[-1:]
 
+        # 获取上月的交易数据
+        if df_monthly.iloc[-1]['日期'] == now_str[:10]:  # 交易日
+            df_last_month = df_monthly[-2:-1]
+        else:  # 非交易日
+            df_last_month = df_monthly[-1:]
+
+        print(df_last_day)
         print(df_last_week)
-
-        start_date = df_last_week["日期"].iloc[0]
-        end_date = df_last_week["日期"].iloc[-1]
-
-        df_pivot_points = pivot_points(df_last_week)
+        print(df_last_month)
 
         output_md = f"""# {symbol} - {name}
 
@@ -57,9 +75,19 @@ def weekly_pivot_points():
 
         ## 交易参考
 
-        ### 周线枢轴点 ({end_date})
+        ### 枢轴点
 
-        {df_pivot_points.to_markdown()}
+        #### 昨日枢轴点 ({df_last_day["日期"].iloc[-1]})
+
+        {pivot_points(df_last_day).to_markdown()}
+
+        #### 上周枢轴点 ({df_last_week["日期"].iloc[-1]})
+
+        {pivot_points(df_last_week).to_markdown()}
+
+        #### 上月枢轴点（{df_last_month["日期"].iloc[-1]}）
+
+        {pivot_points(df_last_month).to_markdown()}
 
         ### 均线
 

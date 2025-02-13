@@ -1,5 +1,5 @@
 import akshare as ak
-
+import pandas as pd
 us_symbol_dict = ak.stock_us_spot_em()
 
 
@@ -30,6 +30,7 @@ def history_klines(type: str, symbol: str, period: str = 'daily', start_date: st
             end_date=end_date,
             period=period,
             adjust=adjust_flag)
+        history_klines['日期'] = history_klines['日期'].astype(str)
         market = 'hk'
     elif type == '美股':
 
