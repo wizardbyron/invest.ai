@@ -11,36 +11,44 @@ from libs.utils.tools import remove_leading_spaces, DISCLIAMER
 timezone = ZoneInfo('Asia/Shanghai')
 
 
-def create_portfolio(num: int):
+def portfolio_from_selected(type: str = "A股ETF", max_item: int = 10):
     df = pd.read_csv("input/selected.csv", dtype={'代码': str})
 
-    etf_cn = df[df["类型"] == "A股ETF"]
+    if type == "全部":
+        selected = df
+    else:
+        selected = df[df["类型"] == type]
 
-    loader = DataFrameLoader(etf_cn, page_content_column="名称")
+    loader = DataFrameLoader(selected, page_content_column="名称")
 
     docs = loader.load()
 
-    prompt = f"""以下是一份用于构建投资组合的候选股票清单：
+    prompt = f"""以下是一份用于构建投资组合的候选股票或 ETF 清单：
 
     {docs}
 
-    从上述候选股票清单中帮我构建一份投资组合，要求如下：
+    从上述清单中帮我构建一份投资组合，要求如下：
 
-    - 投资组合的股票数量为 {num} 个
+    - 投资组合的股票或ETF 数量不超过 {max_item} 个
     - 采用杠铃型配置，兼顾风险和收益
-    - A股，美股和港股占比均衡
+    - A股，美股和港股在投资组合中均衡占比
 
     请以表格的方式输出投资组合，要求如下：
 
-    - 包括股票名称, 股票代码
-    - 股票在投资组合内的占比
-    - 输出股票入选投资组合的原因
-    - 交易频率或者再平衡周期建议
-    - 根据投资组合风险等级的低中高顺序输出
-    - 输出未入选投资组合的股票以及未入选原因。
+    - 股票或ETF名称及其代码
+    - 股票或ETF在投资组合内的占比
+    - 股票或ETF入选投资组合的原因
+    - 股票或ETF的交易频率或者再平衡周期建议
+    - 根据股票或ETF风险等级的低中高顺序输出
+    - 输出未入选投资组合的股票或ETF以及未入选原因。
 
-    如果上述要求超出你能力范围，请列出超出你能力范围的要求。如果没有则不用列出。
-    如果上述内容有表述不清楚的地方，请列出需要进一步精确表述的内容。如果没有则不用列出。
+    并用以下格式输出每个股票或ETF的交易策略：
+
+    ### 股票或 ETF 的名称（股票或 ETF 的代码）
+
+    - 具体的交易策略，并解释交易策略
+    - 交易频率
+
     """
 
     prompt = remove_leading_spaces(prompt)
@@ -57,30 +65,36 @@ def create_portfolio(num: int):
     ]
 
     for model in chat_models.keys():
-        response = chat_models[model].invoke(messages)
+        try:
+            print(f"模型: {chat_models[model].model_name}")
 
-        output_md = f"""# A股ETF投资组合 - {model}
+            response = chat_models[model].invoke(messages)
 
-        更新时间: {datetime.now(timezone).replace(microsecond=0)}
+            output_md = f"""# A股ETF投资组合 - {model}
 
-        模型: {chat_models[model].model_name}
+            更新时间: {datetime.now(timezone).replace(microsecond=0)}
 
-        ## 投资组合参考
+            模型: {chat_models[model].model_name}
 
-        {response.content}
+            ## 投资组合参考
 
-        ## LLM 提示词
+            {response.content}
 
-        {prompt}
+            ## LLM 提示词
 
-        ## 免责声明
+            {prompt}
 
-        {DISCLIAMER}
-        """
+            ## 免责声明
 
-        output_md = remove_leading_spaces(output_md)
+            {DISCLIAMER}
+            """
 
-        file_path = f"docs/portfolio/portfolio_cn_etf_{num}_{model}.md"
+            output_md = remove_leading_spaces(output_md)
 
-        with open(file_path, 'w') as f:
-            f.write(output_md)
+            file_path = f"docs/portfolio/portfolio_cn_etf_{max_item}_{model}.md"
+
+            with open(file_path, 'w') as f:
+                f.write(output_md)
+        except Exception as e:
+            print(f"调用模型[{model}]失败:\n{e}")
+            continue

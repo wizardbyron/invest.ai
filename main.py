@@ -5,7 +5,7 @@ import fire
 
 from libs.backtest import run_backtest
 from libs.guide import weekly_pivot_points
-from libs.portfolio import create_portfolio
+from libs.portfolio import portfolio_from_selected
 
 
 today = datetime.today()
@@ -16,7 +16,7 @@ same_day_last_year_str = same_day_last_year.strftime('%Y%m%d')
 
 def portfolio(num=10):
     print(f'投资组合数量: {num}\n')
-    create_portfolio(num)
+    portfolio_from_selected("A股ETF", num)
 
 
 def guide():
