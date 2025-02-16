@@ -18,13 +18,13 @@ chat_models = {
         temperature=0.01
     ),
     "deepseek": ChatOpenAI(
-        model=os.environ.get("MODEL"),
+        model=os.environ.get("MODEL", "deepseek-chat"),
         api_key=os.environ.get("DEEPSEEK_API_KEY"),
         temperature=0.00,
         base_url="https://api.deepseek.com"
     ),
     "moonshot": ChatOpenAI(
-        model=os.environ.get("MODEL"),
+        model=os.environ.get("MODEL", "moonshot-v1-32k"),
         api_key=os.environ.get("MOONSHOT_API_KEY"),
         temperature=0.01,
         base_url="https://api.moonshot.cn/v1"
