@@ -127,7 +127,7 @@ def ai_guide():
 
         response = chat.invoke(messages)
 
-        print(response.content)
+        # print(response.content)
 
         output_md = f""" # {symbol} - {name}
 

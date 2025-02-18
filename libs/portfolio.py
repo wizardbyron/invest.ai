@@ -70,7 +70,7 @@ def portfolio_from_selected(type: str = "A股ETF", max_item: int = 10):
 
         response = chat.invoke(messages)
 
-        output_md = f"""# A股ETF投资组合 - {model}
+        output_md = f"""# A股ETF投资组合 - {chat.model_name}
 
         更新时间: {datetime.now(timezone).replace(microsecond=0)}
 
