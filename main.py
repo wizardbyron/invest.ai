@@ -5,6 +5,7 @@ import fire
 
 from libs.backtest import run_backtest
 from libs.guide import weekly_pivot_points
+from libs.guide_ai import ai_guide
 from libs.portfolio import portfolio_from_selected
 
 
@@ -21,6 +22,10 @@ def portfolio(num=10):
 
 def guide():
     weekly_pivot_points()
+
+
+def guide_ai():
+    ai_guide()
 
 
 def backtest(start_date=same_day_last_year_str, end_date=today_str):
