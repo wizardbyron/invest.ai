@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+import time
 
 from langchain_community.document_loaders import DataFrameLoader
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -8,8 +9,7 @@ import pandas as pd
 from libs.utils.data import history_klines
 from libs.utils.indicators import pivot_points
 from libs.utils.tools import remove_leading_spaces, DISCLIAMER
-from libs.utils.chat_model import chat_models
-
+from libs.utils.chat_model import get_chat_model
 
 timezone = ZoneInfo('Asia/Shanghai')
 
@@ -69,19 +69,11 @@ def ai_guide():
         else:  # 非交易日
             df_last_month = df_monthly[-1:]
 
-        print(df_last_day)
-        print(df_last_week)
-        print(df_last_month)
-
         prompt = f"""以下是{name}({symbol})最近的交易数据
 
-        近30 个交易日 K 线如下:
+        最近 10 个交易日 K 线数据如下:
 
-        {df_daily[-30:]}
-
-        上个交易日 ({df_last_day["日期"].iloc[-1]}) 枢轴点：
-
-        {pivot_points(df_last_day).to_markdown()}
+        {df_daily[-10:].to_markdown()}
 
         上周枢轴点 ({df_last_week["日期"].iloc[-1]})：
 
@@ -91,7 +83,7 @@ def ai_guide():
 
         {pivot_points(df_last_month).to_markdown()}
 
-        均线：如下
+        均线数据：
 
         * 5 日均线: {df_daily["收盘"][-5:].mean():.2f}
         * 10 日均线: {df_daily["收盘"][-10:].mean():.2f}
@@ -100,32 +92,54 @@ def ai_guide():
 
         请根据上述信息给出交易建议，规则如下：
 
-        - 请用买入/卖出/观望给出交易建议和交易注意事项。如果是买入/卖出请给出价格。按照以下格式：
+        - 请用买入、卖出、观望三个交易建议之一。
+        - 如果交易建议是买入或者卖出，在给交易建议的时候还需要输出相应的买入价格或者卖出价格。
+        - 输出交易建议的分析过程，为什么选择这个买入价格或者卖出价格。
+        - 根据股票或者ETF的特点给出交易中的注意事项以及需要参考的其它数据。
+        
+        按照以下格式输出：
 
         ## 交易建议
 
+        买入或者卖出（价格：）
+
+        ## 交易分析
+
         ## 注意事项
 
-        如果需要额外的参考数据，请告诉我。
+        ## 其它参考数据
+
         """
+
+        prompt = remove_leading_spaces(prompt)
+
+        print(prompt)
 
         messages = [
             SystemMessage(
-                content="你是一个量化交易员，可以根据数据给出专业的股票/ETF 交易建议。"
+                content="你是一个量化交易员，可以根据数据给出专业的交易建议。并且会在信息不足的时候，提出问题以获得更多的参考信息。"
             ),
             HumanMessage(
                 content=prompt
             )
         ]
-        response = chat_models['deepseek'].invoke(messages)
+        chat = get_chat_model("zhipuai", "glm-4-flash")
+
+        response = chat.invoke(messages)
+
+        print(response.content)
 
         output_md = f""" # {symbol} - {name}
+
+        更新时间: {now_str}
+
+        模型: {chat.model_name}
 
         {response.content}
 
         ## 提示词
 
-        {remove_leading_spaces(prompt)}
+        {prompt}
 
         """
 

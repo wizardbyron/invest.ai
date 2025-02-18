@@ -5,7 +5,7 @@ from langchain_community.document_loaders import DataFrameLoader
 from langchain_core.messages import HumanMessage, SystemMessage
 import pandas as pd
 
-from libs.utils.chat_model import chat_models
+from libs.utils.chat_model import get_chat_model
 from libs.utils.tools import remove_leading_spaces, DISCLIAMER
 
 timezone = ZoneInfo('Asia/Shanghai')
@@ -64,37 +64,36 @@ def portfolio_from_selected(type: str = "A股ETF", max_item: int = 10):
         )
     ]
 
-    for model in chat_models.keys():
-        try:
-            print(f"模型: {chat_models[model].model_name}")
+    chat = get_chat_model("deepseek", "deepseek-reasoner")
+    try:
+        print(f"模型: {chat.model_name}")
 
-            response = chat_models[model].invoke(messages)
+        response = chat.invoke(messages)
 
-            output_md = f"""# A股ETF投资组合 - {model}
+        output_md = f"""# A股ETF投资组合 - {model}
 
-            更新时间: {datetime.now(timezone).replace(microsecond=0)}
+        更新时间: {datetime.now(timezone).replace(microsecond=0)}
 
-            模型: {chat_models[model].model_name}
+        模型: {chat.model_name}
 
-            ## 投资组合参考
+        ## 投资组合参考
 
-            {response.content}
+        {response.content}
 
-            ## LLM 提示词
+        ## LLM 提示词
 
-            {prompt}
+        {prompt}
 
-            ## 免责声明
+        ## 免责声明
 
-            {DISCLIAMER}
-            """
+        {DISCLIAMER}
+        """
 
-            output_md = remove_leading_spaces(output_md)
+        output_md = remove_leading_spaces(output_md)
 
-            file_path = f"docs/portfolio/portfolio_cn_etf_{max_item}_{model}.md"
+        file_path = f"docs/portfolio/portfolio_cn_etf_{max_item}_{model}.md"
 
-            with open(file_path, 'w') as f:
-                f.write(output_md)
-        except Exception as e:
-            print(f"调用模型[{model}]失败:\n{e}")
-            continue
+        with open(file_path, 'w') as f:
+            f.write(output_md)
+    except Exception as e:
+        print(f"调用模型[{chat.model_name}]失败:\n{e}")
