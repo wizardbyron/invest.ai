@@ -22,7 +22,7 @@ jobs:
           python-version: 3.13.0
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
       - run: pip install -r requirements.txt
-      - run: python main.py guide
+      - run: python main.py guide_ai
         env:
           LLM_SERVICE: ${{ vars.LLM_SERVICE }}
           MODEL: ${{ vars.MODEL }}

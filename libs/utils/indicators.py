@@ -27,10 +27,7 @@ def classic(high: float, low: float, close: float) -> dict[str, float]:
         "枢轴点": p,
         "支撑位1": s1,
         "支撑位2": s2,
-        "支撑位3": s3,
-        "预期波动率1": (r1-s1)/p * 100,
-        "预期波动率2": (r2-s2)/p * 100,
-        "预期波动率3": (r3-s3)/p * 100
+        "支撑位3": s3
     }
 
 
@@ -57,10 +54,7 @@ def fibonacci(high: float, low: float, close: float) -> dict[str, float]:
         "枢轴点": p,
         "支撑位1": s1,
         "支撑位2": s2,
-        "支撑位3": s3,
-        "预期波动率1": (r1-s1)/p * 100,
-        "预期波动率2": (r2-s2)/p * 100,
-        "预期波动率3": (r3-s3)/p * 100
+        "支撑位3": s3
     }
 
 

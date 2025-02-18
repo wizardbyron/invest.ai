@@ -22,7 +22,7 @@ def ai_guide():
     start_date = today - timedelta(days=100)
     start_date_str = start_date.strftime("%Y%m%d")
 
-    df_input = pd.read_csv("input/portfolio.csv", dtype={"代码": str})
+    df_input = pd.read_csv("input/selected.csv", dtype={"代码": str})
     for index, row in df_input.iterrows():
         print(row)
 
@@ -93,15 +93,15 @@ def ai_guide():
         请根据上述信息给出交易建议，规则如下：
 
         - 请用买入、卖出、观望三个交易建议之一。
-        - 如果交易建议是买入或者卖出，在给交易建议的时候还需要输出相应的买入价格或者卖出价格。
-        - 输出交易建议的分析过程，为什么选择这个买入价格或者卖出价格。
-        - 根据股票或者ETF的特点给出交易中的注意事项以及需要参考的其它数据。
+        - 如果交易建议是买入或者卖出，并输出买入价格或者卖出价格。
+        - 输出交易建议的分析过程，包括成交量。
+        - 输出针对该股票或者 ETF 的交易注意事项以及其它参考数据。
         
         按照以下格式输出：
 
         ## 交易建议
 
-        买入或者卖出（价格：）
+        买入或者卖出（价格）
 
         ## 交易分析
 
@@ -113,7 +113,7 @@ def ai_guide():
 
         prompt = remove_leading_spaces(prompt)
 
-        print(prompt)
+        # print(prompt)
 
         messages = [
             SystemMessage(
