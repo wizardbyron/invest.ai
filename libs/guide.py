@@ -26,10 +26,10 @@ def weekly_pivot_points():
         symbol = row["代码"]
         name = row["名称"]
 
-        market, df_monthly = history_klines(
+        market, df_daily = history_klines(
             type=type,
             symbol=symbol,
-            period='monthly',
+            period='daily',
             start_date=start_date_str,
             end_date=today_str)
 
@@ -40,12 +40,12 @@ def weekly_pivot_points():
             start_date=start_date_str,
             end_date=today_str)
 
-        market, df_daily = history_klines(
-            type=type,
-            symbol=symbol,
-            period='daily',
-            start_date=start_date_str,
-            end_date=today_str)
+        # market, df_monthly = history_klines(
+        #     type=type,
+        #     symbol=symbol,
+        #     period='monthly',
+        #     start_date=start_date_str,
+        #     end_date=today_str)
 
         # 获取上周的交易数据
         if df_daily.iloc[-1]['日期'] == now_str[:10] and now.hour < 15:  # 今天收盘
@@ -54,20 +54,17 @@ def weekly_pivot_points():
             df_last_day = df_daily[-1:]
 
         # 获取上周的交易数据
-        if df_weekly.iloc[-1]['日期'] == now_str[:10]:  # 交易日
+        if df_weekly.iloc[-1]['日期'] == now_str[:10] and today.weekday() < 5:  # 交易日
             df_last_week = df_weekly[-2:-1]
         else:  # 非交易日
             df_last_week = df_weekly[-1:]
 
-        # 获取上月的交易数据
-        if df_monthly.iloc[-1]['日期'] == now_str[:10]:  # 交易日
-            df_last_month = df_monthly[-2:-1]
-        else:  # 非交易日
-            df_last_month = df_monthly[-1:]
+        # # 获取上月的交易数据
+        # df_last_month = df_monthly[-2:-1]
 
         print(df_last_day)
         print(df_last_week)
-        print(df_last_month)
+        # print(df_last_month)
 
         output_md = f"""# {symbol} - {name}
 
@@ -84,10 +81,6 @@ def weekly_pivot_points():
         #### 上周枢轴点 ({df_last_week["日期"].iloc[-1]})
 
         {pivot_points(df_last_week).to_markdown()}
-
-        #### 上月枢轴点（{df_last_month["日期"].iloc[-1]}）
-
-        {pivot_points(df_last_month).to_markdown()}
 
         ### 均线
 
