@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-import time
+import os
 
 from langchain_community.document_loaders import DataFrameLoader
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -15,6 +15,9 @@ timezone = ZoneInfo('Asia/Shanghai')
 
 
 def ai_guide():
+    llm_service = os.environ.get("LLM_SERVICE")
+    model = os.environ.get("MODEL")
+
     now = datetime.now(timezone)
     now_str = now.strftime("%Y-%m-%d  %H:%M:%S")
     today = datetime.today()
@@ -73,7 +76,7 @@ def ai_guide():
 
         最近 10 个交易日 K 线数据如下:
 
-        {df_daily[-10:].to_markdown()}
+        {df_daily[-10:].to_markdown(index=False)}
 
         上周枢轴点 ({df_last_week["日期"].iloc[-1]})：
 
@@ -90,24 +93,19 @@ def ai_guide():
         * 20 日均线: {df_daily["收盘"][-20:].mean():.2f}
         * 30 日均线: {df_daily["收盘"][-30:].mean():.2f}
 
-        请根据上述信息给出交易建议，规则如下：
+        请根据最新的交易价格和上述技术指标输出交易建议，输出要求如下：
 
-        - 请用买入、卖出、观望三个交易建议之一。
-        - 如果交易建议是买入或者卖出，并输出买入价格或者卖出价格。
-        - 输出交易建议的分析过程，包括成交量。
-        - 输出针对该股票或者 ETF 的交易注意事项以及其它参考数据。
+        - 给出买入、卖出、观望三个交易建议之一。
+        - 如果交易价格是买入或卖出就要输出交易价格，并输出原因。
+        - 输出分析过程。
         
         按照以下格式输出：
 
         ## 交易建议
 
-        买入或者卖出（价格）
+        交易建议（交易价格）
 
         ## 交易分析
-
-        ## 注意事项
-
-        ## 其它参考数据
 
         """
 
@@ -123,7 +121,8 @@ def ai_guide():
                 content=prompt
             )
         ]
-        chat = get_chat_model("zhipuai", "glm-4-flash")
+
+        chat = get_chat_model(llm_service, model)
 
         response = chat.invoke(messages)
 
