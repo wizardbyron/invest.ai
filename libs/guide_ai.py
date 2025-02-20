@@ -7,9 +7,9 @@ from langchain_core.messages import HumanMessage, SystemMessage
 import pandas as pd
 
 from libs.utils.data import history_klines
+from libs.utils.llm import create_chat
 from libs.utils.indicators import pivot_points
 from libs.utils.tools import remove_leading_spaces, DISCLIAMER
-from libs.utils.chat_model import get_chat_model
 
 timezone = ZoneInfo('Asia/Shanghai')
 
@@ -61,7 +61,7 @@ def ai_guide():
             df_last_day = df_daily[-1:]
 
         # 获取上周的交易数据
-        if df_weekly.iloc[-1]['日期'] == now_str[:10]:  # 交易日
+        if df_weekly.iloc[-1]['日期'] == now_str[:10] and now.weekday() < 5:  # 交易日
             df_last_week = df_weekly[-2:-1]
         else:  # 非交易日
             df_last_week = df_weekly[-1:]
@@ -93,10 +93,10 @@ def ai_guide():
         * 20 日均线: {df_daily["收盘"][-20:].mean():.2f}
         * 30 日均线: {df_daily["收盘"][-30:].mean():.2f}
 
-        请根据最新的交易价格和上述技术指标输出交易建议，输出要求如下：
+        请根据价格、成交量、均线和枢轴点综合分析输出交易建议，输出要求如下：
 
         - 给出买入、卖出、观望三个交易建议之一。
-        - 如果交易价格是买入或卖出就要输出交易价格，并输出原因。
+        - 如果交易建议是买入或卖出就要输出交易价格，并说明交易价格的选取方法。
         - 输出分析过程。
         
         按照以下格式输出：
@@ -122,7 +122,7 @@ def ai_guide():
             )
         ]
 
-        chat = get_chat_model(llm_service, model)
+        chat = create_chat(llm_service, model)
 
         response = chat.invoke(messages)
 
@@ -132,7 +132,7 @@ def ai_guide():
 
         更新时间: {now_str}
 
-        模型: {chat.model_name}
+        模型: {model}
 
         {response.content}
 
