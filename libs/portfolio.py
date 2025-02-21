@@ -1,17 +1,20 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import os
 
 from langchain_community.document_loaders import DataFrameLoader
 from langchain_core.messages import HumanMessage, SystemMessage
 import pandas as pd
 
-from libs.utils.chat_model import get_chat_model
+from libs.utils.llm import create_chat
 from libs.utils.tools import remove_leading_spaces, DISCLIAMER
 
 timezone = ZoneInfo('Asia/Shanghai')
 
 
 def portfolio_from_selected(type: str = "A股ETF", max_item: int = 10):
+    llm_service = os.environ.get("LLM_SERVICE")
+    model = os.environ.get("MODEL")
     df = pd.read_csv("input/selected.csv", dtype={'代码': str})
 
     if type == "全部":
@@ -19,13 +22,9 @@ def portfolio_from_selected(type: str = "A股ETF", max_item: int = 10):
     else:
         selected = df[df["类型"] == type]
 
-    loader = DataFrameLoader(selected, page_content_column="名称")
-
-    docs = loader.load()
-
     prompt = f"""以下是一份用于构建投资组合的候选股票或 ETF 清单：
 
-    {docs}
+    {selected.to_markdown(index=False)}
 
     从上述清单中帮我构建一份投资组合，要求如下：
 
@@ -64,9 +63,10 @@ def portfolio_from_selected(type: str = "A股ETF", max_item: int = 10):
         )
     ]
 
-    chat = get_chat_model("deepseek", "deepseek-reasoner")
+    chat = create_chat(llm_service, model)
+
     try:
-        print(f"模型: {chat.model_name}")
+        print(f"模型: {model}")
 
         response = chat.invoke(messages)
 
