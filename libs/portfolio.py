@@ -91,7 +91,7 @@ def portfolio_from_selected(type: str = "A股ETF", max_item: int = 10):
 
         output_md = remove_leading_spaces(output_md)
 
-        file_path = f"docs/portfolio/portfolio_cn_etf_{max_item}_{model}.md"
+        file_path = f"docs/portfolio/etf_{max_item}_{llm_service}.md"
 
         with open(file_path, 'w') as f:
             f.write(output_md)
