@@ -162,8 +162,5 @@ cython_debug/
 #.idea/
 
 .DS_Store
-docs/guide/*.csv
-docs/guide/cn/*.md
-docs/guide/hk/*.md
-docs/guide/us/*.md
-output/*.csv
+docs/交易指南/**/*.md
+output/*
