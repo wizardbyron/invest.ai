@@ -19,11 +19,12 @@ now_str = now.strftime("%Y-%m-%d %H:%M:%S")
 llm_list = [
     ("zhipuai", "glm-4-plus"),
     ("deepseek", "deepseek-reasoner"),
+    ("ollama", "glm4"),
     ("moonshot", "moonshot-v1-128k")
 ]
 
 
-def selected(type: str = 'A股ETF', max_item: int = 10) -> str:
+def selected(type: str = 'A股ETF', max: int = 10) -> str:
 
     df = pd.read_csv("input/selected.csv", dtype={'代码': str})
 
@@ -35,24 +36,29 @@ def selected(type: str = 'A股ETF', max_item: int = 10) -> str:
 
     从上述清单中帮我构建一份投资组合，要求如下：
 
-    - 投资组合的 {type} 数量为 {max_item} 个
+    - 投资组合的 {type} 数量为 {max} 个
     - 采用杠铃型配置，兼顾风险和收益
-    - A股，美股和港股在投资组合中均衡占比
+    - A股占比 40%, 美国市场标的占比 30%, 香港市场标的占比 30%
 
-    请以表格的方式输出投资组合，要求如下：
+    请输出投资组合，要求如下：
 
-    - {type}名称及其代码
-    - {type}在投资组合内的占比
-    - {type}入选投资组合的原因
-    - {type}的交易频率或者再平衡周期建议
-    - 根据{type}风险等级的低中高顺序输出
+    - {type}名称及其代码, 以及在投资组合内的占比
+    - 入选投资组合的原因
+    - 交易频率或者再平衡周期建议
+    - 根据风险等级的低中高顺序输出
 
     并用以下格式输出每个{type}的交易策略：
 
+    ## 风险等级
+
     ### {type} 的名称（{type}的交易代码）
 
+    - 在投资组合内的占比
+    - 入选投资组合的原因
     - 具体的交易策略，并解释交易策略
     - 交易频率
+
+    ## 投资组合交易策略
     """
 
     prompt = remove_leading_spaces(prompt)
