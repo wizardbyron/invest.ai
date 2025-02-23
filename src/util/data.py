@@ -67,6 +67,7 @@ def history_klines(type: str,
     else:
         klines = None
 
+    klines['日期'] = klines['日期'].astype(str)
     if len(klines) == 0:
         raise ValueError(f"结果为空, 请检查参数")
 

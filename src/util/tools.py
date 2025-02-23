@@ -1,6 +1,6 @@
 
 
-def remove_leading_spaces(s) -> str:
+def remove_leading_spaces(s: str) -> str:
     """删除文本中的前导空格
 
     Args:
