@@ -21,7 +21,7 @@ def create_chat(service: str, model: str):
     Returns:
         _type_: _description_
     """
-    temperature = float(os.environ.get("TEMPERATURE", 0.00))  # 默认值为 0.01
+    temperature = float(os.environ.get("TEMPERATURE", 0.01))  # 默认值为 0.01
     chat_model_params = {
         "ollama": {
             "api_key": "ollama",
