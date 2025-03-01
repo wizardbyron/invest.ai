@@ -82,7 +82,7 @@ def selected(type: str = 'A股ETF', max: int = 10) -> str:
 
             response = chat.invoke(messages)
 
-            output_md = f"""# A股ETF投资组合 - {llm_service}
+            output_md = f"""# {type}投资组合(自选) - {llm_service}
 
             更新时间: {now_str}
 
@@ -95,7 +95,7 @@ def selected(type: str = 'A股ETF', max: int = 10) -> str:
             output_md = append_discliamer(output_md)
             output_md = remove_leading_spaces(output_md)
 
-            file_path = f"docs/投资组合/自选{type}投资组合_{llm_service}.md"
+            file_path = f"docs/投资组合/{type}投资组合_自选_{llm_service}.md"
 
             with open(file_path, "w") as f:
                 f.write(output_md)
@@ -154,7 +154,7 @@ def zero(type: str = 'A股ETF', max: int = 10) -> str:
 
             response = chat.invoke(messages)
 
-            output_md = f"""# A股ETF投资组合 - {llm_service}
+            output_md = f"""# {type}投资组合 - {llm_service}
 
             更新时间: {now_str}
 
@@ -167,7 +167,7 @@ def zero(type: str = 'A股ETF', max: int = 10) -> str:
             output_md = append_discliamer(output_md)
             output_md = remove_leading_spaces(output_md)
 
-            file_path = f"docs/投资组合/自选{type}投资组合_{llm_service}.md"
+            file_path = f"docs/投资组合/{type}投资组合_{llm_service}.md"
 
             with open(file_path, "w") as f:
                 f.write(output_md)
