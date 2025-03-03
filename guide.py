@@ -67,7 +67,7 @@ for index, row in df_input.iterrows():
     if df_monthly.iloc[-1]['日期'][:7] == now_str[:7]:  # 本月有交易
         df_last_month = df_monthly[-2:-1]
     else:  # 本月没交易
-        df_last_month = df_monthly[-1]
+        df_last_month = df_monthly[-1:]
 
     cmd_prompt = f"""以下是{name}({symbol})最近的交易数据
 
