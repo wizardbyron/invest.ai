@@ -52,25 +52,19 @@ for index, row in df_input.iterrows():
         end_date=today_str)
 
     # 获取上一个交易日的交易数据
-    if df_daily.iloc[-1]['日期'] == now_str[:10] and now.hour < 15:  # 今天收盘
-        df_last_day = df_daily[-2:-1]
-    else:  # 非交易日
-        df_last_day = df_daily[-1:]
+    df_last_day = df_daily[-1:]
 
     # 获取上周的交易数据周线
     if type == "美股":
         df_last_week = df_weekly[-2:-1]
     else:
-        if df_weekly.iloc[-1]['日期'] == now_str[:10] and now.weekday() < 5:  # 交易日
+        if now.weekday() < 5:  # 交易日
             df_last_week = df_weekly[-2:-1]
         else:  # 非交易日
             df_last_week = df_weekly[-1:]
 
     # 获取上月的交易数据
-    if df_monthly.iloc[-1]['日期'][:7] == now_str[:7]:  # 本月有交易
-        df_last_month = df_monthly[-2:-1]
-    else:  # 本月没交易
-        df_last_month = df_monthly[-1:]
+    df_last_month = df_monthly[-2:-1]
 
     cmd_prompt = f"""以下是{name}({symbol})最近的交易数据
 
