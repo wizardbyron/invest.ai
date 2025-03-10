@@ -1,7 +1,16 @@
 import akshare as ak
-from src.util.indicators import pivot_points_index
+
+from src.util.indicators import pivot_points_index, pivot_points
+
 
 df_hstech = ak.stock_hk_index_daily_sina(symbol="HSTECH")
+
+
+end_date = '20250306'
+
+ak.stock_hk_hist(symbol=symbol,
+                 end_date=end_date,
+                 adjust="qfq")
 
 levels = [1, 5]
 

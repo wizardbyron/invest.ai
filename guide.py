@@ -52,7 +52,10 @@ for index, row in df_input.iterrows():
         end_date=today_str)
 
     # 获取上一个交易日的交易数据
-    df_last_day = df_daily[-1:]
+    if type == "美股":
+        df_last_day = df_daily[-2:-1]
+    else:
+        df_last_day = df_daily[-1:]
 
     # 获取上周的交易数据周线
     if type == "美股":
@@ -64,15 +67,14 @@ for index, row in df_input.iterrows():
             df_last_week = df_weekly[-1:]
 
     # 获取上月的交易数据
-    df_last_month = df_monthly[-2:-1]
+    last_month = df_monthly["日期"].iloc[-1]
+    this_month = now.strftime("%Y-%m")
+    if last_month.startswith(this_month):
+        df_last_month = df_monthly[-2:-1]
+    else:
+        df_last_month = df_monthly[-1:]
 
-    cmd_prompt = f"""以下是{name}({symbol})最近的交易数据
-
-    最近 10 个交易日 K 线数据如下:
-
-    {df_daily[-10:].to_markdown(index=False)}
-
-    上个交易日枢轴点 ({df_last_day["日期"].iloc[-1]})：
+    points_md = f"""上个交易日枢轴点 ({df_last_day["日期"].iloc[-1]})：
 
     {pivot_points(df_last_day).to_markdown()}
 
@@ -83,6 +85,11 @@ for index, row in df_input.iterrows():
     上月枢轴点（{df_last_month["日期"].iloc[-1]}）：
 
     {pivot_points(df_last_month).to_markdown()}
+    """
+
+    trade_md = f"""最近 10 个交易日 K 线数据如下:
+
+    {df_daily[-10:].to_markdown(index=False)}
 
     均线数据：
 
@@ -90,25 +97,35 @@ for index, row in df_input.iterrows():
     * 10 日均线: {df_daily["收盘"][-10:].mean():.2f}
     * 20 日均线: {df_daily["收盘"][-20:].mean():.2f}
     * 30 日均线: {df_daily["收盘"][-30:].mean():.2f}
+    """
+
+    prompt = f"""
+    以下是{name}({symbol})最近的交易数据:
+
+    {trade_md}
+
+    以下是{name}({symbol})的枢轴点数据:
+
+    {points_md}
 
     请结合价格、成交量、均线和枢轴点综合分析输出交易建议, 输出要求如下：
 
-    - 给出买入、卖出、观望三个交易建议之一，并输出买入或者卖出的价格。
-    - 输出分析过程。
+    - 输出建议的买入和卖出价格，并输出分析过程。
+    - 给出交易先后策略。
+
     """
 
-    format_prompt = """ 
-    按照以下格式输出：
+    format_prompt = """按照以下格式输出：
 
-    ## 交易建议
+    # 交易建议
 
     交易建议（交易价格）
 
-    ## 交易分析
+    # 交易分析
 
     """
 
-    prompt = remove_leading_spaces(cmd_prompt+format_prompt)
+    prompt = remove_leading_spaces(prompt+format_prompt)
 
     # print(prompt)
 
@@ -121,23 +138,17 @@ for index, row in df_input.iterrows():
         )
     ]
 
-    chat = create_chat(llm_service, model)
+    # chat = create_chat(llm_service, model)
 
-    response = chat.invoke(messages)
+    # response = chat.invoke(messages)
 
     # print(response.content)
 
-    output_md = f""" # {symbol} - {name}
+    output_md = f"""# {symbol} - {name}
 
     更新时间: {now_str}
 
-    模型: {model}
-
-    {response.content}
-
-    ## 提示词
-
-    {cmd_prompt}
+    {points_md}
 
     """
     output_md = append_discliamer(output_md)
