@@ -52,7 +52,7 @@ for index, row in df_input.iterrows():
         end_date=today_str)
 
     # 获取上一个交易日的交易数据
-    if type == "美股":
+    if df_daily.iloc[-1]['日期'] == today.strftime('%Y-%m-%d'):
         df_last_day = df_daily[-2:-1]
     else:
         df_last_day = df_daily[-1:]
