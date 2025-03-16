@@ -1,9 +1,12 @@
 类型,代码,名称
+A股ETF,510050,华夏上证50ETF
 A股ETF,510300,沪深300ETF
 A股ETF,510500,中证500ETF
+A股ETF,511260,十年国债ETF
 A股ETF,512480,半导体ETF
 A股ETF,512890,红利低波ETF
 A股ETF,513050,中概互联网ETF
+A股ETF,513100,国泰纳指ETF
 A股ETF,513130,恒生科技ETF
 A股ETF,513300,华夏纳斯达克ETF
 A股ETF,513500,标普500ETF
@@ -23,6 +26,9 @@ A股,601127,赛力斯
 港股,03690,美团-W
 港股,07226,南方两倍做多恒科
 港股,07552,南方两倍做空恒科
+美股,QQQ,Invesco QQQ Trust
+美股,TQQQ,ProShares UltraPro QQQ
+美股,SQQQ,ProShares UltraPro Short QQQ
 美股,FXI,iShares China Large-Cap ETF
 美股,YINN,Direxion Daily FTSE China Bull 3X Shares
 美股,YANG,Direxion Daily FTSE China Bear 3X Shares

@@ -4,7 +4,7 @@ def remove_leading_spaces(s: str) -> str:
     """删除文本中的前导空格
 
     Args:
-        s (_type_): _description_
+        s (_type_): 输入字符串
 
     Returns:
         _type_: _description_
@@ -13,7 +13,15 @@ def remove_leading_spaces(s: str) -> str:
 
 
 def append_discliamer(md_text: str) -> str:
-    """"""
+    """markdown 文本末尾增加免责声明
+
+    Args:
+        md_text (str): _description_
+
+    Returns:
+        str: _description_
+    """    """"""
+
     output = f"""{md_text}
 
     ## 免责声明

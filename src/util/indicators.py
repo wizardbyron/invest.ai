@@ -84,19 +84,3 @@ def pivot_points(df_input: DataFrame) -> DataFrame:
     df_output["中间值"] = (df_output["经典"] + df_output["斐波那契"])/2
     df_output = df_output.round(3)
     return df_output
-
-
-def pivot_points_index(df_input: DataFrame) -> DataFrame:
-    high = df_input["high"].max()
-    low = df_input["low"].min()
-    close = df_input["close"].iloc[-1]
-
-    c_points = classic(high, low, close)
-    f_points = fibonacci(high, low, close)
-
-    item = {"经典": c_points, "斐波那契": f_points}
-    row_index = c_points.keys()
-    df_output = pd.DataFrame(item, index=row_index)
-    df_output["中间值"] = (df_output["经典"] + df_output["斐波那契"])/2
-    df_output = df_output.round(3)
-    return df_output

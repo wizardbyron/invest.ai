@@ -18,7 +18,7 @@ now_str = now.strftime("%Y-%m-%d %H:%M:%S")
 
 llm_list = [
     ("deepseek", "deepseek-reasoner"),
-    ("ollama", "glm4"),
+    ("ollama", "qwen2.5"),
     ("moonshot", "moonshot-v1-128k"),
     ("zhipuai", "glm-4-plus"),
 ]
@@ -129,6 +129,7 @@ def zero(type: str = 'A股ETF', max: int = 10) -> str:
     - 入选投资组合的原因
     - 具体的交易策略，并解释交易策略
     - 交易频率
+    - 每个 {type} 的止盈和止损策略
 
     ## 投资组合交易策略
     """
