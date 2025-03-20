@@ -1,23 +1,18 @@
+import os
+import time
+
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-import os
-
 
 from langchain_core.messages import HumanMessage, SystemMessage
 import pandas as pd
+
 
 from src.util.data import history_klines
 from src.util.llm import create_chat
 from src.util.indicators import pivot_points
 from src.util.tools import remove_leading_spaces, append_discliamer
 
-timezone = ZoneInfo('Asia/Shanghai')
-now = datetime.now(timezone)
-now_str = now.strftime("%Y-%m-%d %H:%M:%S")
-today = datetime.today()
-today_str = today.strftime("%Y%m%d")
-start_date = today - timedelta(days=100)
-start_date_str = start_date.strftime("%Y%m%d")
 
 llm_service = os.environ.get("LLM_SERVICE")
 model = os.environ.get("MODEL")
@@ -29,6 +24,18 @@ for index, row in df_input.iterrows():
     type = row["类型"]
     symbol = row["代码"]
     name = row["名称"]
+
+    if type == "美股":
+        timezone = ZoneInfo('America/New_York')
+    else:
+        timezone = ZoneInfo('Asia/Shanghai')
+
+    now = datetime.now(timezone)
+    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+    today = datetime.today()
+    today_str = today.strftime("%Y%m%d")
+    start_date = today - timedelta(days=100)
+    start_date_str = start_date.strftime("%Y%m%d")
 
     df_daily = history_klines(
         type=type,
@@ -52,19 +59,16 @@ for index, row in df_input.iterrows():
         end_date=today_str)
 
     # 获取上一个交易日的交易数据
-    if df_daily.iloc[-1]['日期'] == today.strftime('%Y-%m-%d'):
+    if df_daily.iloc[-1]['日期'] == today.strftime('%Y-%m-%d') and now.hour < 16:
         df_last_day = df_daily[-2:-1]
     else:
         df_last_day = df_daily[-1:]
 
     # 获取上周的交易数据周线
-    if type == "美股":
+    if now.weekday() < 5:  # 交易日
         df_last_week = df_weekly[-2:-1]
-    else:
-        if now.weekday() < 5:  # 交易日
-            df_last_week = df_weekly[-2:-1]
-        else:  # 非交易日
-            df_last_week = df_weekly[-1:]
+    else:  # 非交易日
+        df_last_week = df_weekly[-1:]
 
     # 获取上月的交易数据
     last_month = df_monthly["日期"].iloc[-1]
@@ -87,9 +91,9 @@ for index, row in df_input.iterrows():
     {pivot_points(df_last_month).to_markdown()}
     """
 
-    trade_md = f"""最近 10 个交易日 K 线数据如下:
+    trade_md = f"""最近 30 个交易日 K 线数据如下:
 
-    {df_daily[-10:].to_markdown(index=False)}
+    {df_daily[-30:].to_markdown(index=False)}
 
     均线数据：
 
