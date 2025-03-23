@@ -12,207 +12,240 @@ from langchain_community.document_loaders import WebBaseLoader
 from src.util.llm import create_chat
 from src.util.tools import remove_leading_spaces, append_discliamer
 
-timezone = ZoneInfo('Asia/Shanghai')
-now = datetime.now(timezone)
-now_str = now.strftime("%Y-%m-%d %H:%M:%S")
 
-llm_list = [
-    ("deepseek", "deepseek-reasoner"),
-    ("ollama", "qwen2.5"),
-    ("moonshot", "moonshot-v1-128k"),
-    ("zhipuai", "glm-4-plus"),
-]
+class PortfolioBuilder:
 
+    def __init__(self):
+        self.__llms = [
+            ("deepseek", "deepseek-reasoner"),
+            ("ollama", "qwen2.5"),
+            ("moonshot", "moonshot-v1-128k"),
+            ("zhipuai", "glm-4-plus"),
+        ]
 
-def selected(type: str = 'A股ETF', max: int = 10) -> str:
+    def __nowstr(self) -> str:
+        """获得当前时间字符串
 
-    df = pd.read_csv("input/selected.csv", dtype={'代码': str})
+        Returns:
+            _type_: 输出"%Y-%m-%d %H:%M:%S"格式的当前时间字符串
+        """
+        timezone = ZoneInfo('Asia/Shanghai')
+        now = datetime.now(timezone)
+        return now.strftime("%Y-%m-%d %H:%M:%S")
 
-    selected = df[df["类型"] == type]
+    def selected(self, type: str = 'A股ETF', max: int = 10) -> str:
+        """从已选清单生成投资组合
 
-    prompt = f"""以下是一份用于构建投资组合的{type}清单：
+        Args:
+            type (str, optional): _description_. Defaults to 'A股ETF'.
+            max (int, optional): _description_. Defaults to 10.
 
-    {selected.to_markdown(index=False)}
+        Returns:
+            str: _description_
+        """
 
-    从上述清单中帮我构建一份投资组合，要求如下：
+        df = pd.read_csv("input/selected.csv", dtype={'代码': str})
 
-    - 投资组合的 {type} 的个数不超过 {max} 个
-    - 采用杠铃型配置，兼顾风险和收益
-    - 包含中国A股、中国香港、美国的投资标的，且在投资组合里的占比合理
+        selected = df[df["类型"] == type]
 
-    请以表格的方式输出投资组合，要求如下：
+        prompt = f"""以下是一份用于构建投资组合的{type}清单：
 
-    - {type}名称及其代码, 以及在投资组合内的占比
-    - 入选投资组合的原因
-    - 投资组合的交易频率或者再平衡周期建议
-    - 根据风险等级的低中高顺序输出
+        {selected.to_markdown(index=False)}
 
-    并用以下格式输出投资组合中每个{type}的交易策略：
+        从上述清单中帮我构建一份投资组合，要求如下：
 
-    ## 风险等级
+        - 投资组合的 {type} 的个数不超过 {max} 个
+        - 采用杠铃型配置，兼顾风险和收益
+        - 包含中国A股、中国香港、美国的投资标的，且在投资组合里的占比合理
 
-    ### {type} 的名称（{type}的交易代码）
+        请以表格的方式输出投资组合，要求如下：
 
-    - 在投资组合内的占比
-    - 入选投资组合的原因
-    - 具体的交易策略，并解释交易策略
-    - 交易频率
+        - {type}名称及其代码, 以及在投资组合内的占比
+        - 入选投资组合的原因
+        - 投资组合的交易频率或者再平衡周期建议
+        - 根据风险等级的低中高顺序输出
 
-    ## 投资组合交易策略
-    """
+        并用以下格式输出投资组合中每个{type}的交易策略：
 
-    prompt = remove_leading_spaces(prompt)
+        ## 风险等级
 
-    print(prompt)
+        ### {type} 的名称（{type}的交易代码）
 
-    messages = [
-        SystemMessage(
-            content="你是一个专业的投资人，可以根据我所给出的投资标的编制出投资组合，做到风险和收益兼顾。"
-        ),
-        HumanMessage(
-            content=prompt
-        )
-    ]
+        - 在投资组合内的占比
+        - 入选投资组合的原因
+        - 具体的交易策略，并解释交易策略
+        - 交易频率
 
-    for llm_service, model in llm_list:
-        chat = create_chat(llm_service, model)
+        ## 投资组合交易策略
+        """
 
-        try:
-            print(f"模型: {model}")
+        prompt = remove_leading_spaces(prompt)
 
-            response = chat.invoke(messages)
+        print(prompt)
 
-            output_md = f"""# {type}投资组合(自选) - {llm_service}
+        messages = [
+            SystemMessage(
+                content="你是一个专业的投资人，可以根据我所给出的投资标的编制出投资组合，做到风险和收益兼顾。"
+            ),
+            HumanMessage(
+                content=prompt
+            )
+        ]
 
-            更新时间: {now_str}
+        for llm_service, model in self.__llms:
+            chat = create_chat(llm_service, model)
 
-            模型: {model}
+            try:
+                print(f"模型: {model}")
 
-            ## 投资组合参考
+                response = chat.invoke(messages)
 
-            {response.content}
-            """
-            output_md = append_discliamer(output_md)
-            output_md = remove_leading_spaces(output_md)
+                output_md = f"""# {type}投资组合(自选) - {llm_service}
 
-            file_path = f"docs/投资组合/{type}投资组合_自选_{llm_service}.md"
+                更新时间: {self.__nowstr()}
 
-            with open(file_path, "w") as f:
-                f.write(output_md)
+                模型: {model}
 
-        except Exception as e:
-            print(f"调用模型[{model}]失败:\n{e}")
+                ## 投资组合参考
 
+                {response.content}
+                """
+                output_md = append_discliamer(output_md)
+                output_md = remove_leading_spaces(output_md)
 
-def zero(type: str = 'A股ETF', max: int = 10) -> str:
+                file_path = f"docs/投资组合/{type}投资组合_自选_{llm_service}.md"
 
-    prompt = f"""请帮我构建一份{type}投资组合，要求如下：
+                with open(file_path, "w") as f:
+                    f.write(output_md)
 
-    - 投资组合的 {type} 的个数不超过 {max} 个
-    - 兼顾风险和收益
-    - 包含中国A股、中国香港、美国的投资标的，且在投资组合里的占比合理
+            except Exception as e:
+                print(f"调用模型[{model}]失败:\n{e}")
 
-    请以表格的方式输出投资组合，要求如下：
+    def zero(self, type: str = 'A股ETF', max: int = 10) -> str:
+        """从零生成投资组合
 
-    - {type}名称及其代码, 以及在投资组合内的占比
-    - 入选投资组合的原因
-    - 投资组合的交易频率或者再平衡周期建议
-    - 根据风险等级的低中高顺序输出
+        Args:
+            type (str, optional): 投资组合品种. Defaults to 'A股ETF'.
+            max (int, optional): 投资组合品种数量. Defaults to 10.
 
-    并用以下格式输出投资组合中每个{type}的交易策略：
+        Returns:
+            str: 投资组合文本
+        """
 
-    ## 风险等级
+        prompt = f"""请帮我构建一份{type}投资组合，要求如下：
 
-    ### {type} 的名称（{type}的交易代码）
+        - 投资组合的 {type} 的个数不超过 {max} 个
+        - 兼顾风险和收益
+        - 包含中国A股、中国香港、美国的投资标的，且在投资组合里的占比合理
 
-    - 在投资组合内的占比
-    - 入选投资组合的原因
-    - 具体的交易策略，并解释交易策略
-    - 交易频率
-    - 每个 {type} 的止盈和止损策略
+        请以表格的方式输出投资组合，要求如下：
 
-    ## 投资组合交易策略
-    """
+        - {type}名称及其代码, 以及在投资组合内的占比
+        - 入选投资组合的原因
+        - 投资组合的交易频率或者再平衡周期建议
+        - 根据风险等级的低中高顺序输出
 
-    prompt = remove_leading_spaces(prompt)
+        并用以下格式输出投资组合中每个{type}的交易策略：
 
-    print(prompt)
+        ## 风险等级
 
-    messages = [
-        SystemMessage(
-            content="你是一个专业的投资人，可以根据我所给出的投资标的编制出投资组合，做到风险和收益兼顾。"
-        ),
-        HumanMessage(
-            content=prompt
-        )
-    ]
+        ### {type} 的名称（{type}的交易代码）
 
-    for llm_service, model in llm_list:
-        chat = create_chat(llm_service, model)
+        - 在投资组合内的占比
+        - 入选投资组合的原因
+        - 具体的交易策略，并解释交易策略
+        - 交易频率
+        - 每个 {type} 的止盈和止损策略
 
-        try:
-            print(f"模型: {model}")
+        ## 投资组合交易策略
+        """
 
-            response = chat.invoke(messages)
+        prompt = remove_leading_spaces(prompt)
 
-            output_md = f"""# {type}投资组合 - {llm_service}
+        print(prompt)
 
-            更新时间: {now_str}
+        messages = [
+            SystemMessage(
+                content="你是一个专业的投资人，可以根据我所给出的投资标的编制出投资组合，做到风险和收益兼顾。"
+            ),
+            HumanMessage(
+                content=prompt
+            )
+        ]
 
-            模型: {model}
+        for llm_service, model in self.__llms:
+            chat = create_chat(llm_service, model)
 
-            ## 投资组合参考
+            try:
+                print(f"模型: {model}")
 
-            {response.content}
-            """
-            output_md = append_discliamer(output_md)
-            output_md = remove_leading_spaces(output_md)
+                response = chat.invoke(messages)
 
-            file_path = f"docs/投资组合/{type}投资组合_{llm_service}.md"
+                output_md = f"""# {type}投资组合 - {llm_service}
 
-            with open(file_path, "w") as f:
-                f.write(output_md)
+                更新时间: {self.__nowstr()}
 
-        except Exception as e:
-            print(f"调用模型[{model}]失败:\n{e}")
+                模型: {model}
 
+                ## 投资组合参考
 
-def evaluate(url: str):
-    loader = WebBaseLoader(url)
-    doc = loader.load()
-    page = doc[0].page_content
-    page = page[page.find("更新时间"):]
+                {response.content}
+                """
+                output_md = append_discliamer(output_md)
+                output_md = remove_leading_spaces(output_md)
 
-    prompt = f"""以下是一份投资组合说明：
+                file_path = f"docs/投资组合/{type}投资组合_{llm_service}.md"
 
-    {page}
+                with open(file_path, "w") as f:
+                    f.write(output_md)
 
-    请评价这个投资组合的优点和不足，并给出进一步优化建议。
-    """
+            except Exception as e:
+                print(f"调用模型[{model}]失败:\n{e}")
 
-    prompt = remove_leading_spaces(prompt)
+    def __evaluate(self, portfolio_text: str) -> str:
+        prompt = f"""以下是一份投资组合说明：
 
-    print(prompt)
+        {portfolio_text}
 
-    messages = [
-        SystemMessage(
-            content="你是一个专业的投资人，可以根据我所给出的投资组合给出评价，并给出调整方案。"
-        ),
-        HumanMessage(
-            content=prompt
-        )
-    ]
+        请评价这个投资组合的优点和不足，并给出进一步优化建议。
+        """
 
-    chat = create_chat("deepseek", "deepseek-reasoner")
+        prompt = remove_leading_spaces(prompt)
 
-    response = chat.invoke(messages)
+        # print(prompt)
 
-    print(response.content)
+        messages = [
+            SystemMessage(
+                content="你是一个专业的投资人，可以根据我所给出的投资组合给出评价，并给出调整方案。"
+            ),
+            HumanMessage(
+                content=prompt
+            )
+        ]
+
+        chat = create_chat("deepseek", "deepseek-reasoner")
+
+        response = chat.invoke(messages)
+
+        return response.content
+
+    def evaluate(self, url: str):
+        """对投资组合进行评估
+
+        Args:
+            url (str): 评估URL提供的的投资组合
+        """
+        loader = WebBaseLoader(url)
+        doc = loader.load()
+        page = doc[0].page_content
+        page = page[page.find("更新时间"):]
+
+        print(self.__evaluate(doc[0].page_content))
 
 
 if __name__ == "__main__":
     start_time = time.time()
-    fire.Fire()
+    fire.Fire(PortfolioBuilder)
     end_time = time.time()
     duration = end_time - start_time
     print(f"[生成结果用时：{duration:.2f}秒]")
