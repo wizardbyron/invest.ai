@@ -1,4 +1,4 @@
-#!/sbin/env python
+#!/usr/bin/env python
 
 import fire
 import time
