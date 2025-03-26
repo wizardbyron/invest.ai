@@ -1,3 +1,5 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 
 def remove_leading_spaces(s: str) -> str:
@@ -32,3 +34,10 @@ def append_discliamer(md_text: str) -> str:
     """
 
     return remove_leading_spaces(output)
+
+
+def is_in_trading_time(zone: ZoneInfo):
+    # 定义开始时间和结束时间;
+    now = datetime.now(zone)
+    # 判断当前时间是否在指定范围内
+    return now.hour in range(9, 16)
