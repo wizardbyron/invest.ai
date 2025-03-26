@@ -2,12 +2,10 @@
 
 import fire
 import time
-from zoneinfo import ZoneInfo
 
 import akshare as ak
 
 from src.util.indicators import pivot_points
-from src.util.tools import is_in_trading_time
 
 
 def merge_points(klines):
@@ -26,18 +24,40 @@ def merge_points(klines):
     return points
 
 
-def guide_etf(symbol: str):
+def guide(market: str, symbol: str):
+    """获取价格交易指南
+
+    Args:
+        market (str): a, etf, hk
+        symbol (str): 代码
+
+    Raises:
+        ValueError: _description_
+    """
+
     for period in ['weekly']:
-        klines = ak.fund_etf_hist_em(
-            symbol=symbol,
-            period=period)
+        if market == "etf":
+            klines = ak.fund_etf_hist_em(
+                symbol=symbol,
+                period=period)
+        elif market == "hk":
+            klines = ak.stock_hk_hist(
+                symbol=symbol,
+                period=period)
+        elif market == "a":
+            klines = ak.stock_zh_a_hist(
+                symbol=symbol,
+                period=period)
+        else:
+            raise ValueError("Invalid market type")
+
         points = merge_points(klines)
         print(f"{symbol}-{period}\n{klines[-1:]}\n{points}\n")
 
 
 if __name__ == "__main__":
     start_time = time.time()
-    fire.Fire(guide_etf)
+    fire.Fire(guide)
     end_time = time.time()
     duration = end_time - start_time
     print(f"[生成结果用时：{duration:.2f}秒]")
