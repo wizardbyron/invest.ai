@@ -10,13 +10,13 @@ from src.util.indicators import pivot_points
 
 def merge_points(klines):
     points = pivot_points(klines[-2:-1])
-    last = klines.iloc[-1]
-    points.loc["*最高*"] = last["最高"]
-    points.loc["*最低*"] = last["最低"]
-    points.loc["*开盘*"] = last["开盘"]
-    points.loc["*当前=>"] = last["收盘"]
-    latest = last["收盘"]
-    points["波动率"] = (points["中间值"] - latest)/latest
+    current = klines.iloc[-1]
+    points.loc["*最高*"] = current["最高"]
+    points.loc["*最低*"] = current["最低"]
+    points.loc["*开盘*"] = current["开盘"]
+    points.loc["*当前=>"] = current["收盘"]
+    close = current["收盘"]
+    points["波动率"] = (points["中间值"] - close)/close
     points["波动率"] = points["波动率"].map(lambda x: '{:.2%}'.format(x))
     points = points.sort_values(by="中间值", ascending=False)
     points = points[["中间值", "波动率"]]
@@ -35,7 +35,7 @@ def guide(market: str, symbol: str):
         ValueError: _description_
     """
 
-    for period in ['weekly']:
+    for period in ['daily', 'weekly']:
         if market == "etf":
             klines = ak.fund_etf_hist_em(
                 symbol=symbol,

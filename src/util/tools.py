@@ -36,7 +36,7 @@ def append_discliamer(md_text: str) -> str:
     return remove_leading_spaces(output)
 
 
-def is_in_trading_time(zone: ZoneInfo):
+def is_trading_time(zone: ZoneInfo):
     # 定义开始时间和结束时间;
     now = datetime.now(zone)
     # 判断当前时间是否在指定范围内

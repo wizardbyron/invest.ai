@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 import akshare as ak
 
 from src.util.indicators import pivot_points
-from src.util.tools import is_in_trading_time
+from src.util.tools import is_trading_time
 
 
 def merge_points(klines):
@@ -31,7 +31,7 @@ def merge_points(klines):
 def monitor(market: str):
     symbol_map = {
         'nasdaq': {
-            'symbols': ['105.SQQQ', '105.TQQQ'],
+            'symbols': ['105.TQQQ', '105.SQQQ'],
             'time_zone': 'America/New_York',
         },
         'yinnyang': {
@@ -45,7 +45,7 @@ def monitor(market: str):
     }
     tzone = symbol_map[market]['time_zone']
     symbols = symbol_map[market]['symbols']
-    while (is_in_trading_time(ZoneInfo(tzone))):
+    while (is_trading_time(ZoneInfo(tzone))):
         for symbol in symbols:
             for period in ['daily', 'weekly']:
                 if market in ["nasdaq", "yinnyang"]:
