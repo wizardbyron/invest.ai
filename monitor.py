@@ -45,7 +45,8 @@ def monitor(market: str):
     }
     tzone = symbol_map[market]['time_zone']
     symbols = symbol_map[market]['symbols']
-    while (is_trading_time(ZoneInfo(tzone))):
+    is_trading = True
+    while (is_trading):
         for symbol in symbols:
             for period in ['daily', 'weekly']:
                 if market in ["nasdaq", "yinnyang"]:
@@ -59,6 +60,7 @@ def monitor(market: str):
                 points = merge_points(klines)
                 print(f"{symbol}-{period}\n{points}\n")
         time.sleep(10)
+        is_trading = is_trading_time(ZoneInfo(tzone))
     print(f"Market {market} is closed.")
 
 
