@@ -5,23 +5,7 @@ import time
 
 import akshare as ak
 
-from src.util.indicators import pivot_points
-
-
-def merge_points(klines):
-    points = pivot_points(klines[-2:-1])
-    current = klines.iloc[-1]
-    points.loc["*最高*"] = current["最高"]
-    points.loc["*最低*"] = current["最低"]
-    points.loc["*开盘*"] = current["开盘"]
-    points.loc["*当前=>"] = current["收盘"]
-    close = current["收盘"]
-    points["波动率"] = (points["中间值"] - close)/close
-    points["波动率"] = points["波动率"].map(lambda x: '{:.2%}'.format(x))
-    points = points.sort_values(by="中间值", ascending=False)
-    points = points[["中间值", "波动率"]]
-    points = points.round(3)
-    return points
+from src.util.indicators import merge_points
 
 
 def guide(market: str, symbol: str):

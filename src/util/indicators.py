@@ -89,3 +89,20 @@ def pivot_points(df_input: DataFrame) -> DataFrame:
 
     df_output = df_output.round(3)
     return df_output
+
+
+def merge_points(klines: DataFrame) -> DataFrame:
+    points = pivot_points(klines[-2:-1])
+    points.loc["*昨收"] = klines.iloc[-2]["收盘"]
+    today = klines.iloc[-1]
+    points.loc["*最高"] = today["最高"]
+    points.loc["*开盘"] = today["开盘"]
+    points.loc["*最低"] = today["最低"]
+    points.loc["*当前>"] = today["收盘"]
+    latest = today["收盘"]
+    points["波动率"] = (points["中间值"] - latest)/latest
+    points["波动率"] = points["波动率"].map(lambda x: '{:.2%}'.format(x))
+    points = points.sort_values(by="中间值", ascending=False)
+    points = points[["中间值", "波动率"]]
+    points = points.round(3)
+    return points

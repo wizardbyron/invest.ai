@@ -6,35 +6,37 @@ from zoneinfo import ZoneInfo
 
 import akshare as ak
 
-from src.util.indicators import pivot_points
+from pandas import DataFrame
+
+from src.util.indicators import merge_points
 from src.util.tools import is_trading_time
 
 
-def merge_points(klines):
-    points = pivot_points(klines[-2:-1])
-    today = klines.iloc[-1]
-    vwap = today["成交额"].sum() / today["成交量"].sum()
-    points.loc["*VWAP"] = vwap
-    points.loc["*最高"] = today["最高"]
-    points.loc["*开盘"] = today["开盘"]
-    points.loc["*最低"] = today["最低"]
-    points.loc["*当前>"] = today["收盘"]
-    latest = today["收盘"]
-    points["波动率"] = (points["中间值"] - latest)/latest
-    points["波动率"] = points["波动率"].map(lambda x: '{:.2%}'.format(x))
-    points = points.sort_values(by="中间值", ascending=False)
-    points = points[["中间值", "波动率"]]
-    points = points.round(3)
-    return points
+def trade(points: DataFrame):
+    cur_price = points.loc["*当前>", "中间值"]
+    if points.loc["*开盘", "中间值"] > points.loc["*昨收", "中间值"]:  # 高开
+        buy_point = "支撑位1.5"
+        sell_point = "阻力位1.5"
+    else:  # 低开
+        buy_point = "支撑位1.5"
+        sell_point = "阻力位1.5"
+    buy_price = points.loc[buy_point, "中间值"]
+    sell_price = points.loc[sell_point, "中间值"]
+    if cur_price > sell_price:
+        print(f"当前价格{cur_price}高于{sell_price}，建议卖出")
+    elif cur_price < buy_price:
+        print(f"当前价格{cur_price}低于{buy_price}，建议买入")
+    else:
+        print(f"当前价格{cur_price}在{buy_price}和{sell_price}之间，观望")
 
 
 def monitor(market: str):
     symbol_map = {
-        'nasdaq': {
+        'qqq': {
             'symbols': ['105.TQQQ', '105.SQQQ'],
             'time_zone': 'America/New_York',
         },
-        'yinnyang': {
+        'yy': {
             'symbols': ['107.YINN', '107.YANG'],
             'time_zone': 'America/New_York',
         },
@@ -48,8 +50,8 @@ def monitor(market: str):
     is_trading = True
     while (is_trading):
         for symbol in symbols:
-            for period in ['daily', 'weekly']:
-                if market in ["nasdaq", "yinnyang"]:
+            for period in ['daily']:
+                if market in ["qqq", "yy"]:
                     klines = ak.stock_us_hist(
                         symbol=symbol,
                         period=period)
@@ -59,6 +61,7 @@ def monitor(market: str):
                         period=period)
                 points = merge_points(klines)
                 print(f"{symbol}-{period}\n{points}\n")
+                trade(points)
         time.sleep(10)
         is_trading = is_trading_time(ZoneInfo(tzone))
     print(f"Market {market} is closed.")
