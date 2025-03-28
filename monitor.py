@@ -10,24 +10,7 @@ from pandas import DataFrame
 
 from src.util.indicators import merge_points
 from src.util.tools import is_trading_time
-
-
-def trade(points: DataFrame):
-    cur_price = points.loc["*当前>", "中间值"]
-    if points.loc["*开盘", "中间值"] > points.loc["*昨收", "中间值"]:  # 高开
-        buy_point = "支撑位1.5"
-        sell_point = "阻力位1.5"
-    else:  # 低开
-        buy_point = "支撑位1.5"
-        sell_point = "阻力位1.5"
-    buy_price = points.loc[buy_point, "中间值"]
-    sell_price = points.loc[sell_point, "中间值"]
-    if cur_price > sell_price:
-        print(f"当前价格{cur_price}高于{sell_price}，建议卖出")
-    elif cur_price < buy_price:
-        print(f"当前价格{cur_price}低于{buy_price}，建议买入")
-    else:
-        print(f"当前价格{cur_price}在{buy_price}和{sell_price}之间，观望")
+from src.util.strategy import intraday
 
 
 def monitor(market: str):
@@ -61,7 +44,7 @@ def monitor(market: str):
                         period=period)
                 points = merge_points(klines)
                 print(f"{symbol}-{period}\n{points}\n")
-                trade(points)
+                intraday(points)
         time.sleep(10)
         is_trading = is_trading_time(ZoneInfo(tzone))
     print(f"Market {market} is closed.")

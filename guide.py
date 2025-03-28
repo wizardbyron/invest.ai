@@ -6,6 +6,7 @@ import time
 import akshare as ak
 
 from src.util.indicators import merge_points
+from src.util.strategy import intraday
 
 
 def guide(market: str, symbol: str):
@@ -37,6 +38,7 @@ def guide(market: str, symbol: str):
 
         points = merge_points(klines)
         print(f"{symbol}-{period}\n{klines[-1:]}\n{points}\n")
+        intraday(points)
 
 
 if __name__ == "__main__":
