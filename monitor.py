@@ -50,7 +50,7 @@ def monitor(market: str):
     is_trading = True
     while (is_trading):
         for symbol in symbols:
-            for period in ['daily']:
+            for period in ['daily', 'weekly']:
                 if market in ["qqq", "yy"]:
                     klines = ak.stock_us_hist(
                         symbol=symbol,

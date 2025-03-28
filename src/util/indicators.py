@@ -95,9 +95,9 @@ def merge_points(klines: DataFrame, type: str = "中间值") -> DataFrame:
     points.loc["*开盘"] = today["开盘"]
     points.loc["*最低"] = today["最低"]
     points.loc["*当前>"] = today["收盘"]
-    latest = today["收盘"]
-    points["波动率"] = (points[type] - latest)/latest
-    points["波动率"] = points[type].map(lambda x: '{:.2%}'.format(x))
+    cur_price = today["收盘"]
+    points["波动率"] = (points[type] - cur_price)/cur_price
+    points["波动率"] = points["波动率"].map(lambda x: '{:.2%}'.format(x))
     points = points.sort_values(by=type, ascending=False)
     points = points[[type, "波动率"]]
     points = points.round(3)
