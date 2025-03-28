@@ -1,0 +1,1086 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://invest-ai.click/%E6%8A%95%E8%B5%84%E7%BB%84%E5%90%88/A%E8%82%A1ETF%E6%8A%95%E8%B5%84%E7%BB%84%E5%90%88_%E8%87%AA%E9%80%89_deepseek/">
+      
+      
+        <link rel="prev" href="../A%E8%82%A1ETF%E6%8A%95%E8%B5%84%E7%BB%84%E5%90%88_zhipuai/">
+      
+      
+        <link rel="next" href="../A%E8%82%A1ETF%E6%8A%95%E8%B5%84%E7%BB%84%E5%90%88_%E8%87%AA%E9%80%89_moonshot/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.9">
+    
+    
+      
+        <title>A股ETF投资组合(自选) - deepseek - Invest.AI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#aetf-deepseek" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="Invest.AI" class="md-header__button md-logo" aria-label="Invest.AI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Invest.AI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              A股ETF投资组合(自选) - deepseek
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="暗黑模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="暗黑模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="明亮模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="明亮模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Invest.AI" class="md-nav__button md-logo" aria-label="Invest.AI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Invest.AI
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Invest.AI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    投资组合
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            投资组合
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../A%E8%82%A1ETF%E6%8A%95%E8%B5%84%E7%BB%84%E5%90%88_deepseek/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    A股ETF投资组合 - deepseek
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../A%E8%82%A1ETF%E6%8A%95%E8%B5%84%E7%BB%84%E5%90%88_moonshot/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    A股ETF投资组合 - moonshot
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../A%E8%82%A1ETF%E6%8A%95%E8%B5%84%E7%BB%84%E5%90%88_ollama/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    A股ETF投资组合 - ollama
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../A%E8%82%A1ETF%E6%8A%95%E8%B5%84%E7%BB%84%E5%90%88_zhipuai/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    A股ETF投资组合 - zhipuai
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    A股ETF投资组合(自选) - deepseek
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    A股ETF投资组合(自选) - deepseek
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      投资组合参考
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="投资组合参考">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      投资组合构建（杠铃型策略）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      风险等级
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="风险等级">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      低风险
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="低风险">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etf518880" class="md-nav__link">
+    <span class="md-ellipsis">
+      黄金ETF（518880）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etf512890" class="md-nav__link">
+    <span class="md-ellipsis">
+      红利低波ETF（512890）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      中风险
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="中风险">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#300etf510300" class="md-nav__link">
+    <span class="md-ellipsis">
+      沪深300ETF（510300）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#500etf513500" class="md-nav__link">
+    <span class="md-ellipsis">
+      标普500ETF（513500）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      高风险
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="高风险">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etf512480" class="md-nav__link">
+    <span class="md-ellipsis">
+      半导体ETF（512480）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etf513130" class="md-nav__link">
+    <span class="md-ellipsis">
+      恒生科技ETF（513130）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      投资组合交易策略
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      免责声明
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../A%E8%82%A1ETF%E6%8A%95%E8%B5%84%E7%BB%84%E5%90%88_%E8%87%AA%E9%80%89_moonshot/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    A股ETF投资组合(自选) - moonshot
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../A%E8%82%A1ETF%E6%8A%95%E8%B5%84%E7%BB%84%E5%90%88_%E8%87%AA%E9%80%89_ollama/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    A股ETF投资组合(自选) - ollama
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../A%E8%82%A1ETF%E6%8A%95%E8%B5%84%E7%BB%84%E5%90%88_%E8%87%AA%E9%80%89_zhipuai/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    A股ETF投资组合(自选) - zhipuai
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      投资组合参考
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="投资组合参考">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      投资组合构建（杠铃型策略）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      风险等级
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="风险等级">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      低风险
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="低风险">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etf518880" class="md-nav__link">
+    <span class="md-ellipsis">
+      黄金ETF（518880）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etf512890" class="md-nav__link">
+    <span class="md-ellipsis">
+      红利低波ETF（512890）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      中风险
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="中风险">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#300etf510300" class="md-nav__link">
+    <span class="md-ellipsis">
+      沪深300ETF（510300）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#500etf513500" class="md-nav__link">
+    <span class="md-ellipsis">
+      标普500ETF（513500）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      高风险
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="高风险">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etf512480" class="md-nav__link">
+    <span class="md-ellipsis">
+      半导体ETF（512480）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etf513130" class="md-nav__link">
+    <span class="md-ellipsis">
+      恒生科技ETF（513130）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      投资组合交易策略
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      免责声明
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="aetf-deepseek">A股ETF投资组合(自选) - deepseek</h1>
+<p>更新时间: 2025-03-16 21:06:53</p>
+<p>模型: deepseek-reasoner</p>
+<h2 id="_1">投资组合参考</h2>
+<h3 id="_2">投资组合构建（杠铃型策略）</h3>
+<table>
+<thead>
+<tr>
+<th>风险等级</th>
+<th>A股ETF名称（代码）</th>
+<th>占比</th>
+<th>入选原因</th>
+<th>交易频率/再平衡周期</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>低风险</td>
+<td>黄金ETF（518880）</td>
+<td>5%</td>
+<td>避险资产对冲市场波动</td>
+<td>季度再平衡</td>
+</tr>
+<tr>
+<td>低风险</td>
+<td>红利低波ETF（512890）</td>
+<td>10%</td>
+<td>高股息+低波动特性，提供稳定现金流</td>
+<td>半年再平衡</td>
+</tr>
+<tr>
+<td>低风险</td>
+<td>恒生红利ETF（513950）</td>
+<td>5%</td>
+<td>香港高股息资产，分散区域风险</td>
+<td>半年再平衡</td>
+</tr>
+<tr>
+<td>中风险</td>
+<td>沪深300ETF（510300）</td>
+<td>15%</td>
+<td>中国核心资产代表，覆盖大盘蓝筹</td>
+<td>年度再平衡</td>
+</tr>
+<tr>
+<td>中风险</td>
+<td>标普500ETF（513500）</td>
+<td>10%</td>
+<td>美国经济晴雨表，全球资产配置基础</td>
+<td>年度再平衡</td>
+</tr>
+<tr>
+<td>中风险</td>
+<td>中证500ETF（510500）</td>
+<td>10%</td>
+<td>中小盘成长股补充，捕捉经济复苏弹性</td>
+<td>半年调仓</td>
+</tr>
+<tr>
+<td>高风险</td>
+<td>半导体ETF（512480）</td>
+<td>10%</td>
+<td>科技周期核心赛道，高成长高波动</td>
+<td>季度动态调整</td>
+</tr>
+<tr>
+<td>高风险</td>
+<td>恒生科技ETF（513130）</td>
+<td>15%</td>
+<td>港股科技龙头，估值修复潜力</td>
+<td>月度监控</td>
+</tr>
+<tr>
+<td>高风险</td>
+<td>科创50ETF（588000）</td>
+<td>10%</td>
+<td>硬科技战略方向，政策支持明确</td>
+<td>季度动态调整</td>
+</tr>
+<tr>
+<td>中高风险</td>
+<td>华夏纳斯达克ETF（513300）</td>
+<td>10%</td>
+<td>全球科技前沿配置，美元资产对冲</td>
+<td>季度再平衡</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_3">风险等级</h2>
+<h3 id="_4">低风险</h3>
+<h4 id="etf518880">黄金ETF（518880）</h4>
+<ul>
+<li><strong>占比</strong>：5%</li>
+<li><strong>原因</strong>：通胀对冲工具，与股票资产负相关性显著</li>
+<li><strong>策略</strong>：采用逆向配置策略，当VIX恐慌指数＞25时增配1-2%</li>
+<li><strong>频率</strong>：季度监测金价/美债实际收益率变化</li>
+</ul>
+<h4 id="etf512890">红利低波ETF（512890）</h4>
+<ul>
+<li><strong>占比</strong>：10%</li>
+<li><strong>原因</strong>：熊市防御性强，历史年化波动率＜15%</li>
+<li><strong>策略</strong>：股息再投资+阈值再平衡（单月跌幅＞8%补仓）</li>
+<li><strong>频率</strong>：半年调仓</li>
+</ul>
+<hr />
+<h3 id="_5">中风险</h3>
+<h4 id="300etf510300">沪深300ETF（510300）</h4>
+<ul>
+<li><strong>占比</strong>：15%</li>
+<li><strong>原因</strong>：贝塔收益核心来源，MSCI中国A股纳入基准</li>
+<li><strong>策略</strong>：估值分位策略（PE＜10年30%分位时超配至20%）</li>
+<li><strong>频率</strong>：年度再平衡</li>
+</ul>
+<h4 id="500etf513500">标普500ETF（513500）</h4>
+<ul>
+<li><strong>占比</strong>：10%</li>
+<li><strong>原因</strong>：分散汇率风险，挂钩美元资产实际回报</li>
+<li><strong>策略</strong>：美债收益率倒挂结束后启动定投</li>
+<li><strong>频率</strong>：年度调仓</li>
+</ul>
+<hr />
+<h3 id="_6">高风险</h3>
+<h4 id="etf512480">半导体ETF（512480）</h4>
+<ul>
+<li><strong>占比</strong>：10%</li>
+<li><strong>原因</strong>：国产替代+AI算力双重驱动，波动率＞30%</li>
+<li><strong>策略</strong>：行业景气度跟踪（费城半导体指数突破MA120加仓）</li>
+<li><strong>频率</strong>：季度动态调整</li>
+</ul>
+<h4 id="etf513130">恒生科技ETF（513130）</h4>
+<ul>
+<li><strong>占比</strong>：15%</li>
+<li><strong>原因</strong>：估值折价显著，美联储政策转向受益标的</li>
+<li><strong>策略</strong>：港股通资金流向监测（连续5日净流入触发调仓）</li>
+<li><strong>频率</strong>：月度监控</li>
+</ul>
+<hr />
+<h2 id="_7">投资组合交易策略</h2>
+<ol>
+<li><strong>杠铃两端动态平衡</strong>：</li>
+<li>当高风险资产季度收益＞20%时，提取50%超额收益转配低风险资产</li>
+<li>
+<p>当黄金/红利组合季度最大回撤＞5%时，触发防御性加仓</p>
+</li>
+<li>
+<p><strong>跨市场对冲</strong>：</p>
+</li>
+<li>利用港股红利ETF（513820）与纳斯达克ETF（513300）构建汇率对冲组合</li>
+<li>
+<p>当人民币兑美元波动率＞8%时，调整美元资产占比±3%</p>
+</li>
+<li>
+<p><strong>事件驱动调仓</strong>：</p>
+</li>
+<li>美联储议息会议前3日降低高风险仓位至基准的80%</li>
+<li>A股财报季结束后评估行业轮动机会</li>
+</ol>
+<p><strong>再平衡周期</strong>：每季度末检查偏离度（单项仓位±5%触发再平衡）
+<strong>极端行情应对</strong>：若组合单月回撤＞10%，启动10%现金备用金补仓机制</p>
+<blockquote>
+<p>（注：以上策略需配合宏观经济指标跟踪，建议每月检视CPI/PMI/美债收益率等核心数据）</p>
+</blockquote>
+<h2 id="_8">免责声明</h2>
+<p>以上内容由人工智能大语言模型生成，并用于研究实验目的。
+其内容不构成任何投资建议，也不作为任何法律法规、监管政策的依据。
+投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 invest-ai.click
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
