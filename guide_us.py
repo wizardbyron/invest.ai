@@ -24,21 +24,21 @@ def is_trading_time():
     return False
 
 
-def watch(code: str):
-    # 预读取股票代码
-    us_symbol_dict = ak.stock_us_spot_em()
-    stock = us_symbol_dict[us_symbol_dict["代码"].str.endswith(f'.{code}')]
-    symbol = stock['代码'].values[0]
-
+def watch(key: str):
+    hedge_map = {
+        'qqq': ['105.TQQQ', '105.SQQQ'],
+        'yy': ['107.YINN', '107.YANG']
+    }
     is_trading = True
     while (is_trading):
-        for period in ['daily', 'weekly']:
-            klines = ak.stock_us_hist(
-                symbol=symbol,
-                period=period)
-            points = merge_points(klines)
-            print(f"{symbol}-{period}\n{points}\n")
-            intraday(points)
+        for symbol in hedge_map[key]:
+            for period in ['daily']:
+                klines = ak.stock_us_hist(
+                    symbol=symbol,
+                    period=period)
+                points = merge_points(klines)
+                print(f"{symbol}-{period}\n{points}\n")
+                intraday(points)
         time.sleep(10)
         is_trading = is_trading_time()
     print(f"Market is closed.")
