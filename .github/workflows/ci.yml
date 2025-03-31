@@ -4,8 +4,6 @@ on:
     branches:
       - master 
       - main
-  # schedule:
-  #   - cron: '0 10 * * 1-5'
 permissions:
   contents: write
 jobs:
@@ -17,16 +15,6 @@ jobs:
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-      # - uses: actions/setup-python@v5
-      #   with:
-      #     python-version: 3.13.0
-      # - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-      # - run: pip install -r requirements.txt
-      # - run: python guide.py
-      #   env:
-      #     LLM_SERVICE: ${{ vars.LLM_SERVICE }}
-      #     MODEL: ${{ vars.MODEL }}
-      #     ZHIPUAI_API_KEY: ${{ secrets.ZHIPUAI_API_KEY }}
       - uses: actions/cache@v4
         with:
           key: mkdocs-material-${{ env.cache_id }}
