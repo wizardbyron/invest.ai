@@ -6,7 +6,7 @@ import time
 import akshare as ak
 
 from src.util.indicators import merge_points
-from src.util.strategy import intraday
+from src.util.strategy import intraday, weekly
 
 
 class TradingGuide:
@@ -50,7 +50,7 @@ class TradingGuide:
 
             points = merge_points(klines)
             print(f"{symbol}-{period}\n{klines[-1:]}\n{points}\n")
-            intraday(points)
+            weekly(points)
 
 
 if __name__ == "__main__":

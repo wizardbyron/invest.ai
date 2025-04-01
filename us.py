@@ -27,18 +27,16 @@ def is_trading_time():
 def watch(key: str):
     hedge_map = {
         'qqq': ['105.TQQQ', '105.SQQQ'],
-        'yy': ['107.YINN', '107.YANG']
+        'yy': ['107.YINN', '107.YANG'],
+        'vix': ['107.UVIX', '107.VIXY', '107.SVIX'],
     }
     is_trading = True
     while (is_trading):
         for symbol in hedge_map[key]:
-            for period in ['daily']:
-                klines = ak.stock_us_hist(
-                    symbol=symbol,
-                    period=period)
-                points = merge_points(klines)
-                print(f"{symbol}-{period}\n{points}\n")
-                intraday(points)
+            klines = ak.stock_us_hist(symbol=symbol)
+            points = merge_points(klines)
+            print(f"{symbol}\n{points}\n")
+            intraday(points)
         time.sleep(10)
         is_trading = is_trading_time()
     print(f"Market is closed.")
