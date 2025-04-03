@@ -31,7 +31,7 @@ def guide(market: str, symbol: str):
                 period=period)
         elif market == "a":
             klines = ak.stock_zh_a_hist(
-                symbol=symbol,
+                symbol=str(symbol),
                 period=period)
         else:
             raise ValueError("Invalid market type")
