@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 import akshare as ak
 
 from src.util.indicators import merge_points
-from src.util.strategy import intraday
+from src.util.strategy import pivot_points_grid
 
 
 def is_trading_time():
@@ -27,16 +27,19 @@ def is_trading_time():
 def watch(key: str):
     hedge_map = {
         'qqq': ['105.TQQQ', '105.SQQQ'],
+        'vix': ['107.VIXY', '107.SVIX'],
         'yy': ['107.YINN', '107.YANG'],
-        'vix': ['107.UVIX', '107.VIXY', '107.SVIX'],
     }
     is_trading = True
     while (is_trading):
         for symbol in hedge_map[key]:
-            klines = ak.stock_us_hist(symbol=symbol)
+            klines = ak.stock_us_hist(
+                symbol=symbol,
+                period='weekly',
+                adjust='qfq')
             points = merge_points(klines)
             print(f"{symbol}\n{points}\n")
-            intraday(points)
+            pivot_points_grid(points)
         time.sleep(10)
         is_trading = is_trading_time()
     print(f"Market is closed.")
