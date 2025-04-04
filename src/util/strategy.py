@@ -1,7 +1,7 @@
 from pandas import DataFrame
 
 
-def pivot_points_grid(points: DataFrame, buy_point: float = 2.5, sell_point: float = 2.5):
+def pivot_points_grid(points: DataFrame, buy_point: float = 2, sell_point: float = 2):
     cur_price = points.loc["*当前>", "中间值"]
     buy_price = points.loc[f"支撑位{buy_point}", "中间值"]
     sell_price = points.loc[f"阻力位{sell_point}", "中间值"]

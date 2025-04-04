@@ -55,3 +55,20 @@ def is_trading_time(zone: str) -> bool:
     if now_ny.weekday() in range(0, 5):  # 0-4 表示周一到周五
         return market_open <= now_ny <= market_close
     return False
+
+
+def identify_stock_type(code):
+    # 处理代码可能存在的前后空格
+    code = str(code).strip()
+    # 判断是否为 A 股
+    if code.isdigit() and len(code) == 6:
+        if code.startswith(('60', '688', '00', '30')):
+            return 'A股'
+    # 判断是否为 A 股 ETF
+    if code.isdigit() and len(code) == 6:
+        if code.startswith(('51', '15', '16', '18')):
+            return 'A股ETF'
+    # 判断是否为港股
+    if code.isdigit() and len(code) == 5:
+        return '港股'
+    return '未知类型'
