@@ -7,28 +7,16 @@ from zoneinfo import ZoneInfo
 
 import akshare as ak
 
+from src.util.tools import is_trading_time
 from src.util.indicators import merge_points
 from src.util.strategy import pivot_points_grid
-
-
-def is_trading_time():
-    # 美股交易时间通常是从早上9:30到下午4:00（纽约时间）
-    ny_tz = ZoneInfo('America/New_York')
-    now_ny = datetime.now(ny_tz)
-    market_open = now_ny.replace(hour=9, minute=30, second=0, microsecond=0)
-    market_close = now_ny.replace(hour=16, minute=0, second=0, microsecond=0)
-
-    # 检查是否在交易日
-    if now_ny.weekday() in range(0, 5):  # 0-4 表示周一到周五
-        return market_open <= now_ny <= market_close
-    return False
 
 
 def watch(key: str):
     hedge_map = {
         'qqq': ['105.TQQQ', '105.SQQQ'],
         'vix': ['107.VIXY', '107.SVIX'],
-        'yy': ['107.YINN', '107.YANG'],
+        'fix': ['107.YINN', '107.YANG'],
     }
     is_trading = True
     while (is_trading):
@@ -41,7 +29,7 @@ def watch(key: str):
             print(f"{symbol}\n{points}\n")
             pivot_points_grid(points)
         time.sleep(10)
-        is_trading = is_trading_time()
+        is_trading = is_trading_time('America/New_York')
     print(f"Market is closed.")
 
 

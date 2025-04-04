@@ -36,8 +36,22 @@ def append_discliamer(md_text: str) -> str:
     return remove_leading_spaces(output)
 
 
-def is_trading_time(zone: ZoneInfo):
-    # 定义开始时间和结束时间;
-    now = datetime.now(zone)
+def is_trading_time(zone: str) -> bool:
+    """判断是否在交易时间
+
+    Args:
+        zone (str): 时区
+
+    Returns:
+        bool: _description_
+    """
     # 判断当前时间是否在指定范围内
-    return now.hour in range(9, 16)
+    ny_tz = ZoneInfo(zone)
+    now_ny = datetime.now(ny_tz)
+    market_open = now_ny.replace(hour=9, minute=30, second=0, microsecond=0)
+    market_close = now_ny.replace(hour=16, minute=0, second=0, microsecond=0)
+
+    # 检查是否在交易日
+    if now_ny.weekday() in range(0, 5):  # 0-4 表示周一到周五
+        return market_open <= now_ny <= market_close
+    return False
