@@ -12,7 +12,7 @@ import pandas as pd
 
 from src.util.data import history_klines
 from src.util.llm import create_chat
-from src.util.indicators import pivot_points
+from src.util.indicators import pivot_points_table
 from src.util.tools import remove_leading_spaces, append_discliamer
 
 
@@ -90,15 +90,15 @@ def guide(input_date: str = None):
 
         points_md = f"""上个交易日枢轴点 ({df_last_day["日期"].iloc[-1]})：
 
-        {pivot_points(df_last_day).to_markdown()}
+        {pivot_points_table(df_last_day).to_markdown()}
 
         上周枢轴点 ({df_last_week["日期"].iloc[-1]})：
 
-        {pivot_points(df_last_week).to_markdown()}
+        {pivot_points_table(df_last_week).to_markdown()}
 
         上月枢轴点（{df_last_month["日期"].iloc[-1]}）：
 
-        {pivot_points(df_last_month).to_markdown()}
+        {pivot_points_table(df_last_month).to_markdown()}
         """
 
         trade_md = f"""最近 30 个交易日 K 线数据如下:

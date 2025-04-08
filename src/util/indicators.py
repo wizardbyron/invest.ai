@@ -1,4 +1,4 @@
-from pandas import DataFrame
+from pandas import DataFrame, Series
 import pandas as pd
 
 
@@ -70,7 +70,15 @@ def fibonacci(high: float, low: float, close: float) -> dict[str, float]:
     }
 
 
-def pivot_points(df_input: DataFrame) -> DataFrame:
+def pivot_points_table(df_input: DataFrame) -> DataFrame:
+    """将多种枢轴点合并展示
+
+    Args:
+        df_input (DataFrame): k线数据
+
+    Returns:
+        DataFrame: _description_
+    """
     high = df_input["最高"].max()
     low = df_input["最低"].min()
     close = df_input["收盘"].iloc[-1]
@@ -87,16 +95,23 @@ def pivot_points(df_input: DataFrame) -> DataFrame:
     return df_output
 
 
-def merge_points(klines: DataFrame, type: str = "中间值") -> DataFrame:
-    points = pivot_points(klines[-2:-1])
-    points.loc["*昨收"] = klines.iloc[-2]["收盘"]
-    today = klines.iloc[-1]
-    points.loc["*最高"] = today["最高"]
-    points.loc["*开盘"] = today["开盘"]
-    points.loc["*最低"] = today["最低"]
-    points.loc["*当前>"] = today["收盘"]
-    cur_price = today["收盘"]
-    points["波动率"] = (points[type] - cur_price)/cur_price
+def merge_points(kline: Series, points: DataFrame, type: str = "中间值") -> DataFrame:
+    """将K线和枢轴点合并显示
+
+    Args:
+        kline (Series): K线
+        points (DataFrame): 枢轴点
+        type (str, optional): 经典/斐波那契/中间值. Defaults to "中间值".
+
+    Returns:
+        DataFrame: _description_
+    """
+    points.loc["*最高"] = kline["最高"]
+    points.loc["*开盘"] = kline["开盘"]
+    points.loc["*最低"] = kline["最低"]
+    points.loc["*当前>"] = kline["收盘"]
+    points.loc["*VWAP>"] = kline["成交额"]/kline["成交量"]
+    points["波动率"] = (points[type] - kline["收盘"])/kline["收盘"]
     points["波动率"] = points["波动率"].map(lambda x: '{:.2%}'.format(x))
     points = points.sort_values(by=type, ascending=False)
     points = points[[type, "波动率"]]

@@ -2,13 +2,11 @@
 
 import fire
 import time
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 import akshare as ak
 
 from src.util.tools import is_trading_time
-from src.util.indicators import merge_points
+from src.util.indicators import pivot_points_table, merge_points
 from src.util.strategy import pivot_points_grid
 
 
@@ -23,12 +21,13 @@ def watch(key: str):
         for symbol in hedge_map[key]:
             klines = ak.stock_us_hist(
                 symbol=symbol,
-                period='weekly',
+                period='daily',
                 adjust='qfq')
-            points = merge_points(klines)
-            print(f"{symbol}\n{points}\n")
-            pivot_points_grid(points)
-        time.sleep(10)
+            points = pivot_points_table(klines[-2:-1])
+            merged_points = merge_points(klines.iloc[-1], points)
+            print(f"{symbol}\n{merged_points}\n")
+            pivot_points_grid(merged_points)
+        time.sleep(5)
         is_trading = is_trading_time('America/New_York')
     print(f"Market is closed.")
 
@@ -38,4 +37,4 @@ if __name__ == "__main__":
     fire.Fire(watch)
     end_time = time.time()
     duration = end_time - start_time
-    print(f"[生成结果用时：{duration:.2f}秒]")
+    print(f"[运行时长：{duration/60:.2f}分钟]")
