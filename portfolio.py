@@ -9,8 +9,8 @@ import pandas as pd
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_community.document_loaders import WebBaseLoader
 
-from src.util.llm import create_chat
-from src.util.tools import remove_leading_spaces, append_discliamer
+from src.llm import create_chat
+from src.util import remove_leading_spaces, append_discliamer
 
 
 class PortfolioBuilder:

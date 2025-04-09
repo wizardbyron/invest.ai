@@ -1,13 +1,5 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from enum import StrEnum
-
-
-class StockType(StrEnum):
-    A = "A股"
-    A_ETF = "A股ETF"
-    HK = "港股"
-    US = "美股"
 
 
 def remove_leading_spaces(s: str) -> str:

@@ -3,8 +3,8 @@ from datetime import datetime
 import pandas as pd
 from pandas import DataFrame
 
-from src.util.indicators import fibonacci, classic
-from src.util.data import history_klines
+from src.indicators import fibonacci, classic
+from src.data import history_klines
 
 
 def commision(turnover: float) -> float:

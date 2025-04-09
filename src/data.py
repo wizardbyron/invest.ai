@@ -1,15 +1,18 @@
+from datetime import datetime
+
 import akshare as ak
+import pandas as pd
+from pandas import DataFrame
 
-# 预读取股票代码
-us_symbol_dict = ak.stock_us_spot_em()
+from src.util import identify_stock_type
 
 
-def history_klines(type: str,
-                   symbol: str,
+def history_klines(symbol: str,
+                   stock_type: str,
                    period: str = 'daily',
-                   start_date: str = '',
-                   end_date: str = '',
-                   adjust_flag: str = 'qfq'):
+                   start_date: str = "19700101",
+                   end_date: str = "22220101",
+                   adjust_flag: str = 'qfq') -> tuple[str, DataFrame]:
     """获取历史 K 线
 
     Args:
@@ -24,9 +27,11 @@ def history_klines(type: str,
         ValueError: 结果为空则会报错
 
     Returns:
-        _type_: 返回 df
+        str: 时区
+        DataFrame: 返回 df
     """
-    if type == 'A股':
+    stock_type = identify_stock_type(symbol)
+    if stock_type == 'A股':
         # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id21
         klines = ak.stock_zh_a_hist(
             symbol=symbol,
@@ -34,8 +39,9 @@ def history_klines(type: str,
             end_date=end_date,
             period=period,
             adjust=adjust_flag)
+        tzone = 'Asia/Shanghai'
 
-    elif type == 'A股ETF':
+    elif stock_type == 'A股ETF':
         # 参考: https://akshare.akfamily.xyz/data/fund/fund_public.html#id10
         klines = ak.fund_etf_hist_em(
             symbol=symbol,
@@ -43,8 +49,9 @@ def history_klines(type: str,
             end_date=end_date,
             period=period,
             adjust=adjust_flag)
+        tzone = 'Asia/Shanghai'
 
-    elif type == '港股':
+    elif stock_type == '港股':
         # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id66
         klines = ak.stock_hk_hist(
             symbol=symbol,
@@ -52,23 +59,39 @@ def history_klines(type: str,
             end_date=end_date,
             period=period,
             adjust=adjust_flag)
+        tzone = 'Hongkong'
 
-    elif type == '美股':
-        stock = us_symbol_dict[us_symbol_dict["代码"].str.endswith(f'.{symbol}')]
-        code = stock['代码'].values[0]
+    else:
         # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id56
         klines = ak.stock_us_hist(
-            symbol=code,
+            symbol=convert_us_symbol(symbol),
             start_date=start_date,
             end_date=end_date,
             period=period,
             adjust=adjust_flag)
+        tzone = 'America/New_York'
 
-    else:
-        klines = None
-
+    if klines.empty:
+        raise ValueError("没有数据，请检查参数")
     klines['日期'] = klines['日期'].astype(str)
-    if len(klines) == 0:
-        raise ValueError(f"结果为空, 请检查参数")
+    return tzone, klines
 
-    return klines
+
+def convert_us_symbol(symbol: str) -> str:
+    """美股代码转换
+
+    Args:
+        symbol (str): 美股代码
+
+    Returns:
+        str: 美股代码（带市场标记）
+    """
+    today_str = datetime.now().strftime("%Y%m%d")
+    df_symbol_cache = f".cache/us_symbols{today_str}.csv"
+    try:
+        df_symbols = pd.read_csv(df_symbol_cache)
+    except Exception as e:
+        df_symbols = ak.stock_us_spot_em()
+        df_symbols.to_csv(df_symbol_cache, index=False)
+    stock = df_symbols[df_symbols["代码"].str.endswith(f'.{symbol}')]
+    return stock['代码'].values[0]
