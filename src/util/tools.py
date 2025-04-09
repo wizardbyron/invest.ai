@@ -1,15 +1,23 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from enum import StrEnum
+
+
+class StockType(StrEnum):
+    A = "A股"
+    A_ETF = "A股ETF"
+    HK = "港股"
+    US = "美股"
 
 
 def remove_leading_spaces(s: str) -> str:
     """删除文本中的前导空格
 
     Args:
-        s (_type_): 输入字符串
+        s (str): 源字符串
 
     Returns:
-        _type_: _description_
+        str: 处理之后的字符串
     """
     return '\n'.join([line.strip() for line in s.splitlines()])
 
@@ -18,10 +26,10 @@ def append_discliamer(md_text: str) -> str:
     """markdown 文本末尾增加免责声明
 
     Args:
-        md_text (str): _description_
+        md_text (str): 源 markdown 文本
 
     Returns:
-        str: _description_
+        str: 处理之后的 markdown 文本
     """    """"""
 
     output = f"""{md_text}
@@ -43,7 +51,7 @@ def is_trading_time(zone: str) -> bool:
         zone (str): 时区
 
     Returns:
-        bool: _description_
+        bool: 是否在交易时间内
     """
     # 判断当前时间是否在指定范围内
     ny_tz = ZoneInfo(zone)
@@ -57,7 +65,15 @@ def is_trading_time(zone: str) -> bool:
     return False
 
 
-def identify_stock_type(code):
+def identify_stock_type(code: str) -> str:
+    """根据代码判断市场类型
+
+    Args:
+        code (str): 证券代码
+
+    Returns:
+        str: 市场类型
+    """
     # 处理代码可能存在的前后空格
     code = str(code).strip()
     # 判断是否为 A 股
