@@ -8,8 +8,7 @@ from src.util import identify_stock_type
 
 
 def history_klines(symbol: str,
-                   stock_type: str,
-                   period: str = 'daily',
+                   period: str,
                    start_date: str = "19700101",
                    end_date: str = "22220101",
                    adjust_flag: str = 'qfq') -> tuple[str, DataFrame]:
