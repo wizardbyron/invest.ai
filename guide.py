@@ -18,16 +18,16 @@ def guide(symbol: str) -> None:
     Raises:
         ValueError: _description_
     """
-    is_trading = True
-    while (is_trading):
-        for period in ['daily', 'weekly']:
-            tzone, klines = history_klines(symbol, period)
-            points = pivot_points_table(klines[-2:-1])
-            merged_points = merge_points(klines.iloc[-1], points)
-            print(f"{symbol}-{period}\n{klines[-1:]}\n{merged_points}")
-            pivot_points_grid(merged_points, 2, 2)
-        time.sleep(10)
-        is_trading = is_trading_time(tzone)
+    for period in ['daily', 'weekly']:
+        tzone, klines = history_klines(symbol, period)
+        if is_trading_time(tzone) and period == 'daily':
+            data = klines[-1:]
+        else:
+            data = klines[-2:-1]
+        points = pivot_points_table(data)
+        merged_points = merge_points(klines.iloc[-1], points)
+        print(f"{symbol}-{period}\n{klines[-1:]}\n{merged_points}")
+        pivot_points_grid(merged_points, type="中间值", 2, 2)
 
 
 if __name__ == "__main__":
