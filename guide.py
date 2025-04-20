@@ -27,7 +27,7 @@ def guide(symbol: str) -> None:
         points = pivot_points_table(data)
         merged_points = merge_points(klines.iloc[-1], points)
         print(f"{symbol}-{period}\n{klines[-1:]}\n{merged_points}")
-        pivot_points_grid(merged_points, type="中间值", 2, 2)
+        pivot_points_grid(merged_points, 2, 2)
 
 
 if __name__ == "__main__":

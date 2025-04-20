@@ -58,9 +58,7 @@ def pmi():
     for idx, row in df.iterrows():
         if idx == len(df):
             break
-        delta_new_order = df.loc[idx, "新订单指数(%)"]-df.loc[idx+1, "新订单指数(%)"]
-        delta_stock = df.loc[idx, "产成品库存指数(%)"]-df.loc[idx+1, "产成品库存指数(%)"]
-        df.loc[idx, "穿越周期指数"] = delta_new_order-delta_stock
+        df.loc[idx, "穿越周期指数"] = df.loc[idx, "经济势能"]-df.loc[idx+1, "经济势能"]
 
     print(df[["指标", "新订单指数(%)", "产成品库存指数(%)", "经济势能", "穿越周期指数"]])
 
