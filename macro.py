@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import time
 import akshare as ak
 import fire
@@ -24,7 +26,6 @@ def bonds(days=30):
     df_bond_zh_us_rate = ak.bond_zh_us_rate(start_date="19901219")
     df_bond_zh_us_rate = df_bond_zh_us_rate[["日期", "中国国债收益率10年", "美国国债收益率10年"]]
     print(df_bond_zh_us_rate[-days:])
-    ak.macro_china_pmi_yearly
 
 
 def intrest_rate(period=10):
@@ -38,8 +39,10 @@ def intrest_rate(period=10):
     df_euro = df_euro[df_euro["今值"].notna()]
 
 
-def pmi():
+def zh_pmi():
     '''穿越周期指数：
+
+    数据来源: https://data.stats.gov.cn/easyquery.htm?cn=A01&zb=A0B01
     PMI两期新订单差值-两期产成品库存差值
 
     预期需求 - 真实需求
@@ -61,6 +64,7 @@ def pmi():
         df.loc[idx, "穿越周期指数"] = df.loc[idx, "经济势能"]-df.loc[idx+1, "经济势能"]
 
     print(df[["指标", "新订单指数(%)", "产成品库存指数(%)", "经济势能", "穿越周期指数"]])
+    return df
 
 
 def zh_cpi_ppi(months=24):
@@ -80,7 +84,15 @@ def zh_cpi_ppi(months=24):
     })
     df = df[:months]
     print(df)
+    return df
 
+
+def china():
+    df_money = ak.macro_china_money_supply() # 货币供应量
+    df_cpi_ppi = zh_cpi_ppi() # cpi ppi
+    df_zh_pmi = zh_pmi() # pmi
+    df_interest = ak.macro_bank_china_interest_rate() # 利率
+    print(df_money)
 
 if __name__ == "__main__":
     start_time = time.time()
