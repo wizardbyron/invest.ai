@@ -74,9 +74,18 @@ def identify_stock_type(code: str) -> str:
             return 'A股'
     # 判断是否为 A 股 ETF
     if code.isdigit() and len(code) == 6:
-        if code.startswith(('51', '15', '16', '18')):
+        if code.startswith(('5', '15')):
             return 'A股ETF'
     # 判断是否为港股
     if code.isdigit() and len(code) == 5:
         return '港股'
     return '未知类型'
+
+def nowstr(tz='Asia/Shanghai') -> str:
+    """获得当前时间字符串
+
+    Returns:
+        _type_: 输出"%Y-%m-%d %H:%M:%S"格式的当前时间字符串
+    """
+    now = datetime.now(ZoneInfo(tz))
+    return now.strftime("%Y-%m-%d %H:%M:%S")

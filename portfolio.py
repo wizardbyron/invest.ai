@@ -10,28 +10,20 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_community.document_loaders import WebBaseLoader
 
 from src.llm import create_chat
-from src.util import remove_leading_spaces, append_discliamer
+from src.util import remove_leading_spaces, append_discliamer, nowstr
 
 
 class PortfolioBuilder:
 
     def __init__(self):
-        self.__llms = [
+        self.llm = [
             ("deepseek", "deepseek-reasoner"),
-            ("ollama", "qwen2.5"),
+            ("ollama", "qwen3"),
             ("moonshot", "moonshot-v1-128k"),
             ("zhipuai", "glm-4-plus"),
         ]
 
-    def __nowstr(self) -> str:
-        """获得当前时间字符串
 
-        Returns:
-            _type_: 输出"%Y-%m-%d %H:%M:%S"格式的当前时间字符串
-        """
-        timezone = ZoneInfo('Asia/Shanghai')
-        now = datetime.now(timezone)
-        return now.strftime("%Y-%m-%d %H:%M:%S")
 
     def selected(self, type: str = 'A股ETF', max: int = 10) -> str:
         """从已选清单生成投资组合
@@ -92,7 +84,7 @@ class PortfolioBuilder:
             )
         ]
 
-        for llm_service, model in self.__llms:
+        for llm_service, model in self.llm:
             chat = create_chat(llm_service, model)
 
             try:
@@ -102,7 +94,7 @@ class PortfolioBuilder:
 
                 output_md = f"""# {type}投资组合(自选) - {llm_service}
 
-                更新时间: {self.__nowstr()}
+                更新时间: {nowstr()}
 
                 模型: {model}
 
@@ -173,7 +165,7 @@ class PortfolioBuilder:
             )
         ]
 
-        for llm_service, model in self.__llms:
+        for llm_service, model in self.llm:
             chat = create_chat(llm_service, model)
 
             try:
@@ -183,7 +175,7 @@ class PortfolioBuilder:
 
                 output_md = f"""# {type}投资组合 - {llm_service}
 
-                更新时间: {self.__nowstr()}
+                更新时间: {nowstr()}
 
                 模型: {model}
 
