@@ -9,11 +9,12 @@ from src.strategy import pivot_points_grid
 from src.util import is_trading_time
 
 
-def guide(symbol: str) -> None:
+def guide(symbol: str, series: str = "中间值") -> None:
     """获取价格交易指南
 
     Args:
         symbol (str): 代码
+        series (str, optional): 枢轴点类型：经典/斐波那契额/中间值. Defaults to "中间值".
 
     Raises:
         ValueError: _description_
@@ -25,9 +26,9 @@ def guide(symbol: str) -> None:
         else:
             data = klines[-1:]
         points = pivot_points_table(data)
-        merged_points = merge_points(klines.iloc[-1], points)
+        merged_points = merge_points(klines.iloc[-1], points, series)
         print(f"{symbol}-{period}\n{klines[-1:]}\n{merged_points}")
-        pivot_points_grid(merged_points, 1.5, 1.5)
+        pivot_points_grid(merged_points, 1.5, 1.5, series)
 
 
 if __name__ == "__main__":
