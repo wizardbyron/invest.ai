@@ -4,11 +4,15 @@ from nicegui import ui
 from src.data import history_klines
 from src.indicators import pivot_points_table, merge_points
 from src.strategy import pivot_points_grid
-from src.util import nowstr
+from src.util import nowstr, is_trading_time
 
 def get_points(stock_code: str, period: str):
     tzone, klines = history_klines(stock_code, period)
-    points = pivot_points_table(klines[-2:-1])
+    if is_trading_time(tzone) and period == 'daily':
+        data = klines[-2:-1]
+    else:
+        data = klines[-1:]
+    points = pivot_points_table(data)
     df = merge_points(klines.iloc[-1], points)
     df.index.name = "参考点位"
     df = df.reset_index()
@@ -29,7 +33,6 @@ def update_tables():
             if weekly_table is None or daily_table is None:
                 daily_table = ui.table.from_pandas(df_daily,title=f"日内交易参考")
                 weekly_table = ui.table.from_pandas(df_weekly,title="本周交易参考")
-
             else:
                 ui.table.update_from_pandas(daily_table, df_daily)
                 ui.table.update_from_pandas(weekly_table, df_weekly)
@@ -52,7 +55,6 @@ with ui.row():
 
 with ui.footer() as footer:
     ui.label('Invest.AI © 2025')
-
 
 ui.run()
     
