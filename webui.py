@@ -4,14 +4,14 @@ from nicegui import ui
 from src.data import history_klines
 from src.indicators import pivot_points_table, merge_points
 from src.strategy import pivot_points_grid
-from src.util import nowstr, is_trading_time
+from src.util import nowstr, in_trading_time
 
 def get_points(stock_code: str, period: str):
     tzone, klines = history_klines(stock_code, period)
-    if is_trading_time(tzone) and period == 'daily':
-        data = klines[-2:-1]
-    else:
+    if not in_trading_time(tzone) and period == 'daily':
         data = klines[-1:]
+    else:
+        data = klines[-2:-1]
     points = pivot_points_table(data)
     df = merge_points(klines.iloc[-1], points)
     df.index.name = "参考点位"
