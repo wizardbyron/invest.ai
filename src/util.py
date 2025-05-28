@@ -36,7 +36,7 @@ def append_discliamer(md_text: str) -> str:
     return remove_leading_spaces(output)
 
 
-def is_trading_time(zone: str) -> bool:
+def in_trading_time(zone: str) -> bool:
     """判断是否在交易时间
 
     Args:
