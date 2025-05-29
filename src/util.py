@@ -1,3 +1,4 @@
+import subprocess
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -81,6 +82,7 @@ def identify_stock_type(code: str) -> str:
         return '港股'
     return '未知类型'
 
+
 def nowstr(tz='Asia/Shanghai') -> str:
     """获得当前时间字符串
 
@@ -89,3 +91,8 @@ def nowstr(tz='Asia/Shanghai') -> str:
     """
     now = datetime.now(ZoneInfo(tz))
     return now.strftime("%Y-%m-%d %H:%M:%S")
+
+
+def send_voice(message):
+    command = f'''say {message}'''
+    subprocess.call(command, shell=True)
