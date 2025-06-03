@@ -6,7 +6,7 @@ import time
 from src.data import history_klines
 from src.indicators import pivot_points_table, merge_points
 from src.strategy import pivot_points_grid
-from src.util import in_trading_time, send_voice
+from src.util import in_trading_time, send_voice, numbers_in_chinese
 
 
 class Guide:
@@ -54,11 +54,11 @@ class Guide:
                 print(f"\n{symbol}-{period}:\n{klines[-1:]}\n{merged_points}")
                 order, price = pivot_points_grid(
                     merged_points, 1.5, 1.5, series)
-                if order != "持有":
-                    msg = f"注意 {price} {order} {symbol}"
+                if order == "持有":
+                    time.sleep(10)
+                else:
+                    msg = f"注意 {price} {order} {numbers_in_chinese(symbol)}"
                     send_voice(msg)
-
-            time.sleep(10)
 
 
 if __name__ == "__main__":

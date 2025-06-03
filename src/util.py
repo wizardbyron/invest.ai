@@ -93,6 +93,21 @@ def nowstr(tz='Asia/Shanghai') -> str:
     return now.strftime("%Y-%m-%d %H:%M:%S")
 
 
-def send_voice(message):
+def send_voice(message: str) -> None:
     command = f'''say {message}'''
     subprocess.call(command, shell=True)
+
+
+def numbers_in_chinese(text: str) -> str:
+    """
+    将字符串中的阿拉伯数字替换为中文数字
+    """
+    chinese_digits = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九']
+    result = []
+    for char in text:
+        if char.isdigit():
+            num = int(char)
+            result.append(chinese_digits[num])
+        else:
+            result.append(char)
+    return ''.join(result)
