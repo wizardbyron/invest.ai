@@ -3,10 +3,23 @@
 import fire
 import time
 
+import pandas as pd
+
 from src.data import history_klines
 from src.indicators import pivot_points_table, merge_points
 from src.strategy import pivot_points_grid
 from src.util import in_trading_time, send_voice, numbers_in_chinese
+
+
+buy_points = {
+    "weekly": 2.0,
+    "daily": 1.5
+}
+
+sell_points = {
+    "weekly": 2.0,
+    "daily": 1.5
+}
 
 
 class Guide:
@@ -21,7 +34,7 @@ class Guide:
         Raises:
             ValueError: _description_
         """
-        for period in ['daily', 'weekly']:
+        for period in ['weekly', 'daily']:
             tzone, klines = history_klines(symbol, period)
             if not in_trading_time(tzone) and period == 'daily':
                 data = klines[-1:]  # 非交易时间 daily 只取最新一条数据
@@ -30,7 +43,11 @@ class Guide:
             points = pivot_points_table(data)
             merged_points = merge_points(klines.iloc[-1], points, series)
             print(f"\n{symbol}-{period}:\n{klines[-1:]}\n{merged_points}")
-            pivot_points_grid(merged_points, 1.5, 1.5, series)
+            pivot_points_grid(
+                merged_points,
+                sell_points[period],
+                buy_points[period],
+                series)
 
     @classmethod
     def watch(cls, symbol: str, series: str = "中间值") -> None:
@@ -45,7 +62,7 @@ class Guide:
         """
         is_in_trading_time = True
         while is_in_trading_time:
-            for period in ['daily', 'weekly']:
+            for period in ['weekly', 'daily']:
                 tzone, klines = history_klines(symbol, period)
                 is_in_trading_time = in_trading_time(tzone)
                 data = klines[-2:-1]
@@ -53,12 +70,15 @@ class Guide:
                 merged_points = merge_points(klines.iloc[-1], points, series)
                 print(f"\n{symbol}-{period}:\n{klines[-1:]}\n{merged_points}")
                 order, price = pivot_points_grid(
-                    merged_points, 1.5, 1.5, series)
-                if order == "持有":
-                    time.sleep(10)
-                else:
-                    msg = f"注意 {price} {order} {numbers_in_chinese(symbol)}"
+                    merged_points,
+                    sell_points[period],
+                    buy_points[period],
+                    series)
+                if order != "持有":
+                    msg = f"注意 {price} 元 {order} 股票 {numbers_in_chinese(symbol)}"
                     send_voice(msg)
+
+            time.sleep(10)
 
 
 if __name__ == "__main__":
