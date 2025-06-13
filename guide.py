@@ -35,7 +35,7 @@ class Guide:
             ValueError: _description_
         """
         for period in ['weekly', 'daily']:
-            tzone, klines = history_klines(symbol, period)
+            tzone, klines = history_klines(str(symbol), period)
             if not in_trading_time(tzone) and period == 'daily':
                 data = klines[-1:]  # 非交易时间 daily 只取最新一条数据
             else:
@@ -63,7 +63,7 @@ class Guide:
         is_in_trading_time = True
         while is_in_trading_time:
             for period in ['weekly', 'daily']:
-                tzone, klines = history_klines(symbol, period)
+                tzone, klines = history_klines(str(symbol), period)
                 is_in_trading_time = in_trading_time(tzone)
                 data = klines[-2:-1]
                 points = pivot_points_table(data)
