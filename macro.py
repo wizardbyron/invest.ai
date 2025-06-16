@@ -22,10 +22,12 @@ def hs300(up=20.5, down=18.5):
         print("沪深300估值适当，持有观望")
 
 
-def bonds(days=30):
-    df_bond_zh_us_rate = ak.bond_zh_us_rate(start_date="19901219")
-    df_bond_zh_us_rate = df_bond_zh_us_rate[["日期", "中国国债收益率10年", "美国国债收益率10年"]]
-    print(df_bond_zh_us_rate[-days:])
+def bonds(date: str = "20250101", country: str = "中国"):
+    df_bonds = ak.bond_zh_us_rate(start_date=str(date))
+    df_bonds = df_bonds[["日期", f"{country}国债收益率10年"]]
+    print(df_bonds)
+    print(f'最小值: {df_bonds[f"{country}国债收益率10年"].min()}')
+    print(f'最大值: {df_bonds[f"{country}国债收益率10年"].max()}')
 
 
 def intrest_rate(period=10):
