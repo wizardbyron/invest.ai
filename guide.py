@@ -75,7 +75,7 @@ class Guide:
                     buy_points[period],
                     series)
                 if order != "持有":
-                    msg = f"注意 {price} 元 {order} 股票 {numbers_in_chinese(symbol)}"
+                    msg = f"注意 {price} 元 {order} 股票 {numbers_in_chinese(str(symbol))}"
                     send_voice(msg)
 
             time.sleep(10)
