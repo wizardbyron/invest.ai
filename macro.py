@@ -23,8 +23,14 @@ def hs300(up=20.5, down=18.5):
 
 
 def bonds(date: str = "20250101", country: str = "中国"):
+    """国债收益率
+
+    Args:
+        date (str, optional): _description_. Defaults to "20250101".
+        country (str, optional): _description_. Defaults to "中国".
+    """
     df_bonds = ak.bond_zh_us_rate(start_date=str(date))
-    df_bonds = df_bonds[["日期", f"{country}国债收益率10年"]]
+    df_bonds = df_bonds[["日期", f"{country}国债收益率10年"]].dropna()
     print(df_bonds)
     print(f'最小值: {df_bonds[f"{country}国债收益率10年"].min()}')
     print(f'最大值: {df_bonds[f"{country}国债收益率10年"].max()}')
