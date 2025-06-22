@@ -111,3 +111,8 @@ def numbers_in_chinese(text: str) -> str:
         else:
             result.append(char)
     return ''.join(result)
+
+
+def is_weekday():
+    today = datetime.now().weekday()
+    return today < 5  # 0-4 代表周一至周五

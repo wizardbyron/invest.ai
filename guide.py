@@ -8,7 +8,7 @@ import pandas as pd
 from src.data import history_klines
 from src.indicators import pivot_points_table, merge_points
 from src.strategy import pivot_points_grid
-from src.util import in_trading_time, send_voice, numbers_in_chinese
+from src.util import in_trading_time, send_voice, numbers_in_chinese, is_weekday
 
 
 buy_points = {
@@ -36,13 +36,18 @@ class Guide:
         """
         for period in ['weekly', 'daily']:
             tzone, klines = history_klines(str(symbol), period)
-            if not in_trading_time(tzone) and period == 'daily':
-                data = klines[-1:]  # 非交易时间 daily 只取最新一条数据
-            else:
+            if in_trading_time(tzone):
                 data = klines[-2:-1]
+            else:
+                if period == 'daily':
+                    data = klines[-1:]
+                elif is_weekday():
+                    data = klines[-2:-1]
+                else:
+                    data = klines[-1:]
             points = pivot_points_table(data)
             merged_points = merge_points(klines.iloc[-1], points, series)
-            print(f"\n{symbol}-{period}:\n{klines[-1:]}\n{merged_points}")
+            print(f"\n{symbol}-{period}:\n{data}\n{merged_points}")
             pivot_points_grid(
                 merged_points,
                 sell_points[period],
