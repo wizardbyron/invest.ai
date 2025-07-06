@@ -8,7 +8,7 @@ import pandas as pd
 from src.data import history_klines
 from src.indicators import pivot_points_table, merge_points
 from src.strategy import pivot_points_grid
-from src.util import in_trading_time, send_voice, numbers_in_chinese, is_weekday
+from src.util import in_trading_time, send_voice, numbers_in_chinese, is_weekday, todaystr
 
 
 buy_points = {
@@ -84,6 +84,26 @@ class Guide:
                     send_voice(msg)
 
             time.sleep(10)
+
+    @classmethod
+    def portfolio(cls, file: str = "./input/portfolio.csv", series: str = "中间值"):
+        """_summary_
+
+        Args:
+            data (_type_): _description_
+        """
+
+        df_portfolio = pd.read_csv(file, dtype={"代码": str})
+        for period in ['weekly', 'daily']:
+            file_name = f"./output/guides/{todaystr()}_{period}.xlsx"
+            with pd.ExcelWriter(file_name, engine='openpyxl') as writer:
+                for symbol, name in df_portfolio[["代码", "名称"]].values:
+                    print(f'{period}-{symbol}')
+                    tzone, klines = history_klines(str(symbol), period)
+                    data = klines[-1:]
+                    points = pivot_points_table(data)
+                    sheet_name = f'{symbol}-{name}'
+                    points.to_excel(writer, sheet_name=sheet_name)
 
 
 if __name__ == "__main__":

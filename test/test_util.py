@@ -1,4 +1,4 @@
-from src.util import numbers_in_chinese, add_spaces_in_str
+from src.util import *
 
 
 def test_numbers_in_chinese():

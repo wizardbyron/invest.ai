@@ -93,6 +93,16 @@ def nowstr(tz='Asia/Shanghai') -> str:
     return now.strftime("%Y-%m-%d %H:%M:%S")
 
 
+def todaystr() -> str:
+    """获得当前日期字符串
+
+    Returns:
+        _type_: 输出"%Y-%m-%d"格式的当前日期字符串
+    """
+    now = datetime.now()
+    return now.strftime("%Y%m%d")
+
+
 def send_voice(message: str) -> None:
     command = f'''say {message}'''
     subprocess.call(command, shell=True)
