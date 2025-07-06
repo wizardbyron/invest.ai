@@ -113,6 +113,13 @@ def numbers_in_chinese(text: str) -> str:
     return ''.join(result)
 
 
+def add_spaces_in_str(text: str) -> str:
+    """
+    在字符串中每隔指定数量的字符添加一个空格
+    """
+    return ' '.join(text[i:i+1] for i in range(0, len(text), 1))
+
+
 def is_weekday():
     today = datetime.now().weekday()
     return today < 5  # 0-4 代表周一至周五

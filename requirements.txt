@@ -12,3 +12,4 @@ mkdocs-material
 mkdocs-material-extensions
 nicegui
 pyjwt
+pytest
