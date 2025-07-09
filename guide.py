@@ -5,18 +5,17 @@ import time
 
 import pandas as pd
 
-from src.data import history_klines
-from src.indicators import pivot_points_table, merge_points
+from src.data import get_points
 from src.strategy import pivot_points_grid
-from src.util import in_trading_time, send_voice, numbers_in_chinese, is_weekday, todaystr
+from src.util import send_voice, numbers_in_chinese, todaystr
 
 
-buy_points = {
+p_sell = {
     "weekly": 2.0,
     "daily": 1.5
 }
 
-sell_points = {
+p_buy = {
     "weekly": 2.0,
     "daily": 1.5
 }
@@ -35,24 +34,8 @@ class Guide:
             ValueError: _description_
         """
         for period in ['weekly', 'daily']:
-            tzone, klines = history_klines(str(symbol), period)
-            if in_trading_time(tzone):
-                data = klines[-2:-1]
-            else:
-                if period == 'daily':
-                    data = klines[-1:]
-                elif is_weekday():
-                    data = klines[-2:-1]
-                else:
-                    data = klines[-1:]
-            points = pivot_points_table(data)
-            merged_points = merge_points(klines.iloc[-1], points, series)
-            print(f"\n{symbol}-{period}:\n{data}\n{merged_points}")
-            pivot_points_grid(
-                merged_points,
-                sell_points[period],
-                buy_points[period],
-                series)
+            points = get_points(symbol, series, period)
+            pivot_points_grid(points, p_buy[period], p_sell[period], series)
 
     @classmethod
     def watch(cls, symbol: str, series: str = "中间值") -> None:
@@ -68,25 +51,16 @@ class Guide:
         is_in_trading_time = True
         while is_in_trading_time:
             for period in ['weekly', 'daily']:
-                tzone, klines = history_klines(str(symbol), period)
-                is_in_trading_time = in_trading_time(tzone)
-                data = klines[-2:-1]
-                points = pivot_points_table(data)
-                merged_points = merge_points(klines.iloc[-1], points, series)
-                print(f"\n{symbol}-{period}:\n{klines[-1:]}\n{merged_points}")
+                points = get_points(symbol, series, period)
                 order, price = pivot_points_grid(
-                    merged_points,
-                    sell_points[period],
-                    buy_points[period],
-                    series)
+                    points, p_buy[period], p_sell[period], series)
                 if order != "持有":
                     msg = f"注意 {price} 元 {order} 股票 {numbers_in_chinese(str(symbol))}"
                     send_voice(msg)
-
             time.sleep(10)
 
     @classmethod
-    def portfolio(cls, file: str = "./input/portfolio.csv", series: str = "中间值"):
+    def portfolio_guide(cls, file: str = "./input/portfolio.csv", series: str = "中间值"):
         """_summary_
 
         Args:
@@ -99,9 +73,12 @@ class Guide:
             with pd.ExcelWriter(file_name, engine='openpyxl') as writer:
                 for symbol, name in df_portfolio[["代码", "名称"]].values:
                     print(f'{period}-{symbol}')
-                    tzone, klines = history_klines(str(symbol), period)
-                    data = klines[-1:]
-                    points = pivot_points_table(data)
+                    points = get_points(symbol, series, period)
+                    order, price = pivot_points_grid(
+                        points,
+                        p_buy[period],
+                        p_sell[period],
+                        series)
                     sheet_name = f'{symbol}-{name}'
                     points.to_excel(writer, sheet_name=sheet_name)
 

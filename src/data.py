@@ -4,7 +4,8 @@ import akshare as ak
 import pandas as pd
 from pandas import DataFrame
 
-from src.util import identify_stock_type
+from src.indicators import pivot_points_table, merge_points
+from src.util import identify_stock_type, in_trading_time, is_weekend
 
 
 def history_klines(symbol: str,
@@ -94,3 +95,20 @@ def convert_us_symbol(symbol: str) -> str:
         df_symbols.to_csv(df_symbol_cache, index=False)
     stock = df_symbols[df_symbols["代码"].str.endswith(f'.{symbol}')]
     return stock['代码'].values[0]
+
+
+def get_points(symbol, series, period):
+    tzone, klines = history_klines(str(symbol), period)
+    if in_trading_time(tzone):
+        data = klines[-2:-1]
+    else:
+        if is_weekend() or period == "daily":
+            data = klines[-1:]
+        else:
+            data = klines[-2:-1]
+
+    points = merge_points(klines.iloc[-1],
+                          pivot_points_table(data),
+                          series)
+    print(f"\n{symbol}-{period}:\n{data}\n{points}")
+    return points

@@ -133,3 +133,8 @@ def add_spaces_in_str(text: str) -> str:
 def is_weekday():
     today = datetime.now().weekday()
     return today < 5  # 0-4 代表周一至周五
+
+
+def is_weekend():
+    today = datetime.now().weekday()
+    return today > 4  # 0-4 代表周一至周五
