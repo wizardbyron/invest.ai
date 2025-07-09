@@ -7,11 +7,15 @@ Invest.AI 是一个基于大语言模型（LLM）的量化投资研究项目。
 Github:
 
 - [AI 投资系统](https://github.com/24mlight/A_Share_investment_Agent)
+- [股票AI操盘手](https://github.com/charliedream1/ai_quant_trade)
+- [AI-Hedge-Fund](https://github.com/virattt/ai-hedge-fund)
+- [TradingAgents](https://github.com/TauricResearch/TradingAgents)
 
 Papers:
 
 - [TradExpert: Revolutionizing Trading with Mixture of Expert LLMs](https://arxiv.org/abs/2411.00782)
 - [Learning to Generate Explainable Stock Predictions using Self-Reflective Large Language Models](https://arxiv.org/abs/2402.03659)
+- [TradingAgents: Multi-Agents LLM Financial Trading Framework](arxiv.org/abs/2412.20138)
 
 ## 免责声明
 
