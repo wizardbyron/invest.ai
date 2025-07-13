@@ -42,7 +42,7 @@ def get_points(symbol: str, period: str, series: str = "中间值") -> DataFrame
     return points
 
 
-def pivot_points_grid(symbol: str, period: str, series: str = "中间值"):
+def pivot_points_grid(symbol: str, period: str, series: str = "中间值") -> tuple[str, float]:
     """枢轴点网格策略
 
     Args:
@@ -53,7 +53,7 @@ def pivot_points_grid(symbol: str, period: str, series: str = "中间值"):
     Returns:
         _type_: _description_
     """
-    points = get_points(symbol, series, period)
+    points = get_points(symbol, period, series)
     cur_price = points.loc["*当前>", series]
     buy_price = points.loc[f"支撑位{buy_point[period]:.1f}", series]
     sell_price = points.loc[f"阻力位{sell_point[period]:.1f}", series]
