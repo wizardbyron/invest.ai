@@ -28,7 +28,7 @@ def append_discliamer(md_text: str) -> str:
     output = f"""{md_text}
 
     ## 免责声明
-    
+
     以上内容由人工智能大语言模型生成，并用于研究实验目的。
     其内容不构成任何投资建议，也不作为任何法律法规、监管政策的依据。
     投资者不应以该等信息作为决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。
@@ -37,7 +37,7 @@ def append_discliamer(md_text: str) -> str:
     return remove_leading_spaces(output)
 
 
-def in_trading_time(zone: str) -> bool:
+def in_trading_time(zone: str = 'Asia/Shanghai') -> bool:
     """判断是否在交易时间
 
     Args:
