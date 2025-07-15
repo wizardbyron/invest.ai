@@ -37,13 +37,13 @@ def guide(symbol: str = "", period: str = "", series: str = "中间值") -> None
         for period in periods:
             msg, price = pivot_points_grid(symbol, period, series)
             if msg.find("观望") == -1:
-                # msg = f"注意 {price} 元 {order} 股票 {numbers_in_chinese(name)}"
                 print(f'{period}-{symbol}-{name}:{msg}')
                 orders.append(msg)
 
-    print("\n交易建议如下:")
-    for order in orders:
-        print(order)
+    if len(orders) > 0:
+        print("\n交易建议如下:")
+        for order in orders:
+            print(order)
 
 
 if __name__ == "__main__":
