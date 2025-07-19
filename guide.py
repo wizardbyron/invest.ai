@@ -6,11 +6,10 @@ import time
 import pandas as pd
 
 from src.strategy import pivot_points_grid
-from src.util import numbers_in_chinese
 
 
 def guide(symbol: str = "", period: str = "", series: str = "中间值") -> None:
-    """获取价格交易指南
+    """获取交易指南
 
     Args:
         symbol (str): 代码 or ""
@@ -35,9 +34,9 @@ def guide(symbol: str = "", period: str = "", series: str = "中间值") -> None
     orders = []
     for symbol, name in symbols:
         for period in periods:
-            msg, price = pivot_points_grid(symbol, period, series)
-            if msg.find("观望") == -1:
-                print(f'{period}-{symbol}-{name}:{msg}')
+            msg, points = pivot_points_grid(symbol, period, series)
+            print(f'{period}-{symbol}-{name}:\n{points}\n{msg}')
+            if msg.find("建议观望") == -1:
                 orders.append(msg)
 
     if len(orders) > 0:
