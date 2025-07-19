@@ -138,3 +138,7 @@ def is_weekday():
 def is_weekend():
     today = datetime.now().weekday()
     return today > 4  # 0-4 代表周一至周五
+
+
+def this_year_str() -> str:
+    return todaystr()[:4]

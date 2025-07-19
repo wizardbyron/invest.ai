@@ -5,7 +5,7 @@ import pandas as pd
 from pandas import DataFrame
 
 
-from src.util import identify_stock_type
+from src.util import identify_stock_type, this_year_str
 
 
 def history_klines(symbol: str,
@@ -95,3 +95,34 @@ def convert_us_symbol(symbol: str) -> str:
         df_symbols.to_csv(df_symbol_cache, index=False)
     stock = df_symbols[df_symbols["代码"].str.endswith(f'.{symbol}')]
     return stock['代码'].values[0]
+
+
+def cn_bond(term: str = '10y',  year: str = this_year_str()) -> DataFrame:
+    """中国国债收益率（官方）
+
+    Args:
+        term (str, optional): 期限. Defaults to '10y'.
+        year (str, optional): 年份. Defaults to this_year_str().
+
+    Returns:
+        _type_: _description_
+    """
+    url = f'https://yield.chinabond.com.cn/cbweb-mn/yc/downYearBzqx?year={year}&&wrjxCBFlag=0&&zblx=txy&&ycDefId=2c9081e50a2f9606010a3068cae70001&&locale=zh_CN'
+    df = pd.read_excel(url)
+    return df[df['标准期限说明'] == term]
+
+
+def us_bond(term: str = '10 Yr',  year: str = this_year_str()) -> DataFrame:
+    """美国国债收益率（美国财政部）
+
+    Args:
+        term (str, optional): 国债期限. Defaults to '10 Yr'.
+        year (str, optional): _description_. Defaults to this_year_str().
+        recent_days (int, optional): _description_. Defaults to 30.
+
+    Returns:
+        _type_: _description_
+    """
+    url = f"https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/{year}/all?field_tdr_date_value={year}&type=daily_treasury_yield_curve&page&_format=csv"
+    df = pd.read_csv(url)
+    return df[["Date", term]]
