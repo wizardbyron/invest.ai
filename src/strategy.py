@@ -2,7 +2,7 @@ from pandas import DataFrame
 
 from src.data import history_klines
 from src.indicators import merge_points, pivot_points_table
-from src.util import in_trading_time, is_weekday
+from src.util import in_trading_time, is_workday
 
 
 def pivot_points_grid(symbol: str, period: str, series: str = "中间值") -> tuple[str, DataFrame]:
@@ -34,7 +34,7 @@ def pivot_points_grid(symbol: str, period: str, series: str = "中间值") -> tu
         else:
             data = klines[-1:]  # 非交易时段取最后一条数据
     elif period == "weekly":
-        if is_weekday():
+        if is_workday():
             data = klines[-2:-1]  # 工作日取上一周数据
         else:
             data = klines[-1:]  # 周末取最后一条数据

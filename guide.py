@@ -24,7 +24,7 @@ def guide(symbol: str = "", period: str = "", series: str = "中间值") -> None
         df_portfolio = pd.read_csv(file, dtype={"代码": str, "名称": str})
         symbols = df_portfolio[["代码", "名称"]].values
     else:
-        symbols = [[symbol, symbol]]
+        symbols = [[str(symbol), str(symbol)]]
 
     if period == "":
         periods = ['weekly', 'daily']

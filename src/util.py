@@ -103,9 +103,17 @@ def todaystr() -> str:
     return now.strftime("%Y%m%d")
 
 
-def send_voice(message: str) -> None:
+def send_voice(message: str) -> int:
+    """采用苹果默认的say命令播报语音
+
+    Args:
+        message (str): _description_
+
+    Returns:
+        int: _description_
+    """
     command = f'''say {message}'''
-    subprocess.call(command, shell=True)
+    return subprocess.call(command, shell=True)
 
 
 def numbers_in_chinese(text: str) -> str:
@@ -130,15 +138,30 @@ def add_spaces_in_str(text: str) -> str:
     return ' '.join(text[i:i+1] for i in range(0, len(text), 1))
 
 
-def is_weekday():
+def is_workday() -> bool:
+    """判断是否工作日
+
+    Returns:
+        bool: _description_
+    """
     today = datetime.now().weekday()
     return today < 5  # 0-4 代表周一至周五
 
 
-def is_weekend():
+def is_weekend() -> bool:
+    """判断是否周末
+
+    Returns:
+        bool: _description_
+    """
     today = datetime.now().weekday()
     return today > 4  # 0-4 代表周一至周五
 
 
 def this_year_str() -> str:
+    """返回当年字符串
+
+    Returns:
+        str: _description_
+    """
     return todaystr()[:4]
