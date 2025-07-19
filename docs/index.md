@@ -10,6 +10,7 @@ Github:
 - [股票AI操盘手](https://github.com/charliedream1/ai_quant_trade)
 - [AI-Hedge-Fund](https://github.com/virattt/ai-hedge-fund)
 - [TradingAgents](https://github.com/TauricResearch/TradingAgents)
+- [TradingAgents-CN](https://github.com/hsliuping/TradingAgents-CN)
 
 Papers:
 
