@@ -33,11 +33,15 @@ def guide(symbol: str = "", period: str = "", series: str = "中间值") -> None
 
     orders = []
     for symbol, name in symbols:
+        print('='*40)
         for period in periods:
-            msg, points = pivot_points_grid(symbol, period, series)
-            print(f'{period}-{symbol}-{name}:\n{points}\n{msg}')
-            if msg.find("建议观望") == -1:
-                orders.append(msg)
+            result_dict = pivot_points_grid(symbol, period, series)
+            if result_dict['order'] != '观望':
+                orders.append(result_dict['message'])
+
+            print(f'{period}-{symbol}-{name}')
+            print(f'{result_dict['merged_table']}')
+            print(f'{result_dict['order']}\n')
 
     if len(orders) > 0:
         print("\n交易建议如下:")

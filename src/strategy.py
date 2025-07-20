@@ -5,7 +5,7 @@ from src.indicators import merge_points, pivot_points_table
 from src.util import in_trading_time, is_workday
 
 
-def pivot_points_grid(symbol: str, period: str, series: str = "中间值") -> tuple[str, DataFrame]:
+def pivot_points_grid(symbol: str, period: str, series: str = "中间值") -> dict:
     """枢轴点网格交易法
 
     Args:
@@ -47,10 +47,18 @@ def pivot_points_grid(symbol: str, period: str, series: str = "中间值") -> tu
     buy_price = merged_points.loc[f"支撑位{buy_point[period]:.1f}", series]
     sell_price = merged_points.loc[f"阻力位{sell_point[period]:.1f}", series]
     if cur_price > sell_price:
+        order = "卖出"
         msg = f"当前价格{cur_price}高于{period}阻力价格{sell_price}，建议卖出"
     elif cur_price < buy_price:
+        order = "买入"
         msg = f"当前价格{cur_price}低于{period}支撑价格{buy_price}，建议买入"
     else:
+        order = "观望"
         msg = f"当前价格{cur_price}在{period}支撑价格{buy_price}和阻力价格{sell_price}之间，建议观望"
 
-    return msg, merged_points
+    return {
+        "points_table": points_table,
+        "merged_table": merged_points,
+        "order": order,
+        "message": msg
+    }
