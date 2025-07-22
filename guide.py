@@ -37,7 +37,7 @@ def guide(symbol: str = "", period: str = "", series: str = "中间值") -> None
         for period in periods:
             result_dict = pivot_points_grid(symbol, period, series)
             if result_dict['order'] != '观望':
-                orders.append(result_dict['message'])
+                orders.append(f'{symbol}-{result_dict['message']}')
 
             print(f'{period}-{symbol}-{name}')
             print(f'{result_dict['merged_table']}')
