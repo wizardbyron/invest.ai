@@ -15,8 +15,9 @@ def pivot_df(st: st, symbol: str, period: str):
     st.dataframe(resp_weekly['merged_table'], height=700)
 
 
+st.header("Invest.AI")
 symbol = st.text_input("请输入股票代码", max_chars=6)
-if st.button('分析', use_container_width=True) and len(symbol) >= 3:
+if len(symbol) >= 3:
     with st.status("Loading...", expanded=False) as status:
         col_weekly, col_daily = st.columns([2, 2])
 

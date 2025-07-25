@@ -6,7 +6,7 @@ from src.util import in_trading_time, is_workday
 
 
 def pivot_points_grid(symbol: str, period: str, series: str = "中间值") -> dict:
-    """枢轴点网格交易法
+    """枢轴点网格交易策略
 
     Args:
         symbol (str): 股票代码
@@ -60,5 +60,6 @@ def pivot_points_grid(symbol: str, period: str, series: str = "中间值") -> di
         "points_table": points_table,
         "merged_table": merged_points,
         "order": order,
+        "price": cur_price,
         "message": msg
     }

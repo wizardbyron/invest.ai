@@ -33,7 +33,6 @@ def guide(symbol: str = "", period: str = "", series: str = "中间值") -> None
 
     orders = []
     for symbol, name in symbols:
-        print('='*40)
         for period in periods:
             result_dict = pivot_points_grid(symbol, period, series)
             if result_dict['order'] != '观望':
