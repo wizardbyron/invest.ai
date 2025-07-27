@@ -17,7 +17,7 @@ with st.status("Loading...", expanded=False) as status:
         symbol = row["代码"]
         weekly = pivot_points_grid(symbol, 'weekly')
         daily = pivot_points_grid(symbol, 'daily')
-        df.loc[index, "代码"] = f"single/?symbol={symbol}"
+        df.loc[index, "代码"] = f"/?symbol={symbol}"
         df.loc[index, "当前价格"] = weekly["price"]
         df.loc[index, "Weekly建议"] = weekly["order"]
         df.loc[index, "Daily建议"] = daily["order"]
@@ -31,7 +31,7 @@ with st.status("Loading...", expanded=False) as status:
             "代码",
             help="点击代码查看详情",
             max_chars=6,
-            display_text=r"single/\?symbol=(.*)"
+            display_text=r"/\?symbol=(.*)"
         ), }
     )
     status.update(label=msg, state="complete", expanded=True)
