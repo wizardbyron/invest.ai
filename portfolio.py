@@ -1,7 +1,5 @@
+#!/usr/bin/env python
 import time
-
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 import fire
 import pandas as pd
@@ -20,7 +18,7 @@ class PortfolioBuilder:
             ("deepseek", "deepseek-reasoner"),
             ("ollama", "qwen3"),
             ("moonshot", "moonshot-v1-128k"),
-            ("zhipuai", "glm-4.5"),
+            ("zhipuai", "glm-4.5")
         ]
 
     def selected(self, type: str = 'A股ETF', max: int = 10) -> str:
