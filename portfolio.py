@@ -20,10 +20,8 @@ class PortfolioBuilder:
             ("deepseek", "deepseek-reasoner"),
             ("ollama", "qwen3"),
             ("moonshot", "moonshot-v1-128k"),
-            ("zhipuai", "glm-4-plus"),
+            ("zhipuai", "glm-4.5"),
         ]
-
-
 
     def selected(self, type: str = 'A股ETF', max: int = 10) -> str:
         """从已选清单生成投资组合

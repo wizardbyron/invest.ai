@@ -1,7 +1,6 @@
 import os
 
 from dotenv import load_dotenv
-from langchain_community.chat_models import ChatZhipuAI
 from langchain_openai.chat_models import ChatOpenAI
 
 load_dotenv()
@@ -34,13 +33,12 @@ def create_chat(service: str, model: str):
         "moonshot": {
             "api_key": os.environ.get("MOONSHOT_API_KEY"),
             "base_url": "https://api.moonshot.cn/v1"
+        },
+        "zhipuai": {
+            "api_key": os.environ.get("ZHIPUAI_API_KEY"),
+            "base_url": "https://open.bigmodel.cn/api/paas/v4/"
         }
     }
 
-    if service == "zhipuai":
-        return ChatZhipuAI(model=model, temperature=temperature)
-    elif service in chat_model_params:
-        params = chat_model_params[service]
-        return ChatOpenAI(model=model, temperature=temperature, **params)
-    else:
-        raise ValueError(f"Unsupported service: {service}. ")
+    params = chat_model_params[service]
+    return ChatOpenAI(model=model, temperature=temperature, **params)
