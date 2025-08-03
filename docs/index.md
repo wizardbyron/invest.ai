@@ -11,12 +11,13 @@ Github:
 - [AI-Hedge-Fund](https://github.com/virattt/ai-hedge-fund)
 - [TradingAgents](https://github.com/TauricResearch/TradingAgents)
 - [TradingAgents-CN](https://github.com/hsliuping/TradingAgents-CN)
+- [FinGenius](https://github.com/HuaYaoAI/FinGenius)
 
 Papers:
 
 - [TradExpert: Revolutionizing Trading with Mixture of Expert LLMs](https://arxiv.org/abs/2411.00782)
 - [Learning to Generate Explainable Stock Predictions using Self-Reflective Large Language Models](https://arxiv.org/abs/2402.03659)
-- [TradingAgents: Multi-Agents LLM Financial Trading Framework](arxiv.org/abs/2412.20138)
+- [TradingAgents: Multi-Agents LLM Financial Trading Framework](https://arxiv.org/abs/2412.20138)
 
 ## 免责声明
 
