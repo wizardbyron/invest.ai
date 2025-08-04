@@ -64,7 +64,7 @@ def history_klines(symbol: str,
     else:
         # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id56
         klines = ak.stock_us_hist(
-            symbol=convert_us_symbol(symbol),
+            symbol=convert_us_symbol(symbol.upper()),
             start_date=start_date,
             end_date=end_date,
             period=period,
