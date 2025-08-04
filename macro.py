@@ -97,6 +97,23 @@ class MacroEconomic:
         print(df[["指标", "新订单指数(%)", "产成品库存指数(%)", "经济势能", "穿越周期指数"]])
 
     @classmethod
+    def zh_gold(cls):
+        '''黄金储备
+
+        数据来源: http://www.pbc.gov.cn/diaochatongjisi/resource/cms/2025/07/2025070716001083396.htm
+        '''
+        url = "http://www.pbc.gov.cn/diaochatongjisi/resource/cms/2025/07/2025070716001083396.htm"
+        df_raw = pd.read_html(url)[0]
+        df = df_raw.loc[[2, 8]].dropna(axis=1).iloc[:, 1::2]
+        data = {
+            "月份": df.values[0].tolist(),
+            "黄金储备(亿美元)": df.values[1].tolist()
+        }
+        new_df = pd.DataFrame(data)
+
+        print(new_df)
+
+    @classmethod
     def zh_cpi_ppi(cls, months=24):
         """CPI和PPI剪刀差
 
