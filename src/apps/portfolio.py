@@ -26,12 +26,13 @@ with st.status("Loading...", expanded=False) as status:
     duration = end_time - start_time
     msg = f"{nowstr()}分析完毕，用时{duration:.2f}秒"
     st.button("刷新", use_container_width=True)
-    st.dataframe(df, height=900, column_config={
-        "代码": st.column_config.LinkColumn(
-            "代码",
-            help="点击代码查看详情",
-            max_chars=6,
-            display_text=r"/\?symbol=(.*)"
-        ), }
-    )
+    st.dataframe(df, height=len(df)*37,
+                 column_config={
+                     "代码": st.column_config.LinkColumn(
+                         "代码",
+                         help="点击代码查看详情",
+                         max_chars=6,
+                         display_text=r"/\?symbol=(.*)"
+                     ), }
+                 )
     status.update(label=msg, state="complete", expanded=True)
