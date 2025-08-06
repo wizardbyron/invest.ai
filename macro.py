@@ -66,8 +66,8 @@ class MacroEconomic:
             yield_min = df['10 Yr'].min()
             yield_max = df['10 Yr'].max()
         print(df)
-        print(f'{days}最大收益率:{yield_max}')
-        print(f'{days}最小收益率:{yield_min}')
+        print(f'{days}日最大收益率:{yield_max}')
+        print(f'{days}日最小收益率:{yield_min}')
 
     @classmethod
     def zh_pmi(cls):
@@ -135,6 +135,18 @@ class MacroEconomic:
             "CPI-PPI差值": df_zh_cpi["全国-当月"]-df_zh_ppi["当月"],
         })
         df = df[:months]
+        print(df)
+
+    @classmethod
+    def exchange_rate(cls, days=30):
+        """离岸人民币和在岸人民币汇率差
+        """
+        df_usd_cnh = ak.forex_hist_em(symbol="USDCNH")[-days:]
+        df_usd_cnh = df_usd_cnh.set_index("日期")
+        df_usd_cnyc = ak.forex_hist_em(symbol="USDCNYC")[-days:]
+        df_usd_cnyc = df_usd_cnyc.set_index("日期")
+        df = pd.concat([df_usd_cnh, df_usd_cnyc], axis=1, join="outer")
+        df["汇差"] = df_usd_cnh['最新价']-df_usd_cnyc['最新价']
         print(df)
 
     @classmethod
