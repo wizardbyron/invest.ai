@@ -9,7 +9,6 @@ COPY . /app
 # 设置工作目录
 WORKDIR /app
 
-# RUN python3 -m venv venv && source venv/bin/activate
 RUN pip install --no-cache-dir --break-system-packages -r requirements.txt
 
 EXPOSE 8501
