@@ -71,7 +71,7 @@ def identify_stock_type(code: str) -> str:
     code = str(code).strip()
     # 判断是否为 A 股
     if code.isdigit() and len(code) == 6:
-        if code.startswith(('60', '688', '00', '30')):
+        if code.startswith(('60', '688', '00', '30', '8', '9')):
             return 'A股'
     # 判断是否为 A 股 ETF
     if code.isdigit() and len(code) == 6:
