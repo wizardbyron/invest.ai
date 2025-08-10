@@ -1,8 +1,5 @@
-from pandas import DataFrame
-
 from src.data import history_klines
 from src.indicators import merge_points, pivot_points_table
-from src.util import in_trading_time, is_workday
 
 
 def pivot_points_grid(symbol: str, period: str, series: str = "中间值") -> dict:
@@ -27,20 +24,7 @@ def pivot_points_grid(symbol: str, period: str, series: str = "中间值") -> di
     }
 
     tzone, klines = history_klines(symbol, period)
-
-    if period == "daily":
-        if in_trading_time(tzone):
-            data = klines[-2:-1]  # 交易日时段取前一天数据
-        else:
-            data = klines[-1:]  # 非交易时段取最后一条数据
-    elif period == "weekly":
-        if is_workday():
-            data = klines[-2:-1]  # 工作日取上一周数据
-        else:
-            data = klines[-1:]  # 周末取最后一条数据
-    else:
-        raise ValueError(f"错误的参数: {period}")
-
+    data = klines[-2:-1]
     points_table = pivot_points_table(data)
     merged_points = merge_points(klines.iloc[-1], points_table, series)
     cur_price = merged_points.loc["*当前>", series]
