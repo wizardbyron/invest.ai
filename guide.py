@@ -6,6 +6,7 @@ import time
 import pandas as pd
 
 from src.strategy import pivot_points_grid
+from src.util import nowstr
 
 
 def guide(symbol: str = "", period: str = "", series: str = "中间值") -> None:
@@ -56,4 +57,4 @@ if __name__ == "__main__":
     fire.Fire(guide)
     end_time = time.time()
     duration = end_time - start_time
-    print(f"[运行时长：{duration:.2f}秒]")
+    print(f"{nowstr()}[运行时长：{duration:.2f}秒]")
