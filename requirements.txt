@@ -1,4 +1,5 @@
 akshare
+colorama
 fire
 langchain
 langchain-community
@@ -11,5 +12,7 @@ mkdocs-get-deps
 mkdocs-material
 mkdocs-material-extensions
 streamlit
+tabulate
 pyjwt
 pytest
+wcwidth

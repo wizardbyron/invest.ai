@@ -2,6 +2,8 @@ import subprocess
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from colorama import Fore
+
 
 def remove_leading_spaces(s: str) -> str:
     """删除文本中的前导空格
@@ -165,3 +167,13 @@ def this_year_str() -> str:
         str: _description_
     """
     return todaystr()[:4]
+
+
+def format_for_term(order: str) -> str:
+    """格式化输出"""
+    if order == '买入':
+        return f'{Fore.RED}买入{Fore.RESET}'
+    elif order == '卖出':
+        return f'{Fore.GREEN}卖出{Fore.RESET}'
+    else:
+        return f'{Fore.BLUE}观望{Fore.RESET}'

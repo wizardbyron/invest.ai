@@ -5,11 +5,13 @@ import time
 
 import pandas as pd
 
+from tabulate import tabulate
+
 from src.strategy import pivot_points_grid
-from src.util import nowstr
+from src.util import nowstr, format_for_term
 
 
-def guide(symbol: str = "", period: str = "", series: str = "中间值") -> None:
+def guide(symbol: str = "", series: str = "中间值") -> None:
     """获取交易指南
 
     Args:
@@ -27,29 +29,36 @@ def guide(symbol: str = "", period: str = "", series: str = "中间值") -> None
     else:
         symbols = [[str(symbol), str(symbol)]]
 
-    if period == "":
-        periods = ['weekly', 'daily']
-    else:
-        periods = [period]
+    output_dict = {
+        '代码': [],
+        '名称': [],
+        '当前价格': [],
+        '周建议': [],
+        '日建议': [],
 
-    orders = []
+    }
+
     for symbol, name in symbols:
-        for period in periods:
-            result_dict = pivot_points_grid(symbol, period, series)
-            if result_dict['order'] != '观望':
-                orders.append(f'{symbol}-{name}-{result_dict['message']}')
+        weekly = pivot_points_grid(symbol, 'weekly', series)
+        daily = pivot_points_grid(symbol, 'daily', series)
+        output_dict["代码"].append(symbol)
+        output_dict["名称"].append(name)
+        output_dict["当前价格"].append(weekly['price'])
+        output_dict["周建议"].append(format_for_term(weekly['order']))
+        output_dict["日建议"].append(format_for_term(daily['order']))
 
-            if len(symbols) == 1:
-                print(f'{period}-{symbol}-{name}')
-                print(f'{result_dict['merged_table']}')
-                print(f'{result_dict['order']}')
-                print(f'{result_dict['message']}')
+        if len(symbols) == 1:
+            table_weekly = tabulate(weekly['merged_table'],
+                                    headers="keys",
+                                    tablefmt="fancy_grid")
+            table_daily = tabulate(daily['merged_table'],
+                                   headers="keys",
+                                   tablefmt="fancy_grid")
+            print(f'{symbol}-{name}\nWeekly:\n{table_weekly}\nDaily:\n{table_daily}')
 
-    if len(orders) > 0:
-        print("="*40)
-        print("交易建议如下:")
-        for order in orders:
-            print(order)
+    print(tabulate(pd.DataFrame(output_dict).set_index('代码'),
+                   headers=['代码', '名称', '当前价格', '周建议', '日建议'],
+                   tablefmt="fancy_grid"))
 
 
 if __name__ == "__main__":
@@ -57,4 +66,4 @@ if __name__ == "__main__":
     fire.Fire(guide)
     end_time = time.time()
     duration = end_time - start_time
-    print(f"{nowstr()}[运行时长：{duration:.2f}秒]")
+    print(f"[{nowstr()} 执行完成, 花费:{duration:.2f}秒]")
