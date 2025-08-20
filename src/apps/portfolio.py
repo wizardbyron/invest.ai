@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 
 from src.strategy import pivot_points_grid
-from src.util import nowstr
+from src.util import nowstr, format_for_markdown
 
 file = "./input/portfolio.csv"
 df_portfolio = pd.read_csv(file, dtype={"代码": str, "名称": str})
@@ -17,22 +17,14 @@ with st.status("Loading...", expanded=False) as status:
         symbol = row["代码"]
         weekly = pivot_points_grid(symbol, 'weekly')
         daily = pivot_points_grid(symbol, 'daily')
-        df.loc[index, "代码"] = f"/?symbol={symbol}"
+        df.loc[index, "代码"] = f"[{symbol}](/?symbol={symbol})"
         df.loc[index, "当前价格"] = weekly["price"]
-        df.loc[index, "Weekly建议"] = weekly["order"]
-        df.loc[index, "Daily建议"] = daily["order"]
+        df.loc[index, "周建议"] = format_for_markdown(weekly["order"])
+        df.loc[index, "日建议"] = format_for_markdown(daily["order"])
 
     end_time = time.time()
     duration = end_time - start_time
     msg = f"{nowstr()}分析完毕，用时{duration:.2f}秒"
     st.button("刷新", use_container_width=True)
-    st.dataframe(df, height=len(df)*37,
-                 column_config={
-                     "代码": st.column_config.LinkColumn(
-                         "代码",
-                         help="点击代码查看详情",
-                         max_chars=6,
-                         display_text=r"/\?symbol=(.*)"
-                     ), }
-                 )
+    st.table(df)
     status.update(label=msg, state="complete", expanded=True)

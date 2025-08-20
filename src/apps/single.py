@@ -12,7 +12,7 @@ def pivot_df(st: st, symbol: str, period: str):
         st.badge(f"{period}-卖出", color="green", icon=":material/output:")
     else:
         st.badge(f"{period}-观望", color="blue", icon=":material/pending:")
-    st.dataframe(resp['merged_table'], height=len(resp['merged_table'])*37)
+    st.table(resp['merged_table'])
 
 
 if st.query_params == {}:

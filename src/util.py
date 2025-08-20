@@ -170,10 +170,20 @@ def this_year_str() -> str:
 
 
 def format_for_term(order: str) -> str:
-    """格式化输出"""
+    """格式化指令在终端输出"""
     if order == '买入':
         return f'{Fore.RED}买入{Fore.RESET}'
     elif order == '卖出':
         return f'{Fore.GREEN}卖出{Fore.RESET}'
     else:
         return f'{Fore.BLUE}观望{Fore.RESET}'
+
+
+def format_for_markdown(order: str) -> str:
+    """格式化指令以markdown输出"""
+    if order == '买入':
+        return ':red[买入]'
+    elif order == '卖出':
+        return ':green[卖出]'
+    else:
+        return ':blue[观望]'
