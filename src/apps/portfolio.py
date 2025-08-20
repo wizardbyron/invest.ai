@@ -24,6 +24,7 @@ with st.status("Loading...", expanded=False) as status:
 
     end_time = time.time()
     duration = end_time - start_time
+    df = df.set_index("代码")
     msg = f"{nowstr()}分析完毕，用时{duration:.2f}秒"
     st.button("刷新", use_container_width=True)
     st.table(df)
