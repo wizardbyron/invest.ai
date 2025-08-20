@@ -1,17 +1,22 @@
-# 使用 Python 基础镜像
+# 更新镜像并安装必要软件包
 FROM ubuntu
-RUN apt update && apt install -y python3-pip && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt upgrade -y
 
-# 将当前目录下的文件复制到容器的 /app 目录
+RUN apt install -y python3-pip curl build-essential software-properties-common && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir --break-system-packages -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple akshare streamlit colorama
+
+# # 将当前目录下的文件复制到容器的 /app 目录
 COPY . /app
 
-# 设置工作目录
-WORKDIR /app
+# # 覆盖生产环境配置
+COPY .streamlit/config.prod.toml /app/.streamlit/config.toml
 
-RUN pip install --no-cache-dir --break-system-packages -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple akshare streamlit
+# # 设置工作目录
+WORKDIR /app
 
 EXPOSE 8501
 
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+HEALTHCHECK CMD curl --fail http://localhost:8501/healthz
 
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0", "--client.toolbarMode=minimal","--server.disconnectedSessionTTL=3600", "--browser.gatherUsageStats=False"]
+ENTRYPOINT ["streamlit", "run", "app.py"]
