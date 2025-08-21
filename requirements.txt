@@ -13,6 +13,7 @@ mkdocs-material
 mkdocs-material-extensions
 streamlit
 tabulate
+tqdm
 pyjwt
 pytest
 wcwidth

@@ -6,6 +6,7 @@ import time
 import pandas as pd
 
 from tabulate import tabulate
+from tqdm import tqdm
 
 from src.strategy import pivot_points_grid
 from src.util import nowstr, format_for_term
@@ -38,7 +39,7 @@ def guide(symbol: str = "", series: str = "中间值") -> None:
 
     }
 
-    for symbol, name in symbols:
+    for symbol, name in tqdm(symbols):
         weekly = pivot_points_grid(symbol, 'weekly', series)
         daily = pivot_points_grid(symbol, 'daily', series)
         output_dict["代码"].append(symbol)
