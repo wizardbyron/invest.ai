@@ -39,7 +39,7 @@ def guide(symbol: str = "", series: str = "中间值") -> None:
 
     }
 
-    for symbol, name in tqdm(symbols):
+    for symbol, name in tqdm(symbols, leave=False):
         weekly = pivot_points_grid(symbol, 'weekly', series)
         daily = pivot_points_grid(symbol, 'daily', series)
         output_dict["代码"].append(symbol)
@@ -49,16 +49,24 @@ def guide(symbol: str = "", series: str = "中间值") -> None:
         output_dict["日建议"].append(format_for_term(daily['order']))
 
         if len(symbols) == 1:
-            table_weekly = tabulate(weekly['merged_table'],
+            table_weekly = tabulate(weekly['merged_table'].rename_axis('周内交易'),
                                     headers="keys",
                                     tablefmt="fancy_grid")
-            table_daily = tabulate(daily['merged_table'],
+            table_daily = tabulate(daily['merged_table'].rename_axis('日内交易'),
                                    headers="keys",
                                    tablefmt="fancy_grid")
-            print(f'{symbol}-{name}\nWeekly:\n{table_weekly}\nDaily:\n{table_daily}')
+
+            weekly_rows = table_weekly.split('\n')
+            daily_rows = table_daily.split('\n')
+
+            # 横向拼接行
+            combined_rows = [weekly + ' | ' + daily for weekly,
+                             daily in zip(weekly_rows, daily_rows)]
+            print(f'{symbol}-{name}')
+            print('\n'.join(combined_rows))
 
     print(tabulate(pd.DataFrame(output_dict).set_index('代码'),
-                   headers=['代码', '名称', '当前价格', '周建议', '日建议'],
+                   headers=output_dict.keys(),
                    tablefmt="fancy_grid"))
 
 
