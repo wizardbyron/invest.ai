@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
 import time
+
 import akshare as ak
 import fire
 import pandas as pd
+from bs4 import BeautifulSoup
+import requests
+
 
 from src.data import cn_bond, us_bond
 
@@ -98,12 +102,40 @@ class MacroEconomic:
 
     @classmethod
     def zh_gold(cls):
-        '''黄金储备
+        '''中国人民银行黄金储备
 
-        数据来源: http://www.pbc.gov.cn/diaochatongjisi/resource/cms/2025/07/2025070716001083396.htm
+        数据来源: http://www.pbc.gov.cn/diaochatongjisi/116219/116319/5570903/5570886/index.html
         '''
-        url = "http://www.pbc.gov.cn/diaochatongjisi/resource/cms/2025/07/2025070716001083396.htm"
-        df_raw = pd.read_html(url)[0]
+
+        base_url = "http://www.pbc.gov.cn/diaochatongjisi/116219/116319/5570903/5570886/index.html"
+
+        # 发送HTTP请求获取页面内容
+        response = requests.get(base_url)
+        html_content = response.text
+
+        # 使用BeautifulSoup解析HTML
+        soup = BeautifulSoup(html_content, 'lxml')  # 你也可以使用'html.parser'
+
+        # 查找所有的<a>标签
+        a_tags = soup.find_all('a')
+
+        # 列表用于存储文本为"htm"的链接地址
+        links_with_htm_text = []
+
+        # 遍历所有<a>标签
+        for a in a_tags:
+            # 获取<a>标签的文本内容
+            text = a.get_text()
+            # 检查文本内容是否为"htm"
+            if text == "htm":
+                # 获取<a>标签的href属性值
+                href = a.get('href')
+                # 添加到列表中
+                links_with_htm_text.append(href)
+
+        # 提取链接
+        target_url = f'http://www.pbc.gov.cn/{links_with_htm_text[0]}'
+        df_raw = pd.read_html(target_url)[0]
         df = df_raw.loc[[2, 8]].dropna(axis=1).iloc[:, 1::2]
         data = {
             "月份": df.values[0].tolist(),
