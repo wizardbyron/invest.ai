@@ -12,6 +12,7 @@ Github:
 - [TradingAgents](https://github.com/TauricResearch/TradingAgents)
 - [TradingAgents-CN](https://github.com/hsliuping/TradingAgents-CN)
 - [FinGenius](https://github.com/HuaYaoAI/FinGenius)
+- [PyPortfolioOpt](https://github.com/robertmartin8/PyPortfolioOpt)
 
 Papers:
 
