@@ -60,9 +60,10 @@ def guide(symbol: str = "", series: str = "中间值") -> None:
             daily_rows = table_daily.split('\n')
 
             # 横向拼接行
+
             combined_rows = [weekly + ' | ' + daily for weekly,
                              daily in zip(weekly_rows, daily_rows)]
-            print(f'{symbol}-{name}')
+            print('\n')
             print('\n'.join(combined_rows))
 
     print(tabulate(pd.DataFrame(output_dict).set_index('代码'),
