@@ -13,12 +13,14 @@ Github:
 - [TradingAgents-CN](https://github.com/hsliuping/TradingAgents-CN)
 - [FinGenius](https://github.com/HuaYaoAI/FinGenius)
 - [PyPortfolioOpt](https://github.com/robertmartin8/PyPortfolioOpt)
+- [Kronos](https://github.com/shiyu-coder/Kronos)
 
 Papers:
 
 - [TradExpert: Revolutionizing Trading with Mixture of Expert LLMs](https://arxiv.org/abs/2411.00782)
 - [Learning to Generate Explainable Stock Predictions using Self-Reflective Large Language Models](https://arxiv.org/abs/2402.03659)
 - [TradingAgents: Multi-Agents LLM Financial Trading Framework](https://arxiv.org/abs/2412.20138)
+- [Kronos: A Foundation Model for the Language of Financial Markets](https://arxiv.org/abs/2508.02739)
 
 ## 免责声明
 
