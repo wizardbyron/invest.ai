@@ -16,9 +16,9 @@ def pivot_df(st: st, symbol: str, period: str):
 
 
 if st.query_params == {}:
-    symbol = st.text_input("请输入股票代码", max_chars=6)
+    symbol = st.text_input("请输入股票代码：(支持A股、港股、美股以及ETF)", max_chars=6)
 else:
-    symbol = st.text_input("请输入股票代码", max_chars=6,
+    symbol = st.text_input("请输入股票代码：(支持A股、港股、美股以及ETF)", max_chars=6,
                            value=st.query_params["symbol"])
 
 if len(symbol) >= 3:
