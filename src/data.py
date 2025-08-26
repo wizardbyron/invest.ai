@@ -39,6 +39,7 @@ def history_klines(symbol: str,
             end_date=end_date,
             period=period,
             adjust=adjust_flag)
+        klines['成交量'] *= 100
         tzone = 'Asia/Shanghai'
 
     elif stock_type == 'A股ETF':
@@ -49,6 +50,7 @@ def history_klines(symbol: str,
             end_date=end_date,
             period=period,
             adjust=adjust_flag)
+        klines['成交量'] *= 100
         tzone = 'Asia/Shanghai'
 
     elif stock_type == '港股':
