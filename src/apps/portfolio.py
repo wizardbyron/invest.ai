@@ -6,10 +6,17 @@ import pandas as pd
 from src.strategy import pivot_points_grid
 from src.util import nowstr, format_for_markdown
 
-file = "./input/portfolios/default.csv"
+portfolios = {
+    '默认': 'default',
+    '全天候-A': 'all_weather_10',
+    '马太-A': 'matthew_4'
+}
+
+option = st.selectbox("投资组合", portfolios.keys())
+
+
+file = f"./input/portfolios/{portfolios[option]}.csv"
 df_portfolio = pd.read_csv(file, dtype={"代码": str, "名称": str})
-
-
 with st.status("Loading...", expanded=False) as status:
     start_time = time.time()
     df = df_portfolio.copy()
