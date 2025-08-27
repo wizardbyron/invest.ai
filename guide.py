@@ -8,6 +8,7 @@ import pandas as pd
 from tabulate import tabulate
 from tqdm import tqdm
 
+from src.data import get_stock_name
 from src.strategy import pivot_points_grid
 from src.util import nowstr, format_for_term
 
@@ -49,6 +50,7 @@ def guide(symbol: str = "", series: str = "中间值") -> None:
         output_dict["日建议"].append(format_for_term(daily['order']))
 
         if len(symbols) == 1:
+            output_dict["名称"] = get_stock_name(symbol)
             table_weekly = tabulate(weekly['merged_table'].rename_axis('周内交易'),
                                     headers="keys",
                                     tablefmt="fancy_grid")

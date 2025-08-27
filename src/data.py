@@ -5,7 +5,7 @@ import pandas as pd
 from pandas import DataFrame
 
 
-from src.util import identify_stock_type, this_year_str
+from src.util import identify_stock_type, this_year_str, todaystr
 
 
 def history_klines(symbol: str,
@@ -88,8 +88,7 @@ def convert_us_symbol(symbol: str) -> str:
     Returns:
         str: 美股代码（带市场标记）
     """
-    today_str = datetime.now().strftime("%Y%m%d")
-    df_symbol_cache = f".cache/us_symbols{today_str}.csv"
+    df_symbol_cache = f".cache/us_symbols{todaystr()}.csv"
     try:
         df_symbols = pd.read_csv(df_symbol_cache)
     except Exception as e:
@@ -128,3 +127,48 @@ def us_bond(term: str = '10 Yr',  year: str = this_year_str()) -> DataFrame:
     url = f"https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/{year}/all?field_tdr_date_value={year}&type=daily_treasury_yield_curve&page&_format=csv"
     df = pd.read_csv(url)
     return df[["Date", term]]
+
+
+def get_stock_name(symbol: str) -> str:
+    """获取股票名称
+
+    Args:
+        symbol (str): 股票代码
+
+    Returns:
+        str: 股票名称
+    """
+
+    stock_type = identify_stock_type(symbol)
+    if stock_type == 'A股':
+        # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id8
+        name = ak.stock_individual_info_em(symbol).loc[2]['value']
+    elif stock_type == 'A股ETF':
+        # 参考: https://akshare.akfamily.xyz/data/fund/fund_public.html#id1
+        df_symbol_cache = f".cache/zh_etf_symbols{todaystr()}.csv"
+        try:
+            df_symbols = pd.read_csv(df_symbol_cache)
+        except Exception as e:
+            df_symbols = ak.fund_name_em()
+            df_symbols.to_csv(df_symbol_cache, index=False)
+        name = df_symbols[df_symbols['基金代码'] == symbol]['基金简称'].values[0]
+    elif stock_type == '港股':
+        # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id65
+        df_symbol_cache = f".cache/hk_symbols{todaystr()}.csv"
+        try:
+            df_symbols = pd.read_csv(df_symbol_cache, dtype={'代码': str})
+        except Exception as e:
+            df_symbols = ak.stock_hk_spot_em()
+            df_symbols.to_csv(df_symbol_cache, index=False)
+        name = df_symbols[df_symbols['代码'] == symbol]['名称'].values[0]
+    else:  # 美股
+        df_symbol_cache = f".cache/us_symbols{todaystr()}.csv"
+        try:
+            df_symbols = pd.read_csv(df_symbol_cache)
+        except Exception as e:
+            df_symbols = ak.stock_us_spot_em()
+            df_symbols.to_csv(df_symbol_cache, index=False)
+        stock = df_symbols[df_symbols["代码"].str.endswith(f'.{symbol.upper()}')]
+        name = stock['名称'].values[0]
+
+    return name
