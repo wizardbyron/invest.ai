@@ -1,17 +1,27 @@
 import streamlit as st
 
+from src.data import get_stock_name
 from src.strategy import pivot_points_grid
 from src.util import nowstr
 
 
 def pivot_df(st: st, symbol: str, period: str):
     resp = pivot_points_grid(symbol, period)
+    resp['merged_table'] = resp['merged_table'].rename_axis(f'{period}交易')
+    price = resp['price']
+    name = get_stock_name(symbol)
     if resp['order'] == '买入':
-        st.badge(f"{period}-买入", color="red", icon=":material/input:")
+        st.badge(f"{price}元-买入-{name}",
+                 color="red",
+                 icon=":material/input:")
     elif resp['order'] == '卖出':
-        st.badge(f"{period}-卖出", color="green", icon=":material/output:")
+        st.badge(f"{price}元-卖出-{name}",
+                 color="green",
+                 icon=":material/output:")
     else:
-        st.badge(f"{period}-观望", color="blue", icon=":material/pending:")
+        st.badge(f"{price}元-观望-{name}",
+                 color="blue",
+                 icon=":material/pending:")
     st.table(resp['merged_table'])
 
 
@@ -23,12 +33,12 @@ else:
 
 if len(symbol) >= 3:
     with st.status("Loading...", expanded=False) as status:
-        st.button("刷新", use_container_width=True)
+        st.button(f"立即刷新", use_container_width=True)
         col_weekly, col_daily = st.columns([2, 2])
 
         pivot_df(col_weekly, symbol, "weekly")
         pivot_df(col_daily, symbol, "daily")
 
-        status.update(label=f"{nowstr()}分析完毕，结果如下",
+        status.update(label=f"{nowstr()}分析完毕，交易参考如下",
                       state="complete",
                       expanded=True)

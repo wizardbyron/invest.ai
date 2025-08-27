@@ -6,7 +6,7 @@ import pandas as pd
 from src.strategy import pivot_points_grid
 from src.util import nowstr, format_for_markdown
 
-file = "./input/portfolio.csv"
+file = "./input/portfolios/default.csv"
 df_portfolio = pd.read_csv(file, dtype={"代码": str, "名称": str})
 
 

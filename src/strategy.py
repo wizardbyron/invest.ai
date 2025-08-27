@@ -2,13 +2,13 @@ from src.data import history_klines
 from src.indicators import merge_points, pivot_points_table
 
 
-def pivot_points_grid(symbol: str, period: str, series: str = "中间值") -> dict:
+def pivot_points_grid(symbol: str, period: str, series: str = "参考价") -> dict:
     """枢轴点网格交易策略
 
     Args:
         symbol (str): 股票代码
         period (str, optional): 级别. 'weekly'/'daily'.
-        series (str, optional): 枢轴点系列. Defaults to "中间值".
+        series (str, optional): 枢轴点系列. Defaults to "参考价".
 
     Returns:
         tuple[str, float]: 返回交易建议

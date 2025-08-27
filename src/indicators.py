@@ -89,19 +89,19 @@ def pivot_points_table(df_input: DataFrame) -> DataFrame:
     item = {"经典": c_points, "斐波那契": f_points}
     row_index = c_points.keys()
     df_output = pd.DataFrame(item, index=row_index)
-    df_output["中间值"] = (df_output["经典"] + df_output["斐波那契"])/2
+    df_output["参考价"] = (df_output["经典"] + df_output["斐波那契"])/2
     df_output = df_output.round(3)
 
     return df_output
 
 
-def merge_points(kline: Series, points: DataFrame, type: str = "中间值") -> DataFrame:
+def merge_points(kline: Series, points: DataFrame, type: str = "参考价") -> DataFrame:
     """将K线和枢轴点合并显示
 
     Args:
         kline (Series): K线
         points (DataFrame): 枢轴点
-        type (str, optional): 经典/斐波那契/中间值. Defaults to "中间值".
+        type (str, optional): 经典/斐波那契/参考价. Defaults to "参考价".
 
     Returns:
         DataFrame: _description_
@@ -111,9 +111,9 @@ def merge_points(kline: Series, points: DataFrame, type: str = "中间值") -> D
     points.loc["*最低"] = kline["最低"]
     points.loc["*当前>"] = kline["收盘"]
     points.loc["*VWAP>"] = kline["成交额"]/kline["成交量"]
-    points["波动率"] = (points[type] - kline["收盘"])/kline["收盘"]
-    points["波动率"] = points["波动率"].map(lambda x: '{:.2%}'.format(x))
+    points["收益率"] = (points[type] - kline["收盘"])/kline["收盘"]
+    points["收益率"] = points["收益率"].map(lambda x: '{:.2%}'.format(x))
     points = points.sort_values(by=type, ascending=False)
-    points = points[[type, "波动率"]]
+    points = points[[type, "收益率"]]
     points = points.round(3)
     return points
