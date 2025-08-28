@@ -24,12 +24,12 @@ def guide(portfolio: str = "default", series: str = "参考价") -> None:
         ValueError: _description_
     """
 
-    if len(str(portfolio)) > 6:
-        file = f'.input/portfolios/{portfolio}.csv'
+    try:
+        file = f'./input/portfolios/{portfolio}.csv'
         df_portfolio = pd.read_csv(file, dtype={"代码": str, "名称": str})
         symbols = df_portfolio[["代码", "名称"]].values
-    else:
-        symbols = [[str(portfolio), get_stock_name(str(portfolio))]]
+    except FileNotFoundError:
+        symbols = [[str(portfolio).upper(), get_stock_name(str(portfolio))]]
 
     output_dict = {
         '代码': [],

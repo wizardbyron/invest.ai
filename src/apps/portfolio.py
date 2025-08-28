@@ -8,8 +8,8 @@ from src.util import nowstr, format_for_markdown
 
 portfolios = {
     '默认': 'default',
-    '全天候-A': 'all_weather_10',
-    '马太-A': 'matthew_4'
+    '全天候-10': 'all_weather_10',
+    '马太效应-4': 'matthew_4'
 }
 
 option = st.selectbox("投资组合", portfolios.keys())

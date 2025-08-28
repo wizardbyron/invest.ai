@@ -147,8 +147,8 @@ def get_stock_name(symbol: str) -> str:
         # 参考: https://akshare.akfamily.xyz/data/fund/fund_public.html#id1
         df_symbol_cache = f".cache/zh_etf_symbols{todaystr()}.csv"
         try:
-            df_symbols = pd.read_csv(df_symbol_cache)
-        except Exception as e:
+            df_symbols = pd.read_csv(df_symbol_cache, dtype={"基金代码": str})
+        except FileNotFoundError as e:
             df_symbols = ak.fund_name_em()
             df_symbols.to_csv(df_symbol_cache, index=False)
         name = df_symbols[df_symbols['基金代码'] == symbol]['基金简称'].values[0]
@@ -157,7 +157,7 @@ def get_stock_name(symbol: str) -> str:
         df_symbol_cache = f".cache/hk_symbols{todaystr()}.csv"
         try:
             df_symbols = pd.read_csv(df_symbol_cache, dtype={'代码': str})
-        except Exception as e:
+        except FileNotFoundError as e:
             df_symbols = ak.stock_hk_spot_em()
             df_symbols.to_csv(df_symbol_cache, index=False)
         name = df_symbols[df_symbols['代码'] == symbol]['名称'].values[0]
@@ -165,7 +165,7 @@ def get_stock_name(symbol: str) -> str:
         df_symbol_cache = f".cache/us_symbols{todaystr()}.csv"
         try:
             df_symbols = pd.read_csv(df_symbol_cache)
-        except Exception as e:
+        except FileNotFoundError as e:
             df_symbols = ak.stock_us_spot_em()
             df_symbols.to_csv(df_symbol_cache, index=False)
         stock = df_symbols[df_symbols["代码"].str.endswith(f'.{symbol.upper()}')]
