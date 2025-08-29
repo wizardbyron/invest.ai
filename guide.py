@@ -41,24 +41,33 @@ def guide(portfolio: str = "default", series: str = "参考价") -> None:
     }
 
     for symbol, name in tqdm(symbols, leave=False):
-        weekly = pivot_points_grid(symbol, 'weekly', series)
-        daily = pivot_points_grid(symbol, 'daily', series)
+        resp_weekly = pivot_points_grid(symbol, 'weekly', series)
+        df_weekly = resp_weekly['merged_table']
+        df_weekly.rename_axis('周内交易', inplace=True)
+        vwap_weekly = df_weekly.loc['*VWAP>', series]
+
+        resp_daily = pivot_points_grid(symbol, 'daily', series)
+        df_daily = resp_daily['merged_table']
+        df_daily.rename_axis('周内交易', inplace=True)
+        vwap_daily = df_daily.loc['*VWAP>', series]
+
         output_dict["代码"].append(symbol)
         output_dict["名称"].append(name)
-        output_dict["当前价格"].append(weekly['price'])
-        output_dict["周建议"].append(format_for_term(weekly['order']))
-        output_dict["日建议"].append(format_for_term(daily['order']))
+        output_dict["当前价格"].append(resp_weekly['price'])
+        output_dict["周建议"].append(format_for_term(resp_weekly['order']))
+        output_dict["日建议"].append(format_for_term(resp_daily['order']))
+        output_dict["vwap_diff"] = f'{(vwap_daily - vwap_weekly)/vwap_weekly:.2%}'
 
         if len(symbols) == 1:
-            table_weekly = tabulate(weekly['merged_table'].rename_axis('周内交易'),
-                                    headers="keys",
+            weekly_table = tabulate(df_weekly,
+                                    headers='keys',
                                     tablefmt="fancy_grid")
-            table_daily = tabulate(daily['merged_table'].rename_axis('日内交易'),
-                                   headers="keys",
+            daily_table = tabulate(df_daily,
+                                   headers='keys',
                                    tablefmt="fancy_grid")
 
-            weekly_rows = table_weekly.split('\n')
-            daily_rows = table_daily.split('\n')
+            weekly_rows = weekly_table.split('\n')
+            daily_rows = daily_table.split('\n')
 
             # 横向拼接行
 
