@@ -7,11 +7,9 @@ from src.strategy import pivot_points_grid
 from src.util import nowstr, format_for_markdown
 
 portfolios = {
-    '默认': 'default',
+    '默认': 'all',
     '基础-5': 'basic_5',
-    '基础-10': 'basic_10',
-    '调和-10': 'blended_10',
-    '马太-3': 'matthew_3',
+    '基础-10': 'basic_10'
 }
 
 option = st.selectbox("投资组合", portfolios.keys())

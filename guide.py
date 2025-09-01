@@ -13,7 +13,7 @@ from src.strategy import pivot_points_grid
 from src.util import nowstr, format_for_term
 
 
-def guide(portfolio: str = "default", series: str = "参考价") -> None:
+def guide(portfolio: str = "all", series: str = "参考价") -> None:
     """获取交易指南
 
     Args:
@@ -48,7 +48,7 @@ def guide(portfolio: str = "default", series: str = "参考价") -> None:
 
         resp_daily = pivot_points_grid(symbol, 'daily', series)
         df_daily = resp_daily['merged_table']
-        df_daily.rename_axis('周内交易', inplace=True)
+        df_daily.rename_axis('日内交易', inplace=True)
         vwap_daily = df_daily.loc['*VWAP>', series]
 
         output_dict["代码"].append(symbol)
