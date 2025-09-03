@@ -32,8 +32,8 @@ else:
                            value=st.query_params["symbol"])
 
 if len(symbol) >= 3:
-    with st.status("Loading...", expanded=False) as status:
-        st.button(f"立即刷新", use_container_width=True)
+    with st.status("分析中...", expanded=False) as status:
+        st.button(f"立即更新", use_container_width=True)
         col_weekly, col_daily = st.columns([2, 2])
 
         pivot_df(col_weekly, symbol, "weekly")

@@ -9,7 +9,10 @@ from src.util import nowstr, format_for_markdown
 portfolios = {
     '默认': 'all',
     '基础-5': 'basic_5',
-    '基础-10': 'basic_10'
+    '基础-10': 'basic_10',
+    '调和-5': 'blended_10',
+    '调和-10': 'blended_10',
+    '躺平-5': 'layflat_5'
 }
 
 option = st.selectbox("投资组合", portfolios.keys())
@@ -17,7 +20,7 @@ option = st.selectbox("投资组合", portfolios.keys())
 
 file = f"./input/portfolios/{portfolios[option]}.csv"
 df_portfolio = pd.read_csv(file, dtype={"代码": str, "名称": str})
-with st.status("Loading...", expanded=False) as status:
+with st.status("分析中...", expanded=False) as status:
     start_time = time.time()
     df = df_portfolio.copy()
     for index, row in df.iterrows():
@@ -33,6 +36,6 @@ with st.status("Loading...", expanded=False) as status:
     duration = end_time - start_time
     df = df.set_index("代码")
     msg = f"{nowstr()}分析完毕，用时{duration:.2f}秒"
-    st.button("刷新", use_container_width=True)
+    st.button("立即更新", use_container_width=True)
     st.table(df)
     status.update(label=msg, state="complete", expanded=True)
