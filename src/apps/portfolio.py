@@ -12,7 +12,8 @@ portfolios = {
     '基础-10': 'basic_10',
     '调和-5': 'blended_10',
     '调和-10': 'blended_10',
-    '躺平-5': 'layflat_5'
+    '躺平-5': 'layflat_5',
+    '躺平-10': 'layflat_10'
 }
 
 option = st.selectbox("投资组合", portfolios.keys())
