@@ -37,6 +37,7 @@ def guide(portfolio: str = "all", series: str = "参考价") -> None:
         '当前价格': [],
         '周建议': [],
         '日建议': [],
+        '均价偏移': [],
 
     }
 
@@ -56,7 +57,8 @@ def guide(portfolio: str = "all", series: str = "参考价") -> None:
         output_dict["当前价格"].append(resp_weekly['price'])
         output_dict["周建议"].append(format_for_term(resp_weekly['order']))
         output_dict["日建议"].append(format_for_term(resp_daily['order']))
-        output_dict["vwap_diff"] = f'{(vwap_daily - vwap_weekly)/vwap_weekly:.2%}'
+        vwap_diff = (vwap_daily - vwap_weekly)/vwap_weekly
+        output_dict["均价偏移"].append(f"{vwap_diff:.2%}")
 
         if len(symbols) == 1:
             weekly_table = tabulate(df_weekly,
