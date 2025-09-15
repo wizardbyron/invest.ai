@@ -88,7 +88,7 @@ def convert_us_symbol(symbol: str) -> str:
     Returns:
         str: 美股代码（带市场标记）
     """
-    df_symbol_cache = f".cache/us_symbols{todaystr()}.csv"
+    df_symbol_cache = f".cache/us_symbols.csv"
     try:
         df_symbols = pd.read_csv(df_symbol_cache)
     except Exception as e:
@@ -145,7 +145,7 @@ def get_stock_name(symbol: str) -> str:
         name = ak.stock_individual_info_em(symbol).loc[2]['value']
     elif stock_type == 'A股ETF':
         # 参考: https://akshare.akfamily.xyz/data/fund/fund_public.html#id1
-        df_symbol_cache = f".cache/zh_etf_symbols{todaystr()}.csv"
+        df_symbol_cache = f".cache/zh_etf_symbols.csv"
         try:
             df_symbols = pd.read_csv(df_symbol_cache, dtype={"基金代码": str})
         except FileNotFoundError as e:
@@ -154,7 +154,7 @@ def get_stock_name(symbol: str) -> str:
         name = df_symbols[df_symbols['基金代码'] == symbol]['基金简称'].values[0]
     elif stock_type == '港股':
         # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id65
-        df_symbol_cache = f".cache/hk_symbols{todaystr()}.csv"
+        df_symbol_cache = f".cache/hk_symbols.csv"
         try:
             df_symbols = pd.read_csv(df_symbol_cache, dtype={'代码': str})
         except FileNotFoundError as e:
@@ -162,7 +162,7 @@ def get_stock_name(symbol: str) -> str:
             df_symbols.to_csv(df_symbol_cache, index=False)
         name = df_symbols[df_symbols['代码'] == symbol]['名称'].values[0]
     else:  # 美股
-        df_symbol_cache = f".cache/us_symbols{todaystr()}.csv"
+        df_symbol_cache = f".cache/us_symbols.csv"
         try:
             df_symbols = pd.read_csv(df_symbol_cache)
         except FileNotFoundError as e:
