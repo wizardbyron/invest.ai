@@ -2,7 +2,7 @@ import streamlit as st
 
 from src.data import get_stock_name
 from src.strategy import pivot_points_grid
-from src.util import nowstr
+from src.util import nowstr, disclaimer_md
 
 
 def pivot_df(st: st, symbol: str, period: str):
@@ -35,10 +35,10 @@ if len(symbol) >= 3:
     with st.status("分析中...", expanded=False) as status:
         st.button(f"立即更新", use_container_width=True)
         col_weekly, col_daily = st.columns([2, 2])
-
         pivot_df(col_weekly, symbol, "weekly")
         pivot_df(col_daily, symbol, "daily")
 
+        st.markdown(disclaimer_md())
         status.update(label=f"{nowstr()}分析完毕，交易参考如下",
                       state="complete",
                       expanded=True)

@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 
 from src.strategy import pivot_points_grid
-from src.util import nowstr, format_for_markdown
+from src.util import nowstr, format_for_markdown, disclaimer_md
 
 portfolios = {
     '基础-5': 'basic_5',
@@ -17,7 +17,6 @@ portfolios = {
 }
 
 option = st.selectbox("投资组合", portfolios.keys())
-
 
 file = f"./input/portfolios/{portfolios[option]}.csv"
 df_portfolio = pd.read_csv(file, dtype={"代码": str, "名称": str})
@@ -39,4 +38,5 @@ with st.status("分析中...", expanded=False) as status:
     msg = f"{nowstr()}分析完毕，用时{duration:.2f}秒"
     st.button("立即更新", use_container_width=True)
     st.table(df)
+    st.markdown(disclaimer_md())
     status.update(label=msg, state="complete", expanded=True)
