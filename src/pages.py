@@ -88,15 +88,15 @@ def guide(input_date: str = None):
         else:
             df_last_month = df_monthly[-1:]
 
-        points_md = f"""上个交易日枢轴点 ({df_last_day["日期"].iloc[-1]})：
+        points_md = f"""上个交易日基准价 ({df_last_day["日期"].iloc[-1]})：
 
         {pivot_points_table(df_last_day).to_markdown()}
 
-        上周枢轴点 ({df_last_week["日期"].iloc[-1]})：
+        上周基准价 ({df_last_week["日期"].iloc[-1]})：
 
         {pivot_points_table(df_last_week).to_markdown()}
 
-        上月枢轴点（{df_last_month["日期"].iloc[-1]}）：
+        上月基准价（{df_last_month["日期"].iloc[-1]}）：
 
         {pivot_points_table(df_last_month).to_markdown()}
         """
@@ -118,11 +118,11 @@ def guide(input_date: str = None):
 
         {trade_md}
 
-        以下是{name}({symbol})的枢轴点数据:
+        以下是{name}({symbol})的基准价数据:
 
         {points_md}
 
-        请结合价格、成交量、均线和枢轴点综合分析输出交易建议, 输出要求如下：
+        请结合价格、成交量、均线和基准价综合分析输出交易建议, 输出要求如下：
 
         - 输出建议的买入和卖出价格，并输出分析过程。
         - 给出交易先后策略。

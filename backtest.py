@@ -27,7 +27,7 @@ def trade_orders(daily_data: DataFrame,
         if isinstance(date, str):
             date = datetime.strptime(date, "%Y-%m-%d")
 
-        # 获取上周的交易数据计算枢轴点
+        # 获取上周的交易数据计算基准价
         if date.weekday() == 0:  # 周一
             df = daily_data[index-level:index]
             # print(df)

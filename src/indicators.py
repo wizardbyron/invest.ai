@@ -27,7 +27,7 @@ def classic(high: float, low: float, close: float) -> dict[str, float]:
         "阻力位1.5": (r1+r2)/2,
         "阻力位1.0": r1,
         "阻力位0.5": (p+r1)/2,
-        "枢轴点": p,
+        "基准价": p,
         "支撑位0.5": (p+s1)/2,
         "支撑位1.0": s1,
         "支撑位1.5": (s1+s2)/2,
@@ -60,7 +60,7 @@ def fibonacci(high: float, low: float, close: float) -> dict[str, float]:
         "阻力位1.5": (r1+r2)/2,
         "阻力位1.0": r1,
         "阻力位0.5": (p+r1)/2,
-        "枢轴点": p,
+        "基准价": p,
         "支撑位0.5": (p+s1)/2,
         "支撑位1.0": s1,
         "支撑位1.5": (s1+s2)/2,
@@ -71,7 +71,7 @@ def fibonacci(high: float, low: float, close: float) -> dict[str, float]:
 
 
 def pivot_points_table(df_input: DataFrame) -> DataFrame:
-    """将多种枢轴点合并展示
+    """将多种基准价合并展示
 
     Args:
         df_input (DataFrame): k线数据
@@ -96,11 +96,11 @@ def pivot_points_table(df_input: DataFrame) -> DataFrame:
 
 
 def merge_points(kline: Series, points: DataFrame, type: str = "参考价") -> DataFrame:
-    """将K线和枢轴点合并显示
+    """将K线和基准价合并显示
 
     Args:
         kline (Series): K线
-        points (DataFrame): 枢轴点
+        points (DataFrame): 基准价
         type (str, optional): 经典/斐波那契/参考价. Defaults to "参考价".
 
     Returns:
@@ -110,7 +110,7 @@ def merge_points(kline: Series, points: DataFrame, type: str = "参考价") -> D
     points.loc["*开盘"] = kline["开盘"]
     points.loc["*最低"] = kline["最低"]
     points.loc["*当前>"] = kline["收盘"]
-    points.loc["*VWAP>"] = kline["成交额"]/kline["成交量"]
+    points.loc["*均价>"] = kline["成交额"]/kline["成交量"]
     points["收益率"] = (points[type] - kline["收盘"])/kline["收盘"]
     points["收益率"] = points["收益率"].map(lambda x: '{:.2%}'.format(x))
     points = points.sort_values(by=type, ascending=False)

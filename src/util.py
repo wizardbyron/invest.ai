@@ -4,13 +4,15 @@ from zoneinfo import ZoneInfo
 
 from colorama import Fore
 
+disclaimer_md_text = f"""
+**免责声明**
+
+以上内容由人工智能大语言模型生成并用于技术演示。其内容不构成任何投资建议，也不作为任何法律法规、监管政策的依据。投资者不应采用以上信息作为投资决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。
+"""
+
 
 def disclaimer_md():
-    return f"""
-**免责声明**：
-- 以上内容由人工智能大语言模型生成，并用于实验演示。其内容不构成任何投资建议，也不作为任何法律法规、监管政策的依据。
-- 投资者不应采用以上信息作为投资决策依据或依赖该等信息做出法律行为，由此造成的一切后果由投资者自行承担。
-"""
+    return disclaimer_md_text
 
 
 def remove_leading_spaces(s: str) -> str:

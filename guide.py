@@ -18,7 +18,7 @@ def guide(portfolio: str = "all", series: str = "参考价") -> None:
 
     Args:
         symbol (str): 代码 or ""
-        series (str, optional): 枢轴点类型：经典/斐波那契额/参考价. Defaults to "参考价".
+        series (str, optional): 基准价类型：经典/斐波那契额/参考价. Defaults to "参考价".
 
     Raises:
         ValueError: _description_
@@ -45,20 +45,20 @@ def guide(portfolio: str = "all", series: str = "参考价") -> None:
         resp_weekly = pivot_points_grid(symbol, 'weekly', series)
         df_weekly = resp_weekly['merged_table']
         df_weekly.rename_axis('周内交易', inplace=True)
-        vwap_weekly = df_weekly.loc['*VWAP>', series]
+        均价_weekly = df_weekly.loc['*均价>', series]
 
         resp_daily = pivot_points_grid(symbol, 'daily', series)
         df_daily = resp_daily['merged_table']
         df_daily.rename_axis('日内交易', inplace=True)
-        vwap_daily = df_daily.loc['*VWAP>', series]
+        均价_daily = df_daily.loc['*均价>', series]
 
         output_dict["代码"].append(symbol)
         output_dict["名称"].append(name)
         output_dict["当前价格"].append(resp_weekly['price'])
         output_dict["周建议"].append(format_for_term(resp_weekly['order']))
         output_dict["日建议"].append(format_for_term(resp_daily['order']))
-        vwap_diff = (vwap_daily - vwap_weekly)/vwap_weekly
-        output_dict["均价偏移"].append(f"{vwap_diff:.2%}")
+        均价_diff = (均价_daily - 均价_weekly)/均价_weekly
+        output_dict["均价偏移"].append(f"{均价_diff:.2%}")
 
         if len(symbols) == 1:
             weekly_table = tabulate(df_weekly,
