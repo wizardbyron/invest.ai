@@ -164,3 +164,4 @@ cython_debug/
 .DS_Store
 docs/交易指南/**/*.md
 output/*
+.auth/*

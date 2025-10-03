@@ -1,10 +1,14 @@
 # 更新镜像并安装必要软件包
 FROM ubuntu
+
 RUN apt update && apt upgrade -y
 
-RUN apt install -y python3-pip curl build-essential software-properties-common && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y build-essential curl python3-pip software-properties-common git
 
-RUN pip install --no-cache-dir --break-system-packages -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple akshare streamlit colorama
+RUN pip install --no-cache-dir --break-system-packages \
+    -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple \
+    --ignore-installed cryptography \
+    akshare colorama streamlit streamlit_authenticator
 
 # # 将当前目录下的文件复制到容器的 /app 目录
 COPY . /app

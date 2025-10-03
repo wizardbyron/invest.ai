@@ -12,6 +12,7 @@ mkdocs-get-deps
 mkdocs-material
 mkdocs-material-extensions
 streamlit
+streamlit_authenticator
 tabulate
 tqdm
 pyjwt
