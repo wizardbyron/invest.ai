@@ -1,16 +1,19 @@
 import streamlit as st
 
-st.set_page_config(page_title="Invest.AI - 量化投资助手")
-pages = {
-    "Invest.AI": [
-        st.Page("src/apps/individual.py",
-                title="个股交易参考",
-                icon=":material/explore:"),
-        st.Page("src/apps/portfolio.py",
-                title="投资组合参考",
-                icon=":material/fact_check:"),
-    ],
-}
+from src.apps.individual import individual_page
+from src.util import disclaimer_text
 
+page_title = "Invest.AI（演示版）"
+st.set_page_config(page_title=page_title)
+st.header(page_title)
+
+pages = [
+    st.Page(individual_page,
+            title="首页",
+            icon=":material/explore:")
+]
 pg = st.navigation(pages)
 pg.run()
+st.empty()
+st.write(disclaimer_text)
+st.write("© 2025 invest-ai.click All rights reserved.")

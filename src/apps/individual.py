@@ -2,7 +2,7 @@ import streamlit as st
 
 from src.data import get_stock_name
 from src.strategy import pivot_points_grid
-from src.util import nowstr, disclaimer_md
+from src.util import nowstr
 
 
 def pivot_df(st: st, symbol: str, period: str):
@@ -25,20 +25,27 @@ def pivot_df(st: st, symbol: str, period: str):
     st.table(resp['merged_table'])
 
 
-if st.query_params == {}:
-    symbol = st.text_input("请输入股票代码：(支持A股、港股、美股以及ETF)", max_chars=6)
-else:
-    symbol = st.text_input("请输入股票代码：(支持A股、港股、美股以及ETF)", max_chars=6,
-                           value=st.query_params["symbol"])
+def individual_page():
+    hint = "请输入股票代码用于演示(支持A股、港股、美股以及ETF)"
+    if st.query_params == {}:
+        symbol = st.text_input(hint, max_chars=6)
+    else:
+        symbol = st.text_input(hint, max_chars=6,
+                               value=st.query_params["symbol"])
 
-if len(symbol) >= 3:
-    with st.status("分析中...", expanded=False) as status:
-        st.button(f"立即更新", use_container_width=True)
-        col_weekly, col_daily = st.columns([2, 2])
-        pivot_df(col_weekly, symbol, "weekly")
-        pivot_df(col_daily, symbol, "daily")
+    if len(symbol) >= 3:
+        with st.status("分析中...", expanded=False) as status:
+            st.button(f"立即更新", use_container_width=True)
+            try:
+                col_weekly, col_daily = st.columns([2, 2])
+                pivot_df(col_weekly, symbol, "weekly")
+                pivot_df(col_daily, symbol, "daily")
+                status.update(label=f"{nowstr()} 分析完毕，交易参考如下",
+                              state="complete",
+                              expanded=True)
 
-        st.markdown(disclaimer_md())
-        status.update(label=f"{nowstr()}分析完毕，交易参考如下",
-                      state="complete",
-                      expanded=True)
+            except Exception as e:
+                status.update(label=f"{nowstr()} - 系统错误",
+                              state="complete",
+                              expanded=True)
+                st.error('系统错误，请稍后再试。')
