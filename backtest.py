@@ -1,10 +1,14 @@
 from datetime import datetime
+import fire
+import time
 
 import pandas as pd
 from pandas import DataFrame
 
 from src.indicators import fibonacci, classic
+from src.strategy import pivot_points_table
 from src.data import history_klines
+from src.util import nowstr
 
 
 def commision(turnover: float) -> float:
@@ -14,158 +18,130 @@ def commision(turnover: float) -> float:
         return turnover * 0.0003
 
 
-def trade_orders(daily_data: DataFrame,
-                 type: str,
-                 buy_point: int,
-                 sell_point: int) -> DataFrame:
-    df_trade_orders = pd.DataFrame(columns=['日期', '方向', '价格'])
-    buy_price = 0.0
-    sell_price = 0.0
-    level = 5
-    for index, row in daily_data.iterrows():
-        date = row['日期']
-        if isinstance(date, str):
-            date = datetime.strptime(date, "%Y-%m-%d")
-
-        # 获取上周的交易数据计算基准价
-        if date.weekday() == 0:  # 周一
-            df = daily_data[index-level:index]
-            # print(df)
-
-            if df.empty:
-                continue
-            else:
-                high = df['最高'].max()
-                low = df['最低'].min()
-                close = df['收盘'].iloc[-1]
-
-                points = {
-                    '经典': classic(high, low, close),
-                    '斐波那契': fibonacci(high, low, close)
-                }
-
-                buy_price = points[type][f'支撑位{buy_point}']
-                sell_price = points[type][f'阻力位{sell_point}']
-
-        if row['最低'] <= buy_price and buy_price <= row['最高']:
-            order = {
-                '日期': date,
-                '方向': 'BUY',
-                '价格': buy_price
-            }
-            df_trade_orders.loc[len(df_trade_orders)] = order
-
-        if row['最高'] >= sell_price and sell_price >= row['最低']:
-            order = {
-                '日期': date,
-                '方向': 'SELL',
-                '价格': sell_price
-            }
-            df_trade_orders.loc[len(df_trade_orders)] = order
-
-    df_trade_orders = df_trade_orders.round(3)
-
-    return df_trade_orders
+series_enum = {
+    'fibo': '斐波那契',
+    'classic': '经典',
+    'mid': '参考价'
+}
 
 
-def run_backtest(start_date_str: str, end_date_str: str) -> None:
-    df_input = pd.read_csv('input/backtest.csv', dtype={'代码': str})
-    df_output = df_input.copy()
+def run_backtest(symbol: str, start_date_str: str, end_date_str: str = '22220101', series_param: str = 'mid') -> None:
+    symbol = str(symbol)
+    cache_file = f'.cache/backtest_{symbol}_{start_date_str}.csv'
 
-    for idx, row in df_input.iterrows():
-        # print(row)
-
-        type = row['类型']
-        symbol = row['代码']
-        market, daily_data = history_klines(
-            type=type,
+    try:
+        df_all = pd.read_csv(cache_file)
+    except FileNotFoundError:
+        tz, daily_data = history_klines(
             symbol=symbol,
-            start_date=start_date_str,
-            end_date=end_date_str,
-            adjust_flag='hfq')
+            period='daily',
+            start_date=str(start_date_str),
+            end_date=str(end_date_str),
+            adjust_flag='qfq')
+        daily_data['type'] = 'daily'
 
-        if market == None:
-            continue
+        tz, weekly_data = history_klines(
+            symbol=symbol,
+            period='weekly',
+            start_date=str(start_date_str),
+            end_date=str(end_date_str),
+            adjust_flag='qfq')
+        weekly_data['type'] = 'weekly'
 
-        df_trade_orders = trade_orders(daily_data, '经典', 2, 3)
-        # df_trade_orders = trade_orders(daily_data, '斐波那契', 2, 3)
-        df_trade_orders.to_csv(f'output/{symbol}_orders.csv', index=False)
+        df_all = pd.concat([daily_data, weekly_data], ignore_index=True).sort_values(
+            by=['日期'], ascending=True)
+        df_all.to_csv(cache_file, index=False)
 
-        init = 100000
-        trade_unit = 10000
-        hold = 0
-        balance = init
-        trade_times = 0
-        df_trade_roi = df_trade_orders.copy()
-
-        for index, row in df_trade_orders.iterrows():
-            type = row['方向']
-            price = row['价格']
-
-            if type == 'BUY' and trade_unit * price < balance:
-                hold += trade_unit
-                balance -= trade_unit * price
-                fee = commision(trade_unit * price)
-                balance -= fee
-                df_trade_roi.loc[index, '交易数量'] = trade_unit
-                df_trade_roi.loc[index, '持有数量'] = hold
-                df_trade_roi.loc[index, '成交额'] = -trade_unit * price
-                df_trade_roi.loc[index, '手续费'] = fee
-                df_trade_roi.loc[index, '余额'] = balance
-                trade_times += 1
-
-            if type == 'SELL' and hold > 0:
-                hold -= trade_unit
-                balance += trade_unit * price
-                fee = commision(trade_unit * price)
-                balance -= fee
-                df_trade_roi.loc[index, '交易数量'] = -trade_unit
-                df_trade_roi.loc[index, '持有数量'] = hold
-                df_trade_roi.loc[index, '成交额'] = trade_unit * price
-                df_trade_roi.loc[index, '手续费'] = fee
-                df_trade_roi.loc[index, '余额'] = balance
-                trade_times += 1
-
-        df_trade_roi = df_trade_roi.round(2)
-        if '成交额' in df_trade_roi.columns:
-            df_trade_roi = df_trade_roi[df_trade_roi['成交额'].abs() > 0.0]
+    series = series_enum[series_param]
+    weekly_points = None
+    trades = []
+    # print(df_all)
+    for idx, row in df_all.iterrows():
+        if row['type'] == 'weekly':
+            prev_week = df_all.iloc[idx:idx+1]
+            weekly_points = pivot_points_table(prev_week)
+            weekly_guide = {
+                'prev_week': prev_week,
+                'points': weekly_points,
+            }
         else:
-            continue
-        df_trade_roi.to_csv(f'output/{symbol}_trade.csv', index=False)
+            if weekly_points is None:
+                continue
+            if df_all.loc[idx-1, 'type'] == 'weekly':
+                prev_day = df_all.iloc[idx-2:idx-1]
+            else:
+                prev_day = df_all.iloc[idx-1:idx]
 
-        df_output.loc[idx, '账户余额'] = balance
-        df_output.loc[idx, '持仓数量'] = hold
-        df_output.loc[idx, '起始价格'] = daily_data['收盘'].iloc[0]
-        df_output.loc[idx, '最新价格'] = daily_data['收盘'].iloc[-1]
-        df_output.loc[idx, '持仓市值'] = daily_data['收盘'].iloc[-1] * hold
-        df_output.loc[idx, '合计'] = daily_data['收盘'].iloc[-1] * hold + balance
-        trade_roi = (daily_data['收盘'].iloc[-1] * hold + balance - init)/init
-        df_output.loc[idx, '交易收益率'] = trade_roi
+            daily_points = pivot_points_table(prev_day)
+            daily_guide = {
+                'prev_day': df_all.iloc[idx:idx+1],
+                'points': daily_points,
+            }
 
-        start_close = daily_data['收盘'].iloc[0]
-        end_close = daily_data['收盘'].iloc[-1]
-        non_trade_roi = (end_close - start_close) / start_close
+            low = df_all.iloc[idx]['最低']
+            high = df_all.iloc[idx]['最高']
 
-        df_output.loc[idx, '自然收益率'] = non_trade_roi
-        df_output.loc[idx, '超额收益率'] = trade_roi - non_trade_roi
-        df_output.loc[idx, '交易次数'] = trade_times
+            weekly_pos = 2.0
+            weekly_buy_price = weekly_points.loc[f'支撑位{weekly_pos:.1f}', series]
+            weekly_sell_price = weekly_points.loc[f'阻力位{weekly_pos:.1f}', series]
 
-    df_output = df_output.round(3)
-    df_output = df_output.sort_values(by='超额收益率', ascending=False)
+            # daily_pos = 1.5
+            # daily_buy_price = daily_points.loc[f'支撑位{daily_pos:.1f}', series]
+            # daily_sell_price = daily_points.loc[f'阻力位{daily_pos:.1f}', series]
+            if low <= weekly_buy_price:
+                trades.append({
+                    '指令': '买入',
+                    '买入价': weekly_buy_price,
+                    '当日': row,
+                    '周指南': weekly_guide,
+                    '日指南': daily_guide,
+                })
 
-    sum_init = len(df_input) * 100000
-    sum_value = df_output['合计'].sum()
-    sum_roi = (sum_value - sum_init)/sum_init
+            if high >= weekly_sell_price:
+                trades.append({
+                    '指令': '卖出',
+                    '卖出价': weekly_sell_price,
+                    '当日': row,
+                    '周指南': weekly_guide,
+                    '日指南': daily_guide,
+                })
 
-    win_count = (df_output['超额收益率'] > 0).sum()
+    # trades = []
+    init = 100000
+    # trade_unit = 100
+    hold = 0
+    balance = init
+    last_buy_price = 0
 
-    df_output['交易收益率'] = df_output['交易收益率'].apply(lambda x: "{:.2%}".format(x))
-    df_output['自然收益率'] = df_output['自然收益率'].apply(lambda x: "{:.2%}".format(x))
-    df_output['超额收益率'] = df_output['超额收益率'].apply(lambda x: "{:.2%}".format(x))
+    for item in trades:
+        # print(item)
+        if item['指令'] == '买入' and balance > 0:
+            amount = balance/item['买入价']-balance/item['买入价'] % 100
+            balance -= amount * item['买入价']
+            hold += amount
+            last_buy_price = item["买入价"]
+            print(
+                f'日期:{item['当日']['日期']}, 买入价格:{last_buy_price:.3f}, 买入数量：{amount}，买入金额:{hold*item["买入价"]:.2f}, 余额：{balance:.2f}')
 
-    print(df_output)
-    print(f'总体组合收益率:{sum_roi:.2%}')
+        if item['指令'] == '卖出' and hold > 0 and item['卖出价'] > last_buy_price:
+            balance += hold * item['卖出价']
+            print(
+                f'日期:{item['当日']['日期']}, 卖出价格:{item['卖出价']:.3f}, 卖出数量：{hold}，卖出金额:{hold*item["卖出价"]:.2f}, 余额：{balance:.2f}')
+            hold = 0
+            # last_buy_price = 0
 
-    print(f'总体胜率:{win_count/len(df_output):.2%}')
-    roi_file_name = f'output/backtest_{start_date_str}_{end_date_str}.csv'
-    df_output.to_csv(roi_file_name, index=False)
+    print(
+        f'期末持仓：{hold}，期末余额：{balance:.2f}, 期末市值：{balance + hold * df_all.iloc[-1]['收盘']:.2f}')
+
+    print(
+        f'初始资金：{init:.2f},收益率：{((balance + hold * df_all.iloc[-1]['收盘']) / init) - 1:.2%}')
+
+    print(f'基准收益率：{df_all.iloc[-1]["收盘"] / df_all.iloc[0]["收盘"] - 1:.2%}')
+
+
+if __name__ == "__main__":
+    start_time = time.time()
+    fire.Fire(run_backtest)
+    end_time = time.time()
+    duration = end_time - start_time
+    print(f"[{nowstr()} 执行完成, 花费:{duration:.2f}秒]")
