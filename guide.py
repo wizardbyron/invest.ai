@@ -42,6 +42,8 @@ def guide(portfolio: str = "all", series: str = "参考价") -> None:
     }
 
     for symbol, name in tqdm(symbols, leave=False):
+        if pd.isna(name):
+            name = get_stock_name(symbol)
         resp_weekly = pivot_points_grid(symbol, 'weekly', series)
         df_weekly = resp_weekly['merged_table']
         df_weekly.rename_axis('周内交易', inplace=True)

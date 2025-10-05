@@ -33,7 +33,7 @@ def append_discliamer(md_text: str) -> str:
 
     output = f"""{md_text}
 
-    {disclaimer_md()}"""
+    {disclaimer_text}"""
 
     return remove_leading_spaces(output)
 

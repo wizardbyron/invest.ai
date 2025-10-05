@@ -1,11 +1,9 @@
-from datetime import datetime
-
 import akshare as ak
 import pandas as pd
 from pandas import DataFrame
 
 
-from src.util import identify_stock_type, this_year_str, todaystr
+from src.util import identify_stock_type, this_year_str
 
 
 def history_klines(symbol: str,
@@ -16,7 +14,6 @@ def history_klines(symbol: str,
     """获取历史 K 线
 
     Args:
-        type (str): 类型: A股/A股ETF/港股/美股
         symbol (str): 股票代码
         period (str, optional): K线周期: daily/weekly/monthly. Defaults to 'daily'.
         start_date (str, optional): 开始日期, 格式: yyyymmdd. Defaults to ''.
