@@ -1,8 +1,8 @@
 import streamlit as st
 
 from src.data import get_stock_name
-from src.strategy import pivot_points_grid
-from src.util import nowstr
+from src.strategy import pivot_points_grid, ai_guide
+from src.util import nowstr, todaystr
 
 
 def pivot_df(st: st, symbol: str, period: str):
@@ -37,13 +37,13 @@ def individual_page():
         with st.status("分析中...", expanded=False) as status:
             st.button(f"立即更新", use_container_width=True)
             try:
+                st.markdown(ai_guide(symbol, todaystr()))
                 col_weekly, col_daily = st.columns([2, 2])
                 pivot_df(col_weekly, symbol, "weekly")
                 pivot_df(col_daily, symbol, "daily")
                 status.update(label=f"{nowstr()} 分析完毕，交易参考如下",
                               state="complete",
                               expanded=True)
-
             except Exception as e:
                 status.update(label=f"{nowstr()} - 系统错误",
                               state="complete",
