@@ -81,7 +81,31 @@ def identify_stock_type(code: str) -> str:
     # 判断是否为港股
     if code.isdigit() and len(code) == 5:
         return '港股'
+
+    # 判断是否为美股
+    if not code.isdigit():
+        return '美股'
+
     return '未知类型'
+
+
+def get_timezone_by_type(type: str) -> str:
+    """根据市场类型获取时区
+
+    Args:
+        type (str): 市场类型
+
+    Returns:
+        str: 时区
+    """
+    if type == 'A股':
+        return 'Asia/Shanghai'
+    elif type == '港股':
+        return 'Asia/Hong_Kong'
+    elif type == '美股':
+        return 'America/New_York'
+    else:
+        return 'UTC'
 
 
 def nowstr(tz='Asia/Shanghai') -> str:

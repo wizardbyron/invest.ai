@@ -2,7 +2,6 @@ import akshare as ak
 import pandas as pd
 from pandas import DataFrame
 
-
 from src.util import identify_stock_type, this_year_str
 
 
@@ -10,7 +9,7 @@ def history_klines(symbol: str,
                    period: str,
                    start_date: str = "19700101",
                    end_date: str = "22220101",
-                   adjust_flag: str = 'qfq') -> tuple[str, DataFrame]:
+                   adjust_flag: str = 'qfq') -> DataFrame:
     """获取历史 K 线
 
     Args:
@@ -24,7 +23,6 @@ def history_klines(symbol: str,
         ValueError: 结果为空则会报错
 
     Returns:
-        str: 时区
         DataFrame: 返回 df
     """
     stock_type = identify_stock_type(symbol)
@@ -37,7 +35,6 @@ def history_klines(symbol: str,
             period=period,
             adjust=adjust_flag)
         klines['成交量'] *= 100
-        tzone = 'Asia/Shanghai'
 
     elif stock_type == 'A股ETF':
         # 参考: https://akshare.akfamily.xyz/data/fund/fund_public.html#id10
@@ -48,7 +45,6 @@ def history_klines(symbol: str,
             period=period,
             adjust=adjust_flag)
         klines['成交量'] *= 100
-        tzone = 'Asia/Shanghai'
 
     elif stock_type == '港股':
         # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id66
@@ -58,7 +54,6 @@ def history_klines(symbol: str,
             end_date=end_date,
             period=period,
             adjust=adjust_flag)
-        tzone = 'Hongkong'
 
     else:
         # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id56
@@ -68,12 +63,11 @@ def history_klines(symbol: str,
             end_date=end_date,
             period=period,
             adjust=adjust_flag)
-        tzone = 'America/New_York'
 
     if klines.empty:
         raise ValueError("没有数据，请检查参数")
     klines['日期'] = klines['日期'].astype(str)
-    return tzone, klines
+    return klines
 
 
 def convert_us_symbol(symbol: str) -> str:
