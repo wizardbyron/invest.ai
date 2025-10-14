@@ -35,13 +35,29 @@ def individual_page():
 
     if len(symbol) >= 3:
         with st.status("分析中...", expanded=False) as status:
-            st.button(f"立即更新", use_container_width=True)
+            record_file = f'./record/{symbol.upper()}_{todaystr()}.md'
             try:
-                st.markdown(ai_guide(symbol, todaystr()))
-                col_weekly, col_daily = st.columns([2, 2])
-                pivot_df(col_weekly, symbol, "weekly")
-                pivot_df(col_daily, symbol, "daily")
-                status.update(label=f"{nowstr()} 分析完毕，交易参考如下",
+                # col_weekly, col_daily = st.columns([2, 2])
+                # pivot_df(col_weekly, symbol, "weekly")
+                # pivot_df(col_daily, symbol, "daily")
+
+                status.update(label=f"读取 AI 分析报告",
+                              state="running",
+                              expanded=True)
+                with open(record_file, 'r') as f:
+                    st.markdown(f.read())
+                status.update(label=f"完成",
+                              state="complete",
+                              expanded=True)
+            except FileNotFoundError as e:
+                status.update(label=f"AI 分析中，请稍后...",
+                              state="running",
+                              expanded=True)
+                resp = ai_guide(symbol, todaystr())
+                st.markdown(resp)
+                with open(record_file, 'w') as f:
+                    f.write(resp)
+                status.update(label=f"{nowstr()} 分析完成",
                               state="complete",
                               expanded=True)
             except Exception as e:
@@ -49,3 +65,5 @@ def individual_page():
                               state="complete",
                               expanded=True)
                 st.error('系统错误，请稍后再试。')
+                print(e)
+            #

@@ -10,7 +10,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from src.data import history_klines, get_stock_name
 from src.llm import create_chat
 from src.indicators import merge_points, pivot_points_table
-from src.util import remove_leading_spaces, get_timezone_by_type
+from src.util import remove_leading_spaces, get_timezone_by_type, todaystr, nowstr
 
 
 def pivot_points_grid(symbol: str, period: str, series: str = "参考价") -> dict:
@@ -101,13 +101,13 @@ def ai_guide(symbol: str, end_date_str: str, days_off: int = 30) -> str:
     else:
         df_last_day = df_daily[-1:]
 
-        # 获取上周的交易数据周线
+    # 获取上周的交易数据周线
     if now.weekday() < 5:  # 交易日
         df_last_week = df_weekly[-2:-1]
     else:  # 非交易日
         df_last_week = df_weekly[-1:]
 
-        # 获取上月的交易数据
+    # 获取上月的交易数据
     last_month = df_monthly["日期"].iloc[-1]
     this_month = now.strftime("%Y-%m")
     if last_month.startswith(this_month):
@@ -115,18 +115,9 @@ def ai_guide(symbol: str, end_date_str: str, days_off: int = 30) -> str:
     else:
         df_last_month = df_monthly[-1:]
 
-    points_md = f"""
-    今日交易枢轴点 (参考最后一个交易日：{df_last_day["日期"].iloc[-1]})：
-    {pivot_points_table(df_last_day).to_markdown()}
+    prompt = f"""
+    以下是某股票最近的交易数据:
 
-    本周交易枢轴点 (参考最后一个交易日：{df_last_week["日期"].iloc[-1]})：
-    {pivot_points_table(df_last_week).to_markdown()}
-
-    本月交易枢轴点（参考最后一个交易日：{df_last_month["日期"].iloc[-1]}）：
-    {pivot_points_table(df_last_month).to_markdown()}
-    """
-
-    trade_md = f"""
     最近 {days_off} 个交易日 K 线数据如下:
     {df_daily[-days_off:].to_markdown(index=False)}
 
@@ -135,45 +126,59 @@ def ai_guide(symbol: str, end_date_str: str, days_off: int = 30) -> str:
     * 10 日均线: {df_daily["收盘"][-10:].mean():.2f}
     * 20 日均线: {df_daily["收盘"][-20:].mean():.2f}
     * 30 日均线: {df_daily["收盘"][-30:].mean():.2f}
-    """
 
-    prompt = f"""
-    以下是{name}({symbol})最近的交易数据:
+    以下是该股票不同级别的交易基准价参考:
 
-    {trade_md}
+    今日交易参考基准价 (参考最后一个交易日：{df_last_day["日期"].iloc[-1]})：
+    {pivot_points_table(df_last_day).to_markdown()}
 
-    以下是{name}({symbol})不同级别的交易基准价参考:
+    本周交易参考基准价 (参考最后一个交易日：{df_last_week["日期"].iloc[-1]})：
+    {pivot_points_table(df_last_week).to_markdown()}
 
-    {points_md}
+    本月交易参考基准价（参考最后一个交易日：{df_last_month["日期"].iloc[-1]}）：
+    {pivot_points_table(df_last_month).to_markdown()}
 
     请结合价格、成交量、均线和不同级别的交易基准价综合分析输出交易建议, 输出要求如下：
-    - 输出建议的买入和卖出价格，并输出分析过程。
-    - 给出交易先后策略。
-    - 给出期权交易策略。
+    - 输出买入和卖出价格，以及止盈点和止损点。
+    - 输出出股票交易策略。
+    - 输出出期权交易策略。
+    - 输出分析过程。
+
+    并按照以下格式输出：
+
+    #### 股票交易参考
+
+    - 买入价格范围:
+    - 卖出价格范围:
+    - 止盈点:
+    - 止损点:
+
+    **交易策略**:
+
+    #### 期权交易参考
+
+    #### 股票交易分析
+
+    #### 期权交易分析
     """
-
-    format_prompt = """按照以下格式输出：
-    ## 股票交易建议
-    股票交易建议（包含股票交易价格）
-
-    ## 期权交易建议
-    期权交易建议（包含期权交易价格）
-
-    ## 股票交易分析
-
-    ## 期权交易分析
-    """
-
-    prompt = remove_leading_spaces(prompt+format_prompt)
 
     messages = [
         SystemMessage(
-            content="你是一个日内交易的量化交易员，可以根据数据给出专业的交易建议。"
+            content="你是一个资深量化交易员，可以根据市场交易数据给出专业的交易建议。"
         ),
         HumanMessage(
-            content=prompt
+            content=remove_leading_spaces(prompt)
         )
     ]
 
     chat = create_chat(llm_service, model)
-    return chat.invoke(messages).content
+    resp = chat.invoke(messages).content
+    result = f"""
+    ### {name}({symbol})交易参考-{todaystr()}
+
+    分析时间: {nowstr()}
+
+    {resp}
+
+    """
+    return remove_leading_spaces(result)
