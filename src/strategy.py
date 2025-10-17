@@ -1,7 +1,7 @@
 
 import os
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -10,10 +10,10 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from src.data import history_klines, get_stock_name
 from src.llm import create_chat
 from src.indicators import merge_points, pivot_points_table
-from src.util import remove_leading_spaces, get_timezone_by_type, todaystr, nowstr
+from src.util import remove_leading_spaces, get_timezone_by_type, todaystr, in_trading_time, disclaimer_text
 
 
-def pivot_points_grid(symbol: str, period: str, series: str = "参考价") -> dict:
+def pivot_points_grid(symbol: str, period: str, end_date_str: str = todaystr(), series: str = "参考价") -> dict:
     """基准价网格交易策略
 
     Args:
@@ -34,7 +34,7 @@ def pivot_points_grid(symbol: str, period: str, series: str = "参考价") -> di
         "daily": 1.5
     }
 
-    klines = history_klines(symbol, period)
+    klines = history_klines(symbol, period, end_date=end_date_str)
     data = klines[-2:-1]
     points_table = pivot_points_table(data)
     merged_points = merge_points(klines.iloc[-1], points_table, series)
@@ -73,31 +73,24 @@ def ai_guide(symbol: str, end_date_str: str, days_off: int = 30) -> str:
     timezone = ZoneInfo(get_timezone_by_type(get_timezone_by_type(symbol)))
     now = datetime.now(timezone)
 
-    end_date = datetime.strptime(end_date_str, "%Y%m%d")
-    start_date = end_date - timedelta(days=days_off)
-    start_date_str = start_date.strftime("%Y%m%d")
-
     df_daily = history_klines(
         symbol=symbol,
         period='daily',
-        start_date=start_date_str,
         end_date=end_date_str)
 
     df_weekly = history_klines(
         symbol=symbol,
         period='weekly',
-        start_date=start_date_str,
         end_date=end_date_str)
 
     df_monthly = history_klines(
         symbol=symbol,
         period='monthly',
-        start_date=start_date_str,
         end_date=end_date_str)
 
     # 获取上一个交易日的交易数据
-    if df_daily.iloc[-1]['日期'] == end_date.strftime('%Y-%m-%d') and now.hour < 16:
-        df_last_day = df_daily[-2:-1]
+    if df_daily.iloc[-1]['日期'].replace('-', '') == end_date_str and in_trading_time():
+        df_last_day = df_daily[-2:-1]  # 交易时间内，获取上一个交易日的数据
     else:
         df_last_day = df_daily[-1:]
 
@@ -155,9 +148,13 @@ def ai_guide(symbol: str, end_date_str: str, days_off: int = 30) -> str:
 
     **交易策略**:
 
-    #### 期权交易参考
+    - 短期策略:
+    - 中期策略:
+    - 长期策略:
 
-    #### 股票交易分析
+    #### 交易分析
+
+    #### 期权交易参考
 
     #### 期权交易分析
     """
@@ -173,12 +170,18 @@ def ai_guide(symbol: str, end_date_str: str, days_off: int = 30) -> str:
 
     chat = create_chat(llm_service, model)
     resp = chat.invoke(messages).content
-    result = f"""
-    ### {name}({symbol})交易参考-{todaystr()}
 
-    分析时间: {nowstr()}
+    result = f"""
+    ### {name}({symbol})
+
+    交易参考日: {now.strftime("%Y-%m-%d")}
 
     {resp}
 
+    #### 声明
+
+    {disclaimer_text}
+
+    生成时间: {now.strftime("%Y-%m-%d %H:%M:%S")}
     """
     return remove_leading_spaces(result)
