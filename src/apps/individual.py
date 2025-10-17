@@ -60,6 +60,11 @@ def individual_page():
                 status.update(label=f"{nowstr()} 分析完成",
                               state="complete",
                               expanded=True)
+            except IndexError as e:
+                status.update(label=f"{nowstr()} - 系统错误",
+                              state="complete",
+                              expanded=True)
+                st.error('您所查询的股票代码不存在，请确认。')
             except Exception as e:
                 status.update(label=f"{nowstr()} - 系统错误",
                               state="complete",
