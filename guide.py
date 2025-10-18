@@ -2,7 +2,8 @@
 
 import fire
 import time
-
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import pandas as pd
 
 from tabulate import tabulate
@@ -10,15 +11,15 @@ from tqdm import tqdm
 
 from src.data import get_stock_name
 from src.strategy import pivot_points_grid, ai_guide
-from src.util import nowstr, todaystr, format_for_term
+from src.util import nowstr, todaystr, format_for_term, get_timezone_by_type, identify_stock_type
 
 
-def guide(portfolio: str = "all", point_type: str = "中值") -> None:
+def guide(portfolio: str = "all", point_type: str = "斐波那契") -> None:
     """获取交易指南
 
     Args:
         symbol (str): 代码 or ""
-        series (str, optional): 基准价类型：经典/斐波那契额/中值. Defaults to "中值".
+        series (str, optional): 基准价类型：经典/斐波那契/中值. Defaults to "斐波那契".
 
     Raises:
         ValueError: _description_
@@ -39,15 +40,20 @@ def guide(portfolio: str = "all", point_type: str = "中值") -> None:
         '周建议': [],
         '日建议': [],
         'VWAP偏移': [],
-
     }
 
     for symbol, name in tqdm(symbols, leave=False):
+        time.sleep(1)
+        timezone = ZoneInfo(get_timezone_by_type(identify_stock_type(symbol)))
+        now = datetime.now(timezone)
+        start_date = (now - timedelta(days=15))
         if pd.isna(name):
             name = get_stock_name(symbol)
         resp_weekly = pivot_points_grid(
             symbol=symbol,
             period='weekly',
+            start_date=start_date.strftime('%Y-%m-%d'),
+            end_date=now.strftime('%Y-%m-%d'),
             point_type=point_type)
         df_weekly = resp_weekly['merged_table']
         df_weekly.rename_axis('周内交易', inplace=True)
@@ -56,6 +62,8 @@ def guide(portfolio: str = "all", point_type: str = "中值") -> None:
         resp_daily = pivot_points_grid(
             symbol=symbol,
             period='daily',
+            start_date=start_date.strftime('%Y-%m-%d'),
+            end_date=now.strftime('%Y-%m-%d'),
             point_type=point_type)
         df_daily = resp_daily['merged_table']
         df_daily.rename_axis('日内交易', inplace=True)
@@ -86,13 +94,6 @@ def guide(portfolio: str = "all", point_type: str = "中值") -> None:
                              daily in zip(weekly_rows, daily_rows)]
             print('\n')
             print('\n'.join(combined_rows))
-
-            resp = ai_guide(
-                symbol=str(symbol),
-                start_date='2025-01-01',
-                end_date=todaystr())
-
-            print(resp)
 
     print(tabulate(pd.DataFrame(output_dict).set_index('代码'),
                    headers=output_dict.keys(),
