@@ -95,7 +95,7 @@ def pivot_points_table(df_input: DataFrame) -> DataFrame:
     return df_output
 
 
-def merge_points(kline: Series, points: DataFrame, type: str = "中值") -> DataFrame:
+def merge_points(kline: Series, points: DataFrame, type: str) -> DataFrame:
     """将K线和基准价合并显示
 
     Args:

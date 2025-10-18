@@ -111,7 +111,7 @@ def weekly_daily_points(symbol: str, start_date_str: str, end_date_str: str, ser
     return df_all, trades
 
 
-def weekly_points(symbol: str, start_date_str: str, end_date_str: str, series_param: str) -> None:
+def weekly_grid(symbol: str, start_date_str: str, end_date_str: str, point_type: str) -> None:
     symbol = str(symbol)
     cache_file = f'.cache/backtest_weekly_{symbol}_{start_date_str}_{end_date_str}.csv'
 
@@ -138,12 +138,12 @@ def weekly_points(symbol: str, start_date_str: str, end_date_str: str, series_pa
         df_all = df_all.sort_values(by=['日期'], ascending=True)
         df_all.to_csv(cache_file, index=False)
 
-    series = series_enum[series_param]
+    series = series_enum[point_type]
     weekly_points = None
     trades = []
+    weekly_pos = 2.0
     stop_loss_point = 3.0
     stop_loss_price = 0.0
-    weekly_pos = 2.0
     for idx, row in df_all.iterrows():
         if row['type'] == 'weekly':
             prev_week = df_all.iloc[idx:idx+1]
@@ -193,7 +193,7 @@ def weekly_points(symbol: str, start_date_str: str, end_date_str: str, series_pa
     return df_all, trades
 
 
-def daily_points(symbol: str, start_date_str: str, end_date_str: str, series_param: str) -> None:
+def daily_grid(symbol: str, start_date_str: str, end_date_str: str, series_param: str) -> None:
     symbol = str(symbol)
     cache_file = f'.cache/backtest_daily_{symbol}_{start_date_str}_{end_date_str}.csv'
 
@@ -286,23 +286,45 @@ def all_in(df_all, trades):
 
     print(f'初始资金：{init:.2f}, 期末持仓：{hold}, 期末余额：{balance:.2f}, 期末市值：{value:.2f}')
     print(f'交易收益率：{trade_roi:.2%}, 基准收益率：{base_roi:.2%}')
-    print(f'收益率差:{trade_roi - base_roi:.2%}，交易次数：{trade_times}')
-    return trade_roi
+    print(f'超额收益率:{trade_roi - base_roi:.2%}，交易次数：{trade_times}')
+    return f'{trade_roi - base_roi:.2%}'
 
 
-def run_backtest(symbol: str, start_date: str, end_date: str) -> dict[str, float]:
-    result = {}
-    for series in ['classic', 'fibo', 'mid']:
-        print('='*40)
-        print(f'策略：{series}')
-        df_all, trades = weekly_points(symbol, start_date, end_date, series)
-        # df_all, trades = daily_points(symbol, start_date, end_date, series)
-        result['series'] = all_in(df_all, trades)
+class Backtest:
+    @classmethod
+    def individual(clz, symbol: str, start_date: str, end_date: str) -> dict[str, float]:
+        result = {}
+        for point_type in ['classic', 'fibo', 'mid']:
+            print('='*40)
+            print(f'策略：{point_type}')
+            df_all, trades = weekly_grid(
+                symbol, start_date, end_date, point_type)
+            # df_all, trades = daily_grid(symbol, start_date, end_date, point_type)
+            result[point_type] = all_in(df_all, trades)
+        print(result)
+        return result
+
+    @classmethod
+    def portfolio(cls, file_name: str, start_date: str, end_date: str):
+        full_path = f'input/portfolios/{file_name}.csv'
+        df = pd.read_csv(full_path, dtype={"代码": str, "名称": str})
+        df_output = df.copy()
+        for index, row in df_output.iterrows():
+            symbol = df_output.loc[index, "代码"]
+            result = cls.individual(symbol, start_date, end_date)
+            df_output.loc[index, "经典"] = result['classic']
+            df_output.loc[index, "斐波那契"] = result['fibo']
+            df_output.loc[index, "中位数"] = result['mid']
+            time.sleep(1)
+        df_output['开始日期'] = start_date
+        df_output['结束日期'] = end_date
+        print(df_output)
+        df_output.to_csv(f'output/backtest_{file_name}.csv', index=False)
 
 
 if __name__ == "__main__":
     start_time = time.time()
-    fire.Fire(run_backtest)
+    fire.Fire(Backtest)
     end_time = time.time()
     duration = end_time - start_time
     print(f"[{nowstr()} 执行完成, 花费:{duration:.2f}秒]")

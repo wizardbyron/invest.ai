@@ -17,7 +17,7 @@ def pivot_points_grid(symbol: str,
                       period: str,
                       start_date: str,
                       end_date: str,
-                      point_type: str = "中值") -> dict:
+                      point_type: str) -> dict:
     """基准价网格交易策略
 
     Args:

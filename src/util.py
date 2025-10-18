@@ -98,7 +98,7 @@ def get_timezone_by_type(type: str) -> str:
     Returns:
         str: 时区
     """
-    if type == 'A股':
+    if type == 'A股' or type == 'A股ETF':
         return 'Asia/Shanghai'
     elif type == '港股':
         return 'Asia/Hong_Kong'
