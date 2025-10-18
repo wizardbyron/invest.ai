@@ -13,12 +13,12 @@ from src.strategy import pivot_points_grid, ai_guide
 from src.util import nowstr, todaystr, format_for_term
 
 
-def guide(portfolio: str = "all", series: str = "参考价") -> None:
+def guide(portfolio: str = "all", point_type: str = "中值") -> None:
     """获取交易指南
 
     Args:
         symbol (str): 代码 or ""
-        series (str, optional): 基准价类型：经典/斐波那契额/参考价. Defaults to "参考价".
+        series (str, optional): 基准价类型：经典/斐波那契额/中值. Defaults to "中值".
 
     Raises:
         ValueError: _description_
@@ -38,30 +38,36 @@ def guide(portfolio: str = "all", series: str = "参考价") -> None:
         '当前价格': [],
         '周建议': [],
         '日建议': [],
-        '均价偏移': [],
+        'VWAP偏移': [],
 
     }
 
     for symbol, name in tqdm(symbols, leave=False):
         if pd.isna(name):
             name = get_stock_name(symbol)
-        resp_weekly = pivot_points_grid(symbol, 'weekly', series)
+        resp_weekly = pivot_points_grid(
+            symbol=symbol,
+            period='weekly',
+            point_type=point_type)
         df_weekly = resp_weekly['merged_table']
         df_weekly.rename_axis('周内交易', inplace=True)
-        均价_weekly = df_weekly.loc['*均价>', series]
+        vwap_weekly = df_weekly.loc['*VWAP>', point_type]
 
-        resp_daily = pivot_points_grid(symbol, 'daily', series)
+        resp_daily = pivot_points_grid(
+            symbol=symbol,
+            period='daily',
+            point_type=point_type)
         df_daily = resp_daily['merged_table']
         df_daily.rename_axis('日内交易', inplace=True)
-        均价_daily = df_daily.loc['*均价>', series]
+        vwap_daily = df_daily.loc['*VWAP>', point_type]
 
         output_dict["代码"].append(symbol)
         output_dict["名称"].append(name)
         output_dict["当前价格"].append(resp_weekly['price'])
         output_dict["周建议"].append(format_for_term(resp_weekly['order']))
         output_dict["日建议"].append(format_for_term(resp_daily['order']))
-        均价_diff = (均价_daily - 均价_weekly)/均价_weekly
-        output_dict["均价偏移"].append(f"{均价_diff:.2%}")
+        vwap_diff = (vwap_daily - vwap_weekly)/vwap_weekly
+        output_dict["VWAP偏移"].append(f"{vwap_diff:.2%}")
 
         if len(symbols) == 1:
             weekly_table = tabulate(df_weekly,
@@ -83,7 +89,8 @@ def guide(portfolio: str = "all", series: str = "参考价") -> None:
 
             resp = ai_guide(
                 symbol=str(symbol),
-                end_date_str=todaystr())
+                start_date='2025-01-01',
+                end_date=todaystr())
 
             print(resp)
 

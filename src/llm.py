@@ -1,7 +1,9 @@
 import os
 
 from dotenv import load_dotenv
+
 from langchain_openai.chat_models import ChatOpenAI
+
 
 load_dotenv()
 
@@ -20,7 +22,7 @@ def create_chat(service: str, model: str):
     Returns:
         _type_: _description_
     """
-    temperature = float(os.environ.get("TEMPERATURE", 0.01))  # 默认值为 0.01
+
     chat_model_params = {
         "ollama": {
             "api_key": "ollama",
@@ -42,4 +44,4 @@ def create_chat(service: str, model: str):
 
     params = chat_model_params[service]
 
-    return ChatOpenAI(model=model, temperature=temperature, **params)
+    return ChatOpenAI(model=model, temperature=0.01, **params)

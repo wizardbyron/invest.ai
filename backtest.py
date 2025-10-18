@@ -11,7 +11,7 @@ from src.util import nowstr
 series_enum = {
     'fibo': '斐波那契',
     'classic': '经典',
-    'mid': '参考价'
+    'mid': '中值'
 }
 
 

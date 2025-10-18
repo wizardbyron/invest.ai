@@ -8,8 +8,12 @@ from src.strategy import pivot_points_grid, ai_guide
 from src.util import nowstr, todaystr
 
 
-def pivot_df(st: st, symbol: str, period: str, end_date: str = todaystr()):
-    resp = pivot_points_grid(symbol, period, end_date)
+def pivot_df(st: st, symbol: str, period: str, start_date: str = '2000-01-01', end_date: str = todaystr()):
+    resp = pivot_points_grid(
+        symbol=symbol,
+        period=period,
+        start_date=start_date,
+        end_date=end_date)
     resp['merged_table'] = resp['merged_table'].rename_axis(f'{period}交易')
     price = resp['price']
     name = get_stock_name(symbol)
@@ -30,20 +34,20 @@ def pivot_df(st: st, symbol: str, period: str, end_date: str = todaystr()):
 
 def individual_table(symbol: str, date: datetime):
 
-    if st.button("交易参考价", use_container_width=True) and len(symbol) >= 3:
+    if st.button("价格分析", use_container_width=True) and len(symbol) >= 3:
         with st.status("分析中...", expanded=False) as status:
-            try:
-                col_weekly, col_daily = st.columns([2, 2])
-                pivot_df(col_weekly, symbol, "weekly", date)
-                pivot_df(col_daily, symbol, "daily", date)
-                status.update(label=f"{nowstr()} 分析完毕，{date}交易参考如下",
-                              state="complete",
-                              expanded=True)
-            except Exception as e:
-                status.update(label=f"{nowstr()} - 系统错误",
-                              state="complete",
-                              expanded=True)
-                st.error('系统错误，请稍后再试。')
+            col_weekly, col_daily = st.columns([2, 2])
+            pivot_df(st=col_weekly,
+                     symbol=symbol,
+                     period="weekly",
+                     end_date=date.strftime("%Y-%m-%d"))
+            pivot_df(st=col_daily,
+                     symbol=symbol,
+                     period="daily",
+                     end_date=date.strftime("%Y-%m-%d"))
+            status.update(label=f"{nowstr()} 分析完毕，{date}交易参考如下",
+                          state="complete",
+                          expanded=True)
 
 
 def individual_ai(symbol: str, date: datetime):
@@ -64,25 +68,19 @@ def individual_ai(symbol: str, date: datetime):
                 status.update(label=f"AI 分析中，请稍后...",
                               state="running",
                               expanded=False)
-                try:
-                    resp = ai_guide(symbol, date)
-                    st.markdown(resp)
-                    with open(record_file, 'w') as f:
-                        f.write(resp)
-                    status.update(label=f"{nowstr()} 分析完成",
-                                  state="complete",
-                                  expanded=True)
-                except IndexError as e:
-                    status.update(label=f"{nowstr()} - 系统错误",
-                                  state="complete",
-                                  expanded=True)
-                    st.error('您所查询的股票代码不存在，请确认。')
-
+                resp = ai_guide(symbol=symbol,
+                                end_date=date.strftime("%Y-%m-%d"))
+                st.markdown(resp)
+                with open(record_file, 'w') as f:
+                    f.write(resp)
+                status.update(label=f"{nowstr()} 分析完成",
+                              state="complete",
+                              expanded=True)
             except Exception as e:
                 status.update(label=f"{nowstr()} - 系统错误",
                               state="complete",
                               expanded=True)
-                st.error('系统错误，请稍后再试。')
+                st.error(f"系统错误: {e}")
 
 
 def individual_tabs():
@@ -93,13 +91,13 @@ def individual_tabs():
         symbol = st.text_input("股票代码", max_chars=6, help=symbol_help).upper()
 
     with right:
-        date = st.date_input("请选择日期", max_value="today",
-                             format="YYYY-MM-DD", value="today")
+        end_date = st.date_input("请选择日期", max_value="today",
+                                 format="YYYY-MM-DD", value="today")
 
     ai, table = st.tabs(["AI 版", "表格版"])
 
     with ai:
-        individual_ai(symbol, date)
+        individual_ai(symbol, end_date)
 
     with table:
-        individual_table(symbol, date)
+        individual_table(symbol, end_date)

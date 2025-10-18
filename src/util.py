@@ -125,7 +125,7 @@ def todaystr() -> str:
         _type_: 输出"%Y-%m-%d"格式的当前日期字符串
     """
     now = datetime.now()
-    return now.strftime("%Y%m%d")
+    return now.strftime("%Y-%m-%d")
 
 
 def send_voice(message: str) -> int:
@@ -190,6 +190,39 @@ def this_year_str() -> str:
         str: _description_
     """
     return todaystr()[:4]
+
+
+def futu_symbol(symbol: str) -> str:
+    """根据股票代码区分市场并返回"市场.代码"格式的字符串
+
+    Args:
+        code (str): 股票代码
+
+    Returns:
+        str: 格式化后的市场代码，如"HK.00700"
+    """
+    # 处理代码可能存在的前后空格
+    symbol = str(symbol).strip()
+
+    # 判断是否为港股
+    if symbol.isdigit() and len(symbol) == 5:
+        return f"HK.{symbol}"
+
+    # 判断是否为A股
+    if symbol.isdigit() and len(symbol) == 6:
+        # 深圳市场
+        if symbol.startswith(('00', '30', '15', '16', '18', '20', '28', '39')):
+            return f"SZ.{symbol}"
+        # 上海市场
+        elif symbol.startswith(('5', '60', '68', '688', '70', '73', '75', '78', '79', '90', '99')):
+            return f"SH.{symbol}"
+
+    # 判断是否为美股
+    if not symbol.isdigit():
+        return f"US.{symbol}"
+
+    # 未知市场类型，直接返回原代码
+    return symbol
 
 
 def format_for_term(order: str) -> str:
