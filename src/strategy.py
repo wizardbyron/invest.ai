@@ -66,9 +66,6 @@ def ai_guide(symbol: str, end_date_str: str, days_off: int = 30) -> str:
     if days_off < 30:
         raise ValueError("days_off must be greater than or equal to 30")
 
-    llm_service = os.environ.get("LLM_SERVICE")
-    model = os.environ.get("MODEL")
-
     name = get_stock_name(symbol)
     timezone = ZoneInfo(get_timezone_by_type(get_timezone_by_type(symbol)))
     now = datetime.now(timezone)
@@ -152,9 +149,9 @@ def ai_guide(symbol: str, end_date_str: str, days_off: int = 30) -> str:
     - 中期策略:
     - 长期策略:
 
-    #### 交易分析
-
     #### 期权交易参考
+
+    #### 股票交易分析
 
     #### 期权交易分析
     """
@@ -168,6 +165,8 @@ def ai_guide(symbol: str, end_date_str: str, days_off: int = 30) -> str:
         )
     ]
 
+    llm_service = os.environ.get("LLM_SERVICE", "zai")
+    model = os.environ.get("MODEL", "glm-4.5-flash")
     chat = create_chat(llm_service, model)
     resp = chat.invoke(messages).content
 

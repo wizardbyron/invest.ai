@@ -50,7 +50,7 @@ def individual_ai(symbol: str, date: datetime):
 
     if st.button("AI 分析", use_container_width=True) and len(symbol) >= 3:
         with st.status("分析中...", expanded=False) as status:
-            record_file = f'./record/{symbol.upper()}_{date}.md'
+            record_file = f'./record/{symbol.upper()}_{date.strftime("%Y%m%d")}.md'
             try:
                 status.update(label=f"{nowstr()} 读取 AI 分析报告",
                               state="running",

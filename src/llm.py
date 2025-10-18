@@ -34,11 +34,12 @@ def create_chat(service: str, model: str):
             "api_key": os.environ.get("MOONSHOT_API_KEY"),
             "base_url": "https://api.moonshot.cn/v1"
         },
-        "zhipuai": {
-            "api_key": os.environ.get("ZHIPUAI_API_KEY"),
+        "zai": {
+            "api_key": os.environ.get("ZAI_API_KEY"),
             "base_url": "https://open.bigmodel.cn/api/paas/v4/"
         }
     }
 
     params = chat_model_params[service]
+
     return ChatOpenAI(model=model, temperature=temperature, **params)
