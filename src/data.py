@@ -195,7 +195,7 @@ def history_klines(symbol: str,
             adjust_flag=adjust_flag)
     else:
         raise ValueError("请设置环境变量 DATA_SOURCE 为 akshare 或 futu")
-    query_info = f'[{source}]查询: [{futu_symbol(symbol)}] {start_date} to {end_date}, {len(data)} rows.'
+    query_info = f'[{source}]查询[{futu_symbol(symbol)}], 类型: {period},{start_date} to {end_date}, {len(data)} rows.'
     print(query_info)
     return data
 
