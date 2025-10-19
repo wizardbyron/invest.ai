@@ -23,7 +23,7 @@ def pivot_points_grid(symbol: str,
     Args:
         symbol (str): 股票代码
         period (str, optional): 级别. 'weekly'/'daily'.
-        series (str, optional): 基准价系列. Defaults to "中值".
+        series (str, optional): 基准价系列.
 
     Returns:
         tuple[str, float]: 返回交易建议
@@ -160,8 +160,8 @@ def ai_guide(symbol: str,
 
     - 买入价格范围:
     - 卖出价格范围:
-    - 止盈点:
-    - 止损点:
+    - 止盈价:
+    - 止损价:
 
     **交易策略**:
 
@@ -190,7 +190,7 @@ def ai_guide(symbol: str,
     result = f"""
     ### {name}({symbol})
 
-    交易参考日: {now.strftime("%Y-%m-%d")}
+    交易参考日: {df_daily["日期"].iloc[-1]}
 
     {resp}
 
