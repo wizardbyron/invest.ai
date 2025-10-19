@@ -99,6 +99,8 @@ def history_klines_futu(symbol: str,
         'change_rate': '涨跌幅',
         'last_close': '昨收',
     }, inplace=True)
+    if ret_data.empty:
+        raise ValueError("没有数据，请检查参数")
     ret_data['日期'] = ret_data['日期'].str.replace(' 00:00:00', '')
     ret_data['涨跌额'] = ret_data['收盘'] - ret_data['开盘']
     return ret_data
