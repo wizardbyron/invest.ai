@@ -125,10 +125,12 @@ def ai_guide(symbol: str,
     prompt = f"""
     以下是某股票最近的交易数据:
 
-    最近 {days_off} 个交易日 K 线数据如下:
+    最近 {len(df_past)} 个交易日 K 线数据如下:
+
     {df_past.to_markdown(index=False)}
 
     均线数据计算如下：
+
     * 5 日均线: {df_daily["收盘"][-5:].mean():.2f}
     * 10 日均线: {df_daily["收盘"][-10:].mean():.2f}
     * 20 日均线: {df_daily["收盘"][-20:].mean():.2f}
@@ -136,13 +138,13 @@ def ai_guide(symbol: str,
 
     以下是该股票不同级别的交易基准价参考:
 
-    今日交易参考基准价 (参考最后一个交易日：{df_last_day["日期"].iloc[-1]})：
+    今日交易参考基准价 (参考日交易日：{df_last_day["日期"].iloc[-1]})：
     {pivot_points_table(df_last_day).to_markdown()}
 
-    本周交易参考基准价 (参考最后一个交易日：{df_last_week["日期"].iloc[-1]})：
+    本周交易参考基准价 (参考周起始日：{df_last_week["日期"].iloc[-1]})：
     {pivot_points_table(df_last_week).to_markdown()}
 
-    本月交易参考基准价（参考最后一个交易日：{df_last_month["日期"].iloc[-1]}）：
+    本月交易参考基准价（参考月起始日：{df_last_month["日期"].iloc[-1]}）：
     {pivot_points_table(df_last_month).to_markdown()}
 
     最新交易情况如下:

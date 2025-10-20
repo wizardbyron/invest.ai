@@ -177,7 +177,7 @@ def history_klines(symbol: str,
                    start_date: str,
                    end_date: str,
                    adjust_flag: str = 'qfq') -> DataFrame:
-    source = os.environ.get("DATA_SOURCE")
+    source = os.environ.get("DATA_SOURCE", "akshare")
 
     if source == "akshare":
         data = history_klines_akshare(
