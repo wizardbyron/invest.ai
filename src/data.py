@@ -33,21 +33,13 @@ def adjust_flag_to_autype(adjust_flag: str) -> AuType:
         raise ValueError("Invalid adjust_flag: " + adjust_flag)
 
 
-def history_klines_futu(symbol: str,
-                        period: str,
-                        start_date: str,
-                        end_date: str,
-                        adjust_flag: str = "qfq") -> DataFrame:
-    """获取股票历史K线数据
+def history_klines_futu(
+        symbol: str,
+        period: str,
+        start_date: str,
+        end_date: str,
+        adjust_flag: str = "qfq") -> DataFrame:
 
-    Args:
-        stock_code (str): 股票代码，如 'HK.00700'
-        start_date (str): 开始日期，格式 'YYYY-MM-DD'
-        end_date (str): 结束日期，格式 'YYYY-MM-DD'
-
-    Returns:
-        pandas.DataFrame: 包含K线数据的DataFrame
-    """
     quote_ctx = OpenQuoteContext(host='127.0.0.1', port=11111)
     page_size = 100
     ret_data = pd.DataFrame()
@@ -106,19 +98,20 @@ def history_klines_futu(symbol: str,
     return ret_data
 
 
-def history_klines_akshare(symbol: str,
-                           period: str,
-                           start_date: str,
-                           end_date: str,
-                           adjust_flag: str = 'qfq') -> DataFrame:
-    """获取历史 K 线
+def history_klines_akshare(
+        symbol: str,
+        period: str,
+        start_date: str,
+        end_date: str,
+        adjust_flag: str = 'qfq') -> DataFrame:
+    """从akshare获取历史 K 线
 
     Args:
         symbol (str): 股票代码
-        period (str, optional): K线周期: daily/weekly/monthly. Defaults to 'daily'.
-        start_date (str, optional): 开始日期, 格式: yyyymmdd. Defaults to ''.
-        end_date (str, optional): 结束日期, 格式: yyyymmdd. Defaults to ''.
-        adjust_flag (str, optional): 取值: qfq(前复权), hfq(后复权), 为空则不复权. Defaults to 'qfq'.
+        period (str, optional): K线周期: daily/weekly/monthly.
+        start_date (str, optional): 开始日期, 格式: yyyymmdd.
+        end_date (str, optional): 结束日期, 格式: yyyymmdd.
+        adjust_flag (str, optional): 取值: qfq(前复权), hfq(后复权), 为空则不复权.
 
     Raises:
         ValueError: 结果为空则会报错
@@ -172,11 +165,13 @@ def history_klines_akshare(symbol: str,
     return klines
 
 
-def history_klines(symbol: str,
-                   period: str,
-                   start_date: str,
-                   end_date: str,
-                   adjust_flag: str = 'qfq') -> DataFrame:
+def history_klines(
+        symbol: str,
+        period: str,
+        start_date: str,
+        end_date: str,
+        adjust_flag: str = 'qfq') -> DataFrame:
+
     source = os.environ.get("DATA_SOURCE", "akshare")
 
     if source == "akshare":
@@ -195,6 +190,7 @@ def history_klines(symbol: str,
             adjust_flag=adjust_flag)
     else:
         raise ValueError("请设置环境变量 DATA_SOURCE 为 akshare 或 futu")
+
     query_info = f'[{source}]查询[{futu_symbol(symbol)}], 类型: {period},{start_date} to {end_date}, {len(data)} rows.'
     print(query_info)
     return data

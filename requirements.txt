@@ -1,6 +1,7 @@
 akshare
 colorama
 fire
+futu-api
 langchain
 langchain-community
 langchain-core
