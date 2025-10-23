@@ -1,15 +1,22 @@
 #!/usr/bin/env python
 
+import os
 import time
 
 import akshare as ak
 import fire
 import pandas as pd
-from bs4 import BeautifulSoup
 import requests
 
+from dotenv import load_dotenv
+from bs4 import BeautifulSoup
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.data import cn_bond, us_bond
+from src.llm import create_chat
+from src.util import remove_leading_spaces
+
+load_dotenv()
 
 
 class MacroEconomic:
@@ -182,11 +189,77 @@ class MacroEconomic:
         print(df)
 
     @classmethod
-    def china(cls):
+    def china(cls, months=12):
         """中国宏观经济分析
         """
-        df_money = ak.macro_china_money_supply()[:12]  # 货币供应量
-        print(df_money)
+        prompt = f"""
+        请分析以下中国宏观经济数据，并给出分析结果：
+
+        1. 离岸人民币汇率
+
+        {ak.forex_hist_em(symbol="USDCNH")[-30*months:].to_markdown()}
+
+        2. 在岸人民币汇率
+
+        {ak.forex_hist_em(symbol="USDCNYC")[-30*months:].to_markdown()}
+
+        3. 中国居民消费物价指数（CPI）
+
+        {ak.macro_china_cpi()[:months].to_markdown()}
+
+        4. 中国工业品出厂价格指数（PPI）
+
+        {ak.macro_china_ppi()[:months].to_markdown()}
+
+        5. 中国制造业采购经理指数（PMI）
+
+        {pd.read_excel("input/pmi_china.xls").to_markdown()}
+
+        6. 十年期国债收益率
+
+        {cn_bond()[-30 * months:].to_markdown()}
+
+        7. 央行利率
+
+        {ak.macro_bank_china_interest_rate()[-10:].to_markdown()}
+
+        8. 存款准备金率
+
+        {ak.macro_china_reserve_requirement_ratio()[:months].to_markdown()}
+
+        9. 社会融资规模
+
+        {ak.macro_china_shrzgm()[-months:].to_markdown()}
+
+        10. 新增信贷数据
+
+        {ak.macro_china_new_financial_credit()[-months:].to_markdown()}
+
+
+        请根据以上数据对当前的经济形势进行判断, 对未来三个月的经济走势和政策方向进行预测。
+
+        并根据流动性定价的观点，判断对当前股市的影响。
+
+        如果有其他需要的数据，请告诉我，我会提供。
+
+        """
+
+        prompt = remove_leading_spaces(prompt)
+
+        messages = [
+            SystemMessage(
+                content="你是一个宏观经济分析专家，可以根据宏观经济数据对当前的经济形势和未来的经济走势进行分析。"
+            ),
+            HumanMessage(
+                content=(prompt)
+            )
+        ]
+
+        llm_service = os.environ.get("LLM_SERVICE")
+        model = os.environ.get("MODEL")
+        chat = create_chat(llm_service, model)
+        resp = chat.invoke(messages).content
+        print(resp)
 
 
 if __name__ == "__main__":
