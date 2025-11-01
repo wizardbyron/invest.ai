@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import datetime
 import os
 import time
 
@@ -92,7 +93,7 @@ class MacroEconomic:
         < 0(去库存周期)
         '''
 
-        df = pd.read_excel("input/pmi_china.xls", header=None)[2:15]
+        df = pd.read_csv("input/pmi_china.csv", header=None)[2:15]
         df = df.T
         new_header = df.iloc[0]
         df = df[1:]
@@ -153,7 +154,7 @@ class MacroEconomic:
         print(new_df)
 
     @classmethod
-    def zh_cpi_ppi(cls, months=24):
+    def zh_cpi_ppi(cls, months=12):
         """CPI和PPI剪刀差
 
         Args:
@@ -193,15 +194,17 @@ class MacroEconomic:
         """中国宏观经济分析
         """
         prompt = f"""
+        今天是 {datetime.datetime.now().strftime("%Y-%m-%d")}
+
         请分析以下中国宏观经济数据，并给出分析结果：
 
         1. 离岸人民币汇率
 
-        {ak.forex_hist_em(symbol="USDCNH")[-30*months:].to_markdown()}
+        {ak.forex_hist_em(symbol="USDCNH")[-30:].to_markdown()}
 
         2. 在岸人民币汇率
 
-        {ak.forex_hist_em(symbol="USDCNYC")[-30*months:].to_markdown()}
+        {ak.forex_hist_em(symbol="USDCNYC")[-30:].to_markdown()}
 
         3. 中国居民消费物价指数（CPI）
 
@@ -217,24 +220,19 @@ class MacroEconomic:
 
         6. 十年期国债收益率
 
-        {cn_bond()[-30 * months:].to_markdown()}
+        {cn_bond()[-30:].to_markdown()}
 
-        7. 央行利率
+        7. 中国人民银行利率
 
-        {ak.macro_bank_china_interest_rate()[-10:].to_markdown()}
+        {ak.macro_bank_china_interest_rate()[-5:].to_markdown()}
 
         8. 存款准备金率
 
-        {ak.macro_china_reserve_requirement_ratio()[:months].to_markdown()}
+        {ak.macro_china_reserve_requirement_ratio()[:5].to_markdown()}
 
-        9. 社会融资规模
+        9. 新增信贷数据
 
-        {ak.macro_china_shrzgm()[-months:].to_markdown()}
-
-        10. 新增信贷数据
-
-        {ak.macro_china_new_financial_credit()[-months:].to_markdown()}
-
+        {ak.macro_china_new_financial_credit()[:12].to_markdown()}
 
         请根据以上数据对当前的经济形势进行判断, 对未来三个月的经济走势和政策方向进行预测。
 

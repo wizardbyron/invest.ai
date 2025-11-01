@@ -161,6 +161,7 @@ def history_klines_akshare(
     if klines.empty:
         raise ValueError("没有数据，请检查参数")
     klines['日期'] = klines['日期'].astype(str)
+    klines['股票代码'] = symbol
     klines['股票名称'] = get_stock_name(symbol)
     return klines
 

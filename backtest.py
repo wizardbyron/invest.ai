@@ -34,6 +34,78 @@ def find_weekline_index(df, given_date):
     return df.loc[mask, '日期'].idxmax()
 
 
+def weekly_daily_grid(symbol: str, start_date_str: str, end_date_str: str, point_type: str) -> None:
+    symbol = str(symbol)
+
+    daily_klines = history_klines(
+        symbol=symbol,
+        period='daily',
+        start_date=str(start_date_str),
+        end_date=str(end_date_str))
+
+    end_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+    weekly_start_date = end_date - timedelta(days=15)
+    weekly_klines = history_klines(
+        symbol=symbol,
+        period='weekly',
+        start_date=weekly_start_date.strftime('%Y-%m-%d'),
+        end_date=str(end_date_str))
+
+    weekly_klines['日期'] = pd.to_datetime(
+        weekly_klines['日期'], format='%Y-%m-%d')
+
+    weekly_pos = 2.0
+    daily_pos = 1.5
+    stop_loss_point = 3.0
+    stop_loss_price = 0.0
+    last_buy_price = 0.0
+    last_buy_date = start_date_str
+
+    df_order = daily_klines.copy()
+    df_order['指令'] = '观望'
+
+    for idx, today in df_order.iterrows():
+
+        if idx < 1:
+            continue
+
+        latest_weekly_index = find_weekline_index(weekly_klines, today['日期'])
+        weekly_lines = weekly_klines[latest_weekly_index-1:latest_weekly_index]
+
+        weekly_points = pivot_points_table(weekly_lines)[point_type]
+        daily_points = pivot_points_table(daily_klines[idx-1:idx])[point_type]
+
+        buy_price = daily_points.loc[f'支撑位{daily_pos:.1f}']
+        sell_price = daily_points.loc[f'阻力位{daily_pos:.1f}']
+
+        df_order.loc[idx, '参考周线日期'] = weekly_lines.iloc[0]['日期']
+
+        df_order.loc[idx, '买入价'] = buy_price
+        df_order.loc[idx, '卖出价'] = sell_price
+        df_order.loc[idx, '止损价'] = stop_loss_price
+
+        if today['最低'] <= buy_price and today['最低'] <= weekly_points.loc[f'支撑位{weekly_pos:.1f}']:
+            df_order.loc[idx, '指令'] = '买入'
+            df_order.loc[idx, '买入价'] = buy_price
+            stop_loss_price = weekly_points.loc[f'支撑位{stop_loss_point:.1f}']
+            last_buy_date = today['日期']
+            last_buy_price = buy_price
+
+        if today['最低'] <= stop_loss_price and today['日期'] != last_buy_date:  # 避免当天交易
+            df_order.loc[idx, '指令'] = '止损'
+            df_order.loc[idx, '卖出价'] = stop_loss_price
+            stop_loss_price = 0.0
+
+        if today['最高'] >= sell_price and today['最高'] >= weekly_points.loc[f'阻力位{weekly_pos:.1f}'] and today['日期'] != last_buy_date and sell_price > last_buy_price:
+            df_order.loc[idx, '指令'] = '卖出'
+            df_order.loc[idx, '卖出价'] = sell_price
+            stop_loss_price = 0.0
+
+    filename = f'output/weekly_daily_grid_{symbol}_{point_type}_{start_date_str.replace("-", "")}_{end_date_str.replace("-", "")}.csv'
+    df_order.to_csv(filename, index=False)
+    return daily_klines, df_order
+
+
 def weekly_grid(symbol: str, start_date_str: str, end_date_str: str, point_type: str) -> None:
     symbol = str(symbol)
 
@@ -57,6 +129,8 @@ def weekly_grid(symbol: str, start_date_str: str, end_date_str: str, point_type:
     weekly_pos = 2.0
     stop_loss_point = 3.0
     stop_loss_price = 0.0
+    last_buy_price = 0.0
+    last_buy_date = start_date_str
 
     df_order = daily_klines.copy()
     df_order['指令'] = '观望'
@@ -82,13 +156,14 @@ def weekly_grid(symbol: str, start_date_str: str, end_date_str: str, point_type:
             df_order.loc[idx, '买入价'] = buy_price
             stop_loss_price = weekly_points.loc[f'支撑位{stop_loss_point:.1f}']
             last_buy_date = today['日期']
+            last_buy_price = buy_price
 
         if today['最低'] <= stop_loss_price and today['日期'] != last_buy_date:  # 避免当天交易
             df_order.loc[idx, '指令'] = '止损'
             df_order.loc[idx, '卖出价'] = stop_loss_price
             stop_loss_price = 0.0
 
-        if today['最高'] >= sell_price:
+        if today['最高'] >= sell_price and today['日期'] != last_buy_date and sell_price > last_buy_price:
             df_order.loc[idx, '指令'] = '卖出'
             df_order.loc[idx, '卖出价'] = sell_price
             stop_loss_price = 0.0
@@ -109,6 +184,7 @@ def daily_grid(symbol: str, start_date_str: str, end_date_str: str, point_type: 
 
     daily_pos = 1.5
     stop_loss_point = 2.0
+    last_buy_price = 0.0
     stop_loss_price = 0.0
 
     df_order = daily_klines.copy()
@@ -131,6 +207,7 @@ def daily_grid(symbol: str, start_date_str: str, end_date_str: str, point_type: 
             df_order.loc[idx, '指令'] = '买入'
             df_order.loc[idx, '买入价'] = buy_price
             stop_loss_price = daily_points.loc[f'支撑位{stop_loss_point:.1f}']
+            last_buy_price = buy_price
             last_buy_date = today['日期']
 
         if today['最低'] <= stop_loss_price and today['日期'] != last_buy_date:  # 避免当天交易
@@ -138,12 +215,13 @@ def daily_grid(symbol: str, start_date_str: str, end_date_str: str, point_type: 
             df_order.loc[idx, '卖出价'] = stop_loss_price
             stop_loss_price = 0.0
 
-        if today['最高'] >= sell_price:
+        if today['最高'] >= sell_price and sell_price > last_buy_price and today['日期'] != last_buy_date:
             df_order.loc[idx, '指令'] = '卖出'
             df_order.loc[idx, '卖出价'] = sell_price
+            last_buy_price = 0.0
             stop_loss_price = 0.0
 
-    filename = f'output/weekly_grid_{symbol}_{point_type}_{start_date_str.replace("-", "")}_{end_date_str.replace("-", "")}.csv'
+    filename = f'output/daily_grid_{symbol}_{point_type}_{start_date_str.replace("-", "")}_{end_date_str.replace("-", "")}.csv'
     df_order.to_csv(filename, index=False)
     return daily_klines, df_order
 
@@ -253,7 +331,7 @@ class Backtest:
         df = pd.read_csv(full_path, dtype={"代码": str, "名称": str})
         df_output = df.copy()
         for index, row in df_output.iterrows():
-            symbol = df_output.loc[index, "代码"]
+            symbol = row["代码"]
             result = cls.individual(symbol, start_date, end_date)
             df_output.loc[index, "基准收益率"] = result['经典']['基准收益率']
             df_output.loc[index, "经典-交易收益率"] = result['经典']['交易收益率']

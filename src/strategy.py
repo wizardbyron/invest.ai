@@ -69,17 +69,21 @@ def pivot_points_grid(symbol: str,
 
 
 def ai_guide(symbol: str,
-             end_date: str,
-             days_off: int = 100) -> str:
+             start_date: str = "",
+             end_date: str = "") -> str:
     if symbol is None:
         raise ValueError("symbol is required")
-    if days_off < 100:
-        raise ValueError("days_off must be greater than or equal to 100")
+
+    days_off = 100
+    # raise ValueError("days_off must be greater than or equal to 100")
 
     name = get_stock_name(symbol)
     timezone = ZoneInfo(get_timezone_by_type(get_timezone_by_type(symbol)))
     now = datetime.now(timezone)
-    start_date = (now - timedelta(days=days_off)).strftime('%Y-%m-%d')
+    if start_date == "":
+        start_date = (now - timedelta(days=days_off)).strftime('%Y-%m-%d')
+    if end_date == "":
+        end_date = now.strftime('%Y-%m-%d')
 
     df_daily = history_klines(
         symbol=symbol,
@@ -201,5 +205,6 @@ def ai_guide(symbol: str,
     {disclaimer_text}
 
     生成时间: {now.strftime("%Y-%m-%d %H:%M:%S")}
+    分析模型: {model}
     """
     return remove_leading_spaces(result)
