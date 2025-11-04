@@ -68,9 +68,7 @@ def pivot_points_grid(symbol: str,
     }
 
 
-def ai_guide(symbol: str,
-             start_date: str = "",
-             end_date: str = "") -> str:
+def ai_guide(symbol: str, end_date: str = "") -> str:
     if symbol is None:
         raise ValueError("symbol is required")
 
@@ -80,8 +78,8 @@ def ai_guide(symbol: str,
     name = get_stock_name(symbol)
     timezone = ZoneInfo(get_timezone_by_type(get_timezone_by_type(symbol)))
     now = datetime.now(timezone)
-    if start_date == "":
-        start_date = (now - timedelta(days=days_off)).strftime('%Y-%m-%d')
+    start_date = (now - timedelta(days=days_off)).strftime('%Y-%m-%d')
+
     if end_date == "":
         end_date = now.strftime('%Y-%m-%d')
 
@@ -139,6 +137,7 @@ def ai_guide(symbol: str,
     * 10 日均线: {df_daily["收盘"][-10:].mean():.2f}
     * 20 日均线: {df_daily["收盘"][-20:].mean():.2f}
     * 30 日均线: {df_daily["收盘"][-30:].mean():.2f}
+    * 60 日均线: {df_daily["收盘"][-60:].mean():.2f}
 
     以下是该股票不同级别的交易基准价参考:
 
@@ -162,20 +161,25 @@ def ai_guide(symbol: str,
 
     并按照以下格式输出：
 
-    #### 交易参考
+    #### 股票交易参考
 
+    - 交易建议：买入/卖出/持有/观望
     - 买入价格范围:
     - 卖出价格范围:
     - 止盈价:
     - 止损价:
 
-    **交易策略**:
+    **股票交易策略**:
 
     - 短期策略:
     - 中期策略:
     - 长期策略:
 
-    #### 交易分析
+    #### 股票交易分析
+
+    #### 期权交易参考
+
+    #### 期权交易分析
 
     """
 

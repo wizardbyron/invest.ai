@@ -93,7 +93,7 @@ class MacroEconomic:
         < 0(去库存周期)
         '''
 
-        df = pd.read_csv("input/pmi_china.csv", header=None)[2:15]
+        df = pd.read_excel("input/pmi_china.xls", header=None)[2:15]
         df = df.T
         new_header = df.iloc[0]
         df = df[1:]

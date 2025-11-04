@@ -95,6 +95,8 @@ def guide(portfolio: str = "all", point_type: str = "斐波那契") -> None:
             print('\n')
             print('\n'.join(combined_rows))
 
+            print(ai_guide(symbol, now.strftime('%Y-%m-%d')))
+
     print(tabulate(pd.DataFrame(output_dict).set_index('代码'),
                    headers=output_dict.keys(),
                    tablefmt="fancy_grid"))
