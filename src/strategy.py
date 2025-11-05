@@ -139,22 +139,23 @@ def ai_guide(symbol: str, end_date: str = "") -> str:
     * 30 日均线: {df_daily["收盘"][-30:].mean():.2f}
     * 60 日均线: {df_daily["收盘"][-60:].mean():.2f}
 
-    以下是该股票不同级别的交易基准价参考:
+    以下是该股票不同级别的枢轴点参考:
 
-    今日交易参考基准价 (参考日交易日：{df_last_day["日期"].iloc[-1]})：
-    {pivot_points_table(df_last_day).to_markdown()}
+    根据昨日K线生成的枢轴点 (参考日交易日：{df_last_day["日期"].iloc[-1]})：
+    {pivot_points_table(df_last_day)['斐波那契'].to_markdown()}
 
-    本周交易参考基准价 (参考周起始日：{df_last_week["日期"].iloc[-1]})：
-    {pivot_points_table(df_last_week).to_markdown()}
+    根据上周K线生成的枢轴点 (参考周起始日：{df_last_week["日期"].iloc[-1]})：
+    {pivot_points_table(df_last_week)['斐波那契'].to_markdown()}
 
-    本月交易参考基准价（参考月起始日：{df_last_month["日期"].iloc[-1]}）：
-    {pivot_points_table(df_last_month).to_markdown()}
+    根据上月K线生成的枢轴点（参考月起始日：{df_last_month["日期"].iloc[-1]}）：
+    {pivot_points_table(df_last_month)['斐波那契'].to_markdown()}
 
     最新交易情况如下:
 
     {df_last_day.to_markdown(index=False)}
 
-    请结合最新交易数据以及历史交易的价格、成交量、均线和不同级别的交易基准价综合分析输出交易建议, 输出要求如下：
+    请结合最新交易数据以及历史交易的价格、成交量、均线和不同级别的枢轴点综合分析输出交易建议, 输出要求如下：
+    - 交易建议，包括买入，卖出，持有，观望。
     - 输出买入和卖出价格，以及止盈点和止损点。
     - 输出出股票交易策略。
     - 输出分析过程。
