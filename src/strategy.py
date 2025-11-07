@@ -10,7 +10,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from src.data import history_klines, get_stock_name
 from src.llm import create_chat
 from src.indicators import merge_points, pivot_points_table
-from src.util import remove_leading_spaces, get_timezone_by_type, in_trading_time, disclaimer_text
+from src.util import remove_leading_spaces, get_timezone_by_type, in_trading_time, identify_stock_type, disclaimer_text
 
 
 def pivot_points_grid(symbol: str,
@@ -76,7 +76,7 @@ def ai_guide(symbol: str, end_date: str = "") -> str:
     # raise ValueError("days_off must be greater than or equal to 100")
 
     name = get_stock_name(symbol)
-    timezone = ZoneInfo(get_timezone_by_type(get_timezone_by_type(symbol)))
+    timezone = ZoneInfo(get_timezone_by_type(identify_stock_type(symbol)))
     now = datetime.now(timezone)
     start_date = (now - timedelta(days=days_off)).strftime('%Y-%m-%d')
 
