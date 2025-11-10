@@ -211,10 +211,10 @@ def futu_symbol(symbol: str) -> str:
     # 判断是否为A股
     if symbol.isdigit() and len(symbol) == 6:
         # 深圳市场
-        if symbol.startswith(('00', '30', '15', '16', '18', '20', '28', '39')):
+        if symbol.startswith(('0', '1', '2', '3')):
             return f"SZ.{symbol}"
         # 上海市场
-        elif symbol.startswith(('5', '60', '68', '688', '70', '73', '75', '78', '79', '90', '99')):
+        elif symbol.startswith(('5', '6', '7', '9')):
             return f"SH.{symbol}"
 
     # 判断是否为美股

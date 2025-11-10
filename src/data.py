@@ -109,8 +109,8 @@ def history_klines_akshare(
     Args:
         symbol (str): 股票代码
         period (str, optional): K线周期: daily/weekly/monthly.
-        start_date (str, optional): 开始日期, 格式: yyyymmdd.
-        end_date (str, optional): 结束日期, 格式: yyyymmdd.
+        start_date (str, optional): 开始日期, 格式: yyyy-mm-dd.
+        end_date (str, optional): 结束日期, 格式: yyyy-mm-dd.
         adjust_flag (str, optional): 取值: qfq(前复权), hfq(后复权), 为空则不复权.
 
     Raises:
