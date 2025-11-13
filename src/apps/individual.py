@@ -108,7 +108,7 @@ def individual_tabs():
             format="YYYY-MM-DD",
             value="today")
 
-    ai, table = st.tabs(["AI 分析", "参考表格"])
+    ai, table = st.tabs(["交易价格参考", "AI 分析"])
 
     with ai:
         individual_ai(symbol, end_date)
