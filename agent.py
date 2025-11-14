@@ -9,7 +9,7 @@ from src.strategy import ai_guide
 from src.util import nowstr, get_timezone_by_type, identify_stock_type
 
 
-def guide(symbol: str, date: str) -> None:
+def guide(symbol: str, date: str = "") -> None:
     """获取交易指南
 
     Args:
@@ -22,7 +22,7 @@ def guide(symbol: str, date: str) -> None:
     symbol = str(symbol).upper()
     timezone = ZoneInfo(get_timezone_by_type(identify_stock_type(symbol)))
 
-    if date is None:
+    if date == "":
         end_date = datetime.now(timezone)
     else:
         end_date = datetime.strptime(str(date), '%Y%m%d')
