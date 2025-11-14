@@ -72,6 +72,8 @@ def ai_guide(symbol: str, end_date: str = "") -> str:
     if symbol is None:
         raise ValueError("symbol is required")
 
+    llm_service = os.environ.get("LLM_SERVICE")
+    model = os.environ.get("MODEL")
     days_off = 100
     # raise ValueError("days_off must be greater than or equal to 100")
 
@@ -109,6 +111,8 @@ def ai_guide(symbol: str, end_date: str = "") -> str:
         df_last_day = df_daily[-1:]
         df_past = df_daily[-days_off:]  # 获取过去days_off天的数据
 
+    df_today = df_daily[-1:]
+
     # 获取上周的交易数据周线
     if now.weekday() < 5:  # 交易日
         df_last_week = df_weekly[-2:-1]
@@ -124,7 +128,7 @@ def ai_guide(symbol: str, end_date: str = "") -> str:
     else:
         df_last_month = df_monthly[-1:]
 
-    prompt = f"""
+    guide_prompt = f"""
     以下是某股票最近的交易数据:
 
     最近 {len(df_past)} 个交易日 K 线数据如下:
@@ -141,30 +145,16 @@ def ai_guide(symbol: str, end_date: str = "") -> str:
 
     以下是该股票不同级别的枢轴点参考:
 
-    根据昨日K线生成的枢轴点 (参考日交易日：{df_last_day["日期"].iloc[-1]})：
-    {pivot_points_table(df_last_day)['斐波那契'].to_markdown()}
-
     根据上周K线生成的枢轴点 (参考周起始日：{df_last_week["日期"].iloc[-1]})：
     {pivot_points_table(df_last_week)['斐波那契'].to_markdown()}
 
     根据上月K线生成的枢轴点（参考月起始日：{df_last_month["日期"].iloc[-1]}）：
     {pivot_points_table(df_last_month)['斐波那契'].to_markdown()}
 
-    最新交易情况如下:
-
-    {df_last_day.to_markdown(index=False)}
-
-    请结合最新交易数据以及历史交易的价格、成交量、均线和不同级别的枢轴点综合分析输出交易建议, 输出要求如下：
-    - 交易建议，包括买入，卖出，持有，观望。
-    - 输出买入和卖出价格，以及止盈点和止损点。
-    - 输出出股票交易策略。
-    - 输出分析过程。
-
-    并按照以下格式输出：
+    结合以上历史交易的价格、成交量、均线和不同级别的枢轴点综合分析输出交易参考, 输出要求格式如下：
 
     #### 股票交易参考
 
-    - 交易建议：买入/卖出/持有/观望
     - 买入价格范围:
     - 卖出价格范围:
     - 止盈价:
@@ -177,33 +167,62 @@ def ai_guide(symbol: str, end_date: str = "") -> str:
     - 长期策略:
 
     #### 股票交易分析
-
-    #### 期权交易参考
-
-    #### 期权交易分析
-
     """
 
-    messages = [
+    guide_messages = [
         SystemMessage(
             content="你是一个资深量化交易员，可以根据市场交易数据给出专业的交易建议。"
         ),
         HumanMessage(
-            content=remove_leading_spaces(prompt)
+            content=remove_leading_spaces(guide_prompt)
         )
     ]
 
-    llm_service = os.environ.get("LLM_SERVICE", "zai")
-    model = os.environ.get("MODEL", "glm-4.5-flash")
     chat = create_chat(llm_service, model)
-    resp = chat.invoke(messages).content
+    resp_guide = chat.invoke(guide_messages).content
+
+    trade_prompt = f"""
+
+    根据以下某股票交易参考:
+
+    {resp_guide}
+
+    以下是该股票最新的交易数据:
+
+    {df_today.to_markdown()}
+
+    请严格遵循交易参考，并根据最新的交易数据，给出最新的交易建议，输出要求格式如下：
+
+    - 交易建议：买入/卖出/观望
+    - 交易价格，如果交易建议为观望，则无需输出。
+    - 原因说明
+
+    """
+
+    trade_messages = [
+        SystemMessage(
+            content="你是一个资深量化交易员，可以根据市场交易数据给出专业的交易建议。"
+        ),
+        HumanMessage(
+            content=remove_leading_spaces(trade_prompt)
+        )
+    ]
+
+    chat = create_chat(llm_service, model)
+    resp_trade = chat.invoke(trade_messages).content
 
     result = f"""
-    ### {name}({symbol})
+    ### {name}({symbol}) 交易参考
 
     交易参考日: {df_daily["日期"].iloc[-1]}
 
-    {resp}
+    ### 交易建议
+
+    {resp_trade}
+
+    ### 交易参考
+
+    {resp_guide}
 
     #### 声明
 
