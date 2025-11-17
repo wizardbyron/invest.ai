@@ -4,10 +4,10 @@ from zoneinfo import ZoneInfo
 
 import streamlit as st
 
-from src.strategy import ai_guide
+from src.agents import trade_agent
 from src.util import nowstr
 from src.data import get_stock_name
-from src.strategy import pivot_points_grid, ai_guide
+from src.strategy import pivot_points_grid
 from src.util import nowstr, get_timezone_by_type
 
 
@@ -79,8 +79,8 @@ def individual_ai(symbol: str, date: datetime):
                 status.update(label=f"AI 分析中，请稍后...",
                               state="running",
                               expanded=False)
-                resp = ai_guide(symbol=symbol,
-                                end_date=date.strftime("%Y-%m-%d"))
+                resp = trade_agent(symbol=symbol,
+                                   end_date=date.strftime("%Y-%m-%d"))
                 st.markdown(resp)
                 with open(record_file, 'w') as f:
                     f.write(resp)
@@ -103,15 +103,17 @@ def individual_tabs():
 
     with right:
         end_date = st.date_input(
-            "请选择日期",
+            "请选择日期，默认为今天",
             max_value="today",
             format="YYYY-MM-DD",
             value="today")
 
-    ai, table = st.tabs(["交易价格参考", "AI 分析"])
+    individual_ai(symbol, end_date)
 
-    with ai:
-        individual_ai(symbol, end_date)
+    # ai, table = st.tabs(["交易价格参考", "AI 分析"])
 
-    with table:
-        individual_table(symbol, end_date)
+    # with ai:
+    #     individual_ai(symbol, end_date)
+
+    # with table:
+    #     individual_table(symbol, end_date)

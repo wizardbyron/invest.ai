@@ -3,7 +3,7 @@ import time
 import pandas as pd
 from tqdm import tqdm
 
-from src.strategy import ai_guide
+from src.agents import trade_agent
 from src.util import todaystr, nowstr
 
 
@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
         for symbol in tqdm(symbols, leave=False):
             try:
-                output = ai_guide(symbol, date)
+                output = trade_agent(symbol, date)
                 filename = f"./record/{symbol}_{date}.md"
                 with open(filename, 'w', encoding='utf-8') as f:
                     f.write(output)

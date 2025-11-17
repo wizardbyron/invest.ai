@@ -5,11 +5,11 @@ import time
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from src.strategy import ai_guide
+from src.agents import trade_agent
 from src.util import nowstr, get_timezone_by_type, identify_stock_type
 
 
-def guide(symbol: str, date: str = "") -> None:
+def agent(symbol: str, date: str = "") -> None:
     """获取交易指南
 
     Args:
@@ -26,12 +26,13 @@ def guide(symbol: str, date: str = "") -> None:
         end_date = datetime.now(timezone)
     else:
         end_date = datetime.strptime(str(date), '%Y%m%d')
-    print(ai_guide(symbol, end_date.strftime('%Y-%m-%d')))
+    resp = trade_agent(symbol, end_date.strftime('%Y-%m-%d'))
+    print(resp)
 
 
 if __name__ == "__main__":
     start_time = time.time()
-    fire.Fire(guide)
+    fire.Fire(agent)
     end_time = time.time()
     duration = end_time - start_time
     print(f"[{nowstr()} 执行完成, 花费:{duration:.2f}秒]")
