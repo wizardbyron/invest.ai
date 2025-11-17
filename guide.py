@@ -10,8 +10,8 @@ from tabulate import tabulate
 from tqdm import tqdm
 
 from src.data import get_stock_name
-from src.strategy import pivot_points_grid, ai_guide
-from src.util import nowstr, todaystr, format_for_term, get_timezone_by_type, identify_stock_type
+from src.strategy import pivot_points_grid
+from src.util import nowstr, format_for_term, get_timezone_by_type, identify_stock_type
 
 
 def guide(portfolio: str = "all", point_type: str = "斐波那契") -> None:
