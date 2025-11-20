@@ -24,6 +24,10 @@ def create_chat(service: str, model: str):
     """
 
     chat_model_params = {
+        "aliyun": {
+            "api_key": os.environ.get("ALIYUN_API_KEY"),
+            "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1/"
+        },
         "ollama": {
             "api_key": "ollama",
             "base_url": "http://localhost:11434/v1/"
@@ -34,7 +38,7 @@ def create_chat(service: str, model: str):
         },
         "moonshot": {
             "api_key": os.environ.get("MOONSHOT_API_KEY"),
-            "base_url": "https://api.moonshot.cn/v1"
+            "base_url": "https://api.moonshot.cn/v1/"
         },
         "zai": {
             "api_key": os.environ.get("ZAI_API_KEY"),
