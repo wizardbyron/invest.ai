@@ -110,7 +110,7 @@ def individual_tabs():
 
     individual_ai(symbol, end_date)
 
-    # ai, table = st.tabs(["交易价格参考", "AI 分析"])
+    # ai, table = st.tabs(["AI 分析","交易价格参考"])
 
     # with ai:
     #     individual_ai(symbol, end_date)

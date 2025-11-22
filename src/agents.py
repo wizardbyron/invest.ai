@@ -46,6 +46,10 @@ def trade_agent(symbol: str, end_date: str) -> str:
         start_date=start_date,
         end_date=end_date)
 
+    df_daily = df_daily.drop(['股票代码', '股票名称'], axis=1)
+    df_weekly = df_weekly.drop(['股票代码', '股票名称'], axis=1)
+    df_monthly = df_monthly.drop(['股票代码', '股票名称'], axis=1)
+
     # 获取上一个交易日的交易数据
     if df_daily.iloc[-1]['日期'] == end_date and in_trading_time():
         # df_last_day = df_daily[-2:-1]  # 交易时间内，获取上一个交易日的数据

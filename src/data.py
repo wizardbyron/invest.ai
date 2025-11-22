@@ -260,7 +260,8 @@ def get_stock_name(symbol: str) -> str:
     stock_type = identify_stock_type(symbol)
     if stock_type == 'A股':
         # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id8
-        name = ak.stock_individual_info_em(symbol).loc[2]['value']
+        new_symbol = futu_symbol(symbol).replace('.','')
+        name = ak.stock_individual_basic_info_xq(new_symbol).loc[2]['value']
     elif stock_type == 'A股ETF':
         # 参考: https://akshare.akfamily.xyz/data/fund/fund_public.html#id1
         df_symbol_cache = f".cache/zh_etf_symbols.csv"
