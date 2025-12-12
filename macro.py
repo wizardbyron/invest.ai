@@ -25,24 +25,38 @@ class MacroEconomic:
     """
 
     @classmethod
-    def hs300(cls, up=20.5, down=18.5):
+    def hs300(cls, days=100):
         """沪深300指数市盈率中位数判断
 
         Args:
-            up (float, optional): _description_. Defaults to 20.5.
-            down (float, optional): _description_. Defaults to 18.5.
+            days: 最近数据天数
         """
         df_hs300_pe = ak.stock_index_pe_lg(symbol="沪深300")
-        df_hs300_pe = df_hs300_pe[["日期", "静态市盈率中位数"]]
+        df_hs300_pe = df_hs300_pe[["日期", "静态市盈率中位数"]][-days:]
 
-        print(df_hs300_pe[-20:])
-        last_day_pe = df_hs300_pe.iloc[-1]
-        if last_day_pe["静态市盈率中位数"] > up:
-            print("沪深300估值偏高，注意减仓")
-        elif last_day_pe["静态市盈率中位数"] < down:
-            print("沪深300估值偏低，注意加仓")
-        else:
-            print("沪深300估值适当，持有观望")
+        prompt = f'''
+        沪深300 最近{days}的市盈率如下：
+
+        {df_hs300_pe.to_markdown()}
+
+        请计算出最大值、最小值、最新值的分位。
+
+        并根据分位对最新值进行估计，输出是低估、高估、合理。
+        '''
+        prompt = remove_leading_spaces(prompt)
+
+        messages = [
+            HumanMessage(
+                content=(prompt)
+            )
+        ]
+
+        llm_service = os.environ.get("LLM_SERVICE")
+        model = os.environ.get("MODEL")
+        chat = create_chat(llm_service, model)
+        resp = chat.invoke(messages).content
+        print(resp)
+
 
     @classmethod
     def intrest_rate(cls, period=10):
@@ -80,6 +94,27 @@ class MacroEconomic:
         print(df)
         print(f'{days}日最大收益率:{yield_max}')
         print(f'{days}日最小收益率:{yield_min}')
+        prompt = f'''最近{days}的国债利率如下：
+
+        {df.to_markdown()}
+
+        请计算出最大值、最小值、最新值的分位。
+
+        并根据分位对最新值进行估计，输出是低估、高估、合理。
+        '''
+        prompt = remove_leading_spaces(prompt)
+
+        messages = [
+            HumanMessage(
+                content=(prompt)
+            )
+        ]
+
+        llm_service = os.environ.get("LLM_SERVICE")
+        model = os.environ.get("MODEL")
+        chat = create_chat(llm_service, model)
+        resp = chat.invoke(messages).content
+        print(resp)
 
     @classmethod
     def zh_pmi(cls):
