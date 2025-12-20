@@ -2,11 +2,10 @@
 
 import fire
 import time
-from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from src.agents import trade_agent
-from src.util import nowstr, get_timezone_by_type, identify_stock_type
+from src.util import nowstr, get_timezone_by_type, identify_stock_type, todaystr
 
 
 def agent(symbol: str, date: str = "") -> None:
@@ -23,10 +22,8 @@ def agent(symbol: str, date: str = "") -> None:
     timezone = ZoneInfo(get_timezone_by_type(identify_stock_type(symbol)))
 
     if date == "":
-        end_date = datetime.now(timezone)
-    else:
-        end_date = datetime.strptime(str(date), '%Y%m%d')
-    resp = trade_agent(symbol, end_date.strftime('%Y-%m-%d'))
+        date = todaystr()
+    resp = trade_agent(symbol, date)
     print(resp)
 
 
