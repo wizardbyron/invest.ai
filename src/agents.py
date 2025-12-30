@@ -104,8 +104,6 @@ def trade_agent(symbol: str, end_date: str) -> str:
 
     - 买入价格范围:
     - 卖出价格范围:
-    - 止盈价:
-    - 止损价:
 
     ##### 交易策略
 
