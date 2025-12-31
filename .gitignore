@@ -162,7 +162,6 @@ cython_debug/
 #.idea/
 
 .DS_Store
-docs/交易指南/**/*.md
 output/*
 .auth/*
 record/*.md
