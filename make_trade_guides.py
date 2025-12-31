@@ -15,7 +15,7 @@ def make_trade_guides(date= ""):
         date = todaystr()
 
     file_path = "./input/portfolios/all.csv"  # 替换为你的CSV文件路径
-    path_str = f'./record/{date}'
+    path_str = f'./docs/交易指南/{date.replace("-", "")}'
     dir_path = Path(path_str)
     try:
         dir_path.mkdir(parents=True, exist_ok=True)

@@ -100,18 +100,18 @@ def trade_agent(symbol: str, end_date: str) -> str:
 
     结合以上历史交易的价格、成交量、均线和不同级别的枢轴点综合分析输出交易参考, 输出要求格式如下：
 
-    ##### 价格参考
+    ### 价格参考
 
     - 买入价格范围:
     - 卖出价格范围:
 
-    ##### 交易策略
+    ### 交易策略
 
-    - 短期策略:
-    - 中期策略:
-    - 长期策略:
+    #### 短期策略:
+    #### 中期策略:
+    #### 长期策略:
 
-    ##### 股票交易分析
+    ### 股票交易分析
     """
 
     guide_messages = [
@@ -157,19 +157,19 @@ def trade_agent(symbol: str, end_date: str) -> str:
     resp_trade = chat.invoke(trade_messages).content
 
     result = f"""
-    ### {name}({symbol}) 交易参考
+    # {symbol}-{name}
 
-    交易参考日: {df_daily["日期"].iloc[-1]}
+    **交易参考日**: {df_daily["日期"].iloc[-1]}
 
-    #### 交易建议
+    ## 交易建议
 
     {resp_trade}
 
-    #### 交易参考
+    ## 交易参考
 
     {resp_guide}
 
-    #### 声明
+    ## 声明
 
     {disclaimer_text}
 
