@@ -9,7 +9,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from src.data import history_klines, get_stock_name
 from src.indicators import pivot_points_table
 from src.llm import create_chat
-from src.util import remove_leading_spaces, get_timezone_by_type, in_trading_time, identify_stock_type, disclaimer_text
+from src.util import remove_leading_spaces, get_timezone_by_type, in_trading_time, identify_stock_type, disclaimer_text, todaystr
 
 
 def trade_agent(symbol: str, end_date: str) -> str:
@@ -148,6 +148,7 @@ def trade_agent(symbol: str, end_date: str) -> str:
         SystemMessage(
             content="你是一个资深量化交易员，可以根据市场交易数据给出专业的交易建议。"
         ),
+
         HumanMessage(
             content=remove_leading_spaces(trade_prompt)
         )
@@ -156,10 +157,11 @@ def trade_agent(symbol: str, end_date: str) -> str:
     chat = create_chat(llm_service, model)
     resp_trade = chat.invoke(trade_messages).content
 
-    result = f"""
-    # {symbol}-{name}
+    result = f"""# {symbol}-{name}
 
-    **交易参考日**: {df_daily["日期"].iloc[-1]}
+    > 数据参考日期: {df_daily["日期"].iloc[-1]}
+    > 指南生成时间: {now.strftime("%Y-%m-%d %H:%M:%S")}
+    > 分析模型: {model}
 
     ## 交易建议
 
@@ -172,8 +174,5 @@ def trade_agent(symbol: str, end_date: str) -> str:
     ## 声明
 
     {disclaimer_text}
-
-    生成时间: {now.strftime("%Y-%m-%d %H:%M:%S")}
-    分析模型: {model}
     """
     return remove_leading_spaces(result)

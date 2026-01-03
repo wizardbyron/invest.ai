@@ -128,6 +128,15 @@ def todaystr() -> str:
     return now.strftime("%Y-%m-%d")
 
 
+def todaystr_zh() -> str:
+    """获得当前日期字符串
+
+    Returns:
+        _type_: 输出"%Y年%m月%d日"格式的当前日期字符串
+    """
+    now = datetime.now()
+    return now.strftime("%Y年%m月%d日")
+
 def send_voice(message: str) -> int:
     """采用苹果默认的say命令播报语音
 
