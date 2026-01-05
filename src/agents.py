@@ -6,21 +6,19 @@ from zoneinfo import ZoneInfo
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from src.data import history_klines, get_stock_name
+from src.data import history_klines
 from src.indicators import pivot_points_table
 from src.llm import create_chat
 from src.util import remove_leading_spaces, get_timezone_by_type, in_trading_time, identify_stock_type, disclaimer_text
 
 
-def trade_agent(symbol: str, end_date: str) -> str:
+def trade_agent(symbol: str, end_date: str, days_off=100) -> str:
     if symbol is None:
         raise ValueError("symbol is required")
 
     llm_service = os.environ.get("LLM_SERVICE")
     model = os.environ.get("MODEL")
-    days_off = 100
 
-    name = get_stock_name(symbol)
     timezone = ZoneInfo(get_timezone_by_type(identify_stock_type(symbol)))
     now = datetime.now(timezone)
     start_date = (now - timedelta(days=days_off)).strftime('%Y-%m-%d')
@@ -45,7 +43,7 @@ def trade_agent(symbol: str, end_date: str) -> str:
         period='monthly',
         start_date=start_date,
         end_date=end_date)
-
+    name = df_daily['股票名称'].iloc[-1]
     df_daily = df_daily.drop(['股票代码', '股票名称'], axis=1)
     df_weekly = df_weekly.drop(['股票代码', '股票名称'], axis=1)
     df_monthly = df_monthly.drop(['股票代码', '股票名称'], axis=1)
@@ -108,15 +106,17 @@ def trade_agent(symbol: str, end_date: str) -> str:
     ### 交易策略
 
     #### 短期策略:
+
     #### 中期策略:
+
     #### 长期策略:
 
-    ### 股票交易分析
+    ### 交易分析
     """
 
     guide_messages = [
         SystemMessage(
-            content="你是一个资深量化交易员，可以根据市场交易数据给出专业的交易建议。"
+            content="你是一个资深股票交易分析师，可以根据市场交易数据给出专业的交易建议。"
         ),
         HumanMessage(
             content=remove_leading_spaces(guide_prompt)
@@ -126,9 +126,7 @@ def trade_agent(symbol: str, end_date: str) -> str:
     chat = create_chat(llm_service, model)
     resp_guide = chat.invoke(guide_messages).content
 
-    trade_prompt = f"""
-
-    根据以下某股票交易参考:
+    trade_prompt = f"""根据以下某股票交易参考:
 
     {resp_guide}
 
@@ -136,12 +134,19 @@ def trade_agent(symbol: str, end_date: str) -> str:
 
     {df_today.to_markdown()}
 
-    根据最新的交易数据。严格遵循交易参考的买入卖出交易价格范围，给出最新的条件单交易建议，输出要求格式如下：
+    根据最新的交易数据输出最新的交易建议，要求如下：
 
-    - 条件单交易建议：买入/卖出/观望
-    - 条件单交易价格，如果交易建议为观望，则无需输出。
-    - 原因说明
+    1. 严格遵循交易参考的买入卖出交易价格范围。
+    2. 交易建议为买入、卖出或者观望。
+    3. 交易价格在交易参考的价格范围内。
+    4. 如果交易建议为买入或者卖出，则给出建议交易价格。
+    5. 如果交易建议为观望，则同时给出买入或者卖出的建议价格。
 
+    输出要求格式如下：
+
+    ### 交易建议：
+    ### 交易价格：
+    ### 原因说明：
     """
 
     trade_messages = [
@@ -159,9 +164,9 @@ def trade_agent(symbol: str, end_date: str) -> str:
 
     result = f"""# {symbol}-{name}
 
-    > 数据参考日期: {df_daily["日期"].iloc[-1]}
+    > 参考日期: {df_daily["日期"].iloc[0]} 至 {df_daily["日期"].iloc[-1]}
     >
-    > 指南生成时间: {now.strftime("%Y-%m-%d %H:%M:%S")}
+    > 生成时间: {now.strftime("%Y-%m-%d %H:%M:%S")}
     >
     > 分析模型: {model}
 
