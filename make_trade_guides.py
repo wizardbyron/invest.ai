@@ -1,3 +1,4 @@
+import re
 import time
 
 import fire
@@ -9,15 +10,66 @@ from src.util import todaystr, nowstr, todaystr_zh
 from pathlib import Path
 
 
+def extract_trade_info(output: str, symbol: str) -> dict:
+    """从交易指南输出中提取关键信息"""
+    lines = output.split("\n")
+
+    stock_name = ""
+    trade_suggestion = ""
+    buy_range = ""
+    sell_range = ""
+
+    # 提取股票名称
+    title_match = re.search(r"# ([\w\d]+)-(.+)", lines[0])
+    if title_match:
+        stock_name = title_match.group(2).strip()
+
+    # 解析内容
+    section = ""
+    for i, line in enumerate(lines):
+        line = line.strip()
+
+        if line.startswith("### 交易建议："):
+            section = "suggestion"
+            continue
+        elif line.startswith("### 交易价格："):
+            section = "price"
+            continue
+        elif line.startswith("### 原因说明："):
+            section = "reason"
+            continue
+        elif line.startswith("## 交易参考"):
+            break
+
+        if section == "suggestion" and line and not line.startswith("#"):
+            trade_suggestion = line
+        elif section == "price" and line and not line.startswith("#"):
+            # 解析买入和卖出价格区间
+            if "买入" in line or "Buy" in line or "buy" in line:
+                buy_range = line
+            elif "卖出" in line or "Sell" in line or "sell" in line:
+                sell_range = line
+
+    return {
+        "symbol": symbol,
+        "name": stock_name,
+        "trade_suggestion": trade_suggestion,
+        "buy_range": buy_range,
+        "sell_range": sell_range,
+    }
+
+
 def make_trade_guides(date=""):
-    # 使用示例
     start_time = time.time()
     if date == "":
         date = todaystr()
 
-    file_path = "./input/portfolios/all.csv"  # 替换为你的CSV文件路径
-    path_str = f'./docs/交易指南/{todaystr_zh()}'
+    file_path = "./input/portfolios/all.csv"
+    path_str = f"./docs/交易指南/{todaystr_zh()}"
     dir_path = Path(path_str)
+
+    trade_data_list = []
+
     try:
         dir_path.mkdir(parents=True, exist_ok=True)
         print(f"目录 '{dir_path}' 创建成功或已存在")
@@ -25,20 +77,40 @@ def make_trade_guides(date=""):
         df_portfolio = pd.read_csv(file_path, dtype={"代码": str, "名称": str})
         symbols = df_portfolio["代码"].values
 
-        print(f'分析日期:{date}，分析进度')
+        print(f"分析日期:{date}，分析进度")
 
         for symbol in tqdm(symbols, leave=False):
             try:
                 output = trade_agent(symbol, date)
                 filename = f"{path_str}/{symbol}.md"
-                with open(filename, 'w', encoding='utf-8') as f:
+                with open(filename, "w", encoding="utf-8") as f:
                     f.write(output)
+
+                trade_info = extract_trade_info(output, symbol)
+                trade_data_list.append(trade_info)
             except Exception as e:
                 print(f"处理{symbol}时发生错误：{str(e)}")
-    except OSError as e:
-        print(f"创建目录失败: {e}")
+
+        # 生成汇总文档
+        summary_path = f"{path_str}/汇总.md"
+        with open(summary_path, "w", encoding="utf-8") as f:
+            f.write(f"# 交易指南汇总\n\n")
+            f.write(f"> 生成时间: {nowstr()}\n\n")
+            f.write(
+                f"| 股票代码 | 股票名称 | 交易建议 | 买入价格区间 | 卖出价格区间 |\n"
+            )
+            f.write(f"|---------|---------|---------|-------------|-------------|\n")
+
+            for data in trade_data_list:
+                f.write(
+                    f"| {data['symbol']} | {data['name']} | {data['trade_suggestion']} | {data['buy_range']} | {data['sell_range']} |\n"
+                )
+
+        print(f"汇总文档已生成: {summary_path}")
     except FileNotFoundError:
         print(f"错误：找不到文件 {file_path}")
+    except OSError as e:
+        print(f"创建目录失败: {e}")
 
     end_time = time.time()
     duration = end_time - start_time
