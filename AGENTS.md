@@ -156,6 +156,7 @@ df_symbol_cache = f".cache/us_symbols.csv"
 - Write clear commit messages
 - Never commit secrets or `.env` files
 - Test changes before committing
+- **NEVER automatically commit or push to remote repository** - always ask user for confirmation first
 
 ### Working with This Repository
 - Main entry points: `agent.py`, `app.py`, `portfolio.py`, `guide.py`
