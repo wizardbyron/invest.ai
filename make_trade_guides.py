@@ -92,7 +92,7 @@ def make_trade_guides(date=""):
                 print(f"处理{symbol}时发生错误：{str(e)}")
 
         # 生成汇总文档
-        summary_path = f"{path_str}/汇总.md"
+        summary_path = f"{path_str}/0-交易指南汇总.md"
         with open(summary_path, "w", encoding="utf-8") as f:
             f.write(f"# 交易指南汇总\n\n")
             f.write(f"> 生成时间: {nowstr()}\n\n")
