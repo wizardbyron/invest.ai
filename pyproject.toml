@@ -27,3 +27,6 @@ dependencies = [
     "tqdm>=4.67.1",
     "wcwidth>=0.2.14",
 ]
+
+[tool.uv]
+index-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
