@@ -103,7 +103,7 @@ def make_trade_guides(date=""):
 
             for data in trade_data_list:
                 f.write(
-                    f"| {data['symbol']} | {data['name']} | {data['trade_suggestion']} | {data['buy_range']} | {data['sell_range']} |\n"
+                    f"| [{data['symbol']}]({data['symbol']}.md) | [{data['name']}]({data['symbol']}.md) | {data['trade_suggestion']} | {data['buy_range']} | {data['sell_range']} |\n"
                 )
 
         print(f"汇总文档已生成: {summary_path}")
