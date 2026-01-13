@@ -1,62 +1,62 @@
-# AGENTS.md - Guidelines for AI Agents
+# AGENTS.md - AI 代理指南
 
-This document provides guidelines for AI agents working on the invest.ai codebase.
+本文档为在 invest.ai 代码库中工作的 AI 代理提供指导。
 
-Before python scripts you need to activate virtual environment via 'source .venv/bin/activate'
+在运行 Python 脚本前，需要通过 'source .venv/bin/activate' 激活虚拟环境。
 
-## Build, Lint, and Test Commands
+## 构建、检查和测试命令
 
-This project uses `uv` for dependency management. 
+本项目使用 `uv` 进行依赖管理。
 
-### Installing Dependencies
+### 安装依赖
 ```bash
-# Install dependencies
+# 安装依赖
 uv sync
 
-# Update lockfile
+# 更新锁文件
 uv lock
 
-# Add a new dependency
+# 添加新依赖
 uv add <package-name>
 ```
 
-### Running Tests
+### 运行测试
 ```bash
-# Run all tests
+# 运行所有测试
 uv run pytest
 
-# Run a specific test file
+# 运行特定测试文件
 uv run pytest test/test_util.py
 
-# Run a single test function
+# 运行单个测试函数
 uv run pytest test/test_util.py::test_numbers_in_chinese
 
-# Run tests with verbose output
+# 以详细模式运行测试
 uv run pytest -v
 ```
 
-### Building Docker Image
+### 构建 Docker 镜像
 ```bash
 ./build.sh
 ```
 
-### Code Quality
-- No explicit linting tools are configured
-- Manual code review is required before committing
+### 代码质量
+- 未配置显式的代码检查工具
+- 提交前需要人工代码审查
 
-## Code Style Guidelines
+## 代码风格指南
 
-### General Principles
-- Write clean, readable code with clear intent
-- Prefer explicit over implicit
-- Keep functions focused and single-purpose
-- Use type hints for function signatures
+### 通用原则
+- 编写清晰、可读且意图明确的代码
+- 显式优于隐式
+- 保持函数单一职责
+- 为函数签名使用类型提示
 
-### Imports
-Organize imports in three sections with blank lines between:
-1. Standard library imports
-2. Third-party imports
-3. Local/relative imports
+### 导入
+将导入分为三个部分，中间用空行分隔：
+1. 标准库导入
+2. 第三方库导入
+3. 本地/相对导入
 
 ```python
 import os
@@ -70,17 +70,17 @@ from src.data import history_klines
 from src.util import remove_leading_spaces
 ```
 
-### Naming Conventions
-| Type | Convention | Example |
+### 命名约定
+| 类型 | 约定 | 示例 |
 |------|------------|---------|
-| Functions | snake_case | `remove_leading_spaces()` |
-| Variables | snake_case | `start_date`, `end_date` |
-| Constants | UPPER_SNAKE_CASE | `disclaimer_text` |
-| Type Aliases | PascalCase | `DataFrame` |
-| Private Helpers | _prefix_snake_case | `_helper_function()` |
+| 函数 | snake_case | `remove_leading_spaces()` |
+| 变量 | snake_case | `start_date`, `end_date` |
+| 常量 | UPPER_SNAKE_CASE | `disclaimer_text` |
+| 类型别名 | PascalCase | `DataFrame` |
+| 私有辅助函数 | _prefix_snake_case | `_helper_function()` |
 
-### Type Hints
-Use type hints for all function signatures:
+### 类型提示
+为所有函数签名使用类型提示：
 ```python
 def history_klines(
         symbol: str,
@@ -90,8 +90,8 @@ def history_klines(
         adjust_flag: str = 'qfq') -> DataFrame:
 ```
 
-### Docstrings
-Include docstrings for all public functions:
+### 文档字符串
+为所有公共函数包含文档字符串：
 ```python
 def identify_stock_type(code: str) -> str:
     """根据代码判断市场类型
@@ -104,10 +104,10 @@ def identify_stock_type(code: str) -> str:
     """
 ```
 
-### Error Handling
-- Use `ValueError` for invalid arguments
-- Use try/except for I/O operations
-- Provide meaningful error messages
+### 错误处理
+- 对无效参数使用 `ValueError`
+- 对 I/O 操作使用 try/except
+- 提供有意义的错误信息
 ```python
 if symbol is None:
     raise ValueError("symbol is required")
@@ -118,49 +118,49 @@ except FileNotFoundError as e:
     df_symbols = ak.stock_us_spot_em()
 ```
 
-### Environment Variables
-- Use `os.environ.get()` for configuration
-- Provide sensible defaults
+### 环境变量
+- 使用 `os.environ.get()` 进行配置
+- 提供合理的默认值
 ```python
 source = os.environ.get("DATA_SOURCE", "akshare")
 ```
 
-### String Formatting
-- Use f-strings for simple interpolation
-- Use `.format()` for complex cases
-- Use `remove_leading_spaces()` utility for multi-line strings
+### 字符串格式化
+- 对简单插值使用 f-strings
+- 对复杂情况使用 `.format()`
+- 对多行字符串使用 `remove_leading_spaces()` 工具
 
-### Data Handling
-- Use pandas DataFrames for tabular data
-- Use descriptive Chinese column names (股票代码, 股票名称, 日期, 开盘, 收盘, etc.)
-- Validate DataFrames are not empty before processing
+### 数据处理
+- 使用 pandas DataFrames 处理表格数据
+- 使用描述性的中文列名（股票代码, 股票名称, 日期, 开盘, 收盘等）
+- 在处理前验证 DataFrames 不为空
 ```python
 if klines.empty:
     raise ValueError("没有数据，请检查参数")
 ```
 
-### Date/Time Handling
-- Use `datetime` with `ZoneInfo` for timezone-aware times
-- Store dates as strings in 'YYYY-MM-DD' format
-- Use `Asia/Shanghai` as default timezone for Chinese markets
+### 日期/时间处理
+- 使用带 `ZoneInfo` 的 `datetime` 处理时区时间
+- 将日期以 'YYYY-MM-DD' 格式存储为字符串
+- 对中国市场使用 `Asia/Shanghai` 作为默认时区
 
-### File Paths
-- Use relative paths from project root
-- Cache data in `.cache/` directory
+### 文件路径
+- 使用相对于项目根目录的路径
+- 将数据缓存在 `.cache/` 目录中
 ```python
 df_symbol_cache = f".cache/us_symbols.csv"
 ```
 
-### Git Workflow
-- Create commits for logical changes
-- Write clear commit messages
-- Never commit secrets or `.env` files
-- Test changes before committing
-- **NEVER automatically commit or push to remote repository** - always ask user for confirmation first
+### Git 工作流
+- 为逻辑变更创建提交
+- 编写清晰的提交信息
+- 永远不要提交密钥或 `.env` 文件
+- 提交前测试变更
+- **永远不要自动提交或推送到远程仓库** - 始终先征求用户确认
 
-### Working with This Repository
-- Main entry points: `agent.py`, `app.py`, `portfolio.py`, `guide.py`
-- Core logic in `src/` directory
-- Tests in `test/` directory
-- Data sources in `input/portfolios/`
-- Configuration via `.env` file (copy from `.env.example`)
+### 在此代码库中工作
+- 主要入口点：`agent.py`, `app.py`, `portfolio.py`, `guide.py`
+- 核心逻辑在 `src/` 目录中
+- 测试在 `test/` 目录中
+- 数据源在 `input/portfolios/` 中
+- 通过 `.env` 文件进行配置（从 `.env.example` 复制）
