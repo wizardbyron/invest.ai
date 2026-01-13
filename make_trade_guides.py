@@ -59,12 +59,12 @@ def extract_trade_info(output: str, symbol: str) -> dict:
     }
 
 
-def make_trade_guides(date=""):
+def make_trade_guides(portfolio: str = "all", date: str = ""):
     start_time = time.time()
     if date == "":
         date = todaystr()
 
-    file_path = "./input/portfolios/all.csv"
+    file_path = f"./input/portfolios/{portfolio}.csv"
     path_str = f"./docs/交易指南/{todaystr_zh()}"
     dir_path = Path(path_str)
 
@@ -96,15 +96,53 @@ def make_trade_guides(date=""):
         with open(summary_path, "w", encoding="utf-8") as f:
             f.write(f"# 交易指南汇总\n\n")
             f.write(f"> 生成时间: {nowstr()}\n\n")
-            f.write(
-                f"| 股票代码 | 股票名称 | 交易建议 | 买入价格区间 | 卖出价格区间 |\n"
-            )
-            f.write(f"|---------|---------|---------|-------------|-------------|\n")
+
+            # 按交易建议分组
+            buy_stocks = []
+            sell_stocks = []
+            hold_stocks = []
 
             for data in trade_data_list:
-                f.write(
-                    f"| [{data['symbol']}]({data['symbol']}.md) | [{data['name']}]({data['symbol']}.md) | {data['trade_suggestion']} | {data['buy_range']} | {data['sell_range']} |\n"
-                )
+                suggestion = data["trade_suggestion"]
+                if "买入" in suggestion:
+                    buy_stocks.append(data)
+                elif "卖出" in suggestion:
+                    sell_stocks.append(data)
+                else:
+                    hold_stocks.append(data)
+
+            # 买入股票
+            if buy_stocks:
+                f.write(f"## 买入\n\n")
+                f.write(f"| 股票代码 | 股票名称 | 买入价格区间 | 卖出价格区间 |\n")
+                f.write(f"|---------|---------|-------------|-------------|\n")
+                for data in buy_stocks:
+                    f.write(
+                        f"| [{data['symbol']}]({data['symbol']}.md) | [{data['name']}]({data['symbol']}.md) | {data['buy_range']} | {data['sell_range']} |\n"
+                    )
+                f.write(f"\n")
+
+            # 卖出股票
+            if sell_stocks:
+                f.write(f"## 卖出\n\n")
+                f.write(f"| 股票代码 | 股票名称 | 买入价格区间 | 卖出价格区间 |\n")
+                f.write(f"|---------|---------|-------------|-------------|\n")
+                for data in sell_stocks:
+                    f.write(
+                        f"| [{data['symbol']}]({data['symbol']}.md) | [{data['name']}]({data['symbol']}.md) | {data['buy_range']} | {data['sell_range']} |\n"
+                    )
+                f.write(f"\n")
+
+            # 观望股票
+            if hold_stocks:
+                f.write(f"## 观望\n\n")
+                f.write(f"| 股票代码 | 股票名称 | 买入价格区间 | 卖出价格区间 |\n")
+                f.write(f"|---------|---------|-------------|-------------|\n")
+                for data in hold_stocks:
+                    f.write(
+                        f"| [{data['symbol']}]({data['symbol']}.md) | [{data['name']}]({data['symbol']}.md) | {data['buy_range']} | {data['sell_range']} |\n"
+                    )
+                f.write(f"\n")
 
         print(f"汇总文档已生成: {summary_path}")
     except FileNotFoundError:
