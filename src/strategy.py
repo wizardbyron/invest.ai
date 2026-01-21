@@ -19,12 +19,12 @@ def pivot_points_grid(symbol: str,
     """
     sell_point = {
         "weekly": 2.0,
-        "daily": 1.5
+        "daily": 2.0
     }
 
     buy_point = {
         "weekly": 2.0,
-        "daily": 1.5
+        "daily": 2.0
     }
 
     klines = history_klines(

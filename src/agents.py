@@ -90,13 +90,18 @@ def trade_agent(symbol: str, end_date: str, days_off=100) -> str:
 
     以下是该股票不同级别的枢轴点参考:
 
-    根据上周K线生成的枢轴点 (参考周起始日：{df_last_week["日期"].iloc[-1]})：
+    根据上周K线生成的枢轴点 (参考周起始日：{df_last_week["日期"].iloc[-1]}）如下：
     {pivot_points_table(df_last_week)['斐波那契'].to_markdown()}
 
-    根据上月K线生成的枢轴点（参考月起始日：{df_last_month["日期"].iloc[-1]}）：
+    根据上月K线生成的枢轴点（参考月起始日：{df_last_month["日期"].iloc[-1]}）如下：
     {pivot_points_table(df_last_month)['斐波那契'].to_markdown()}
 
-    结合以上历史交易的价格、成交量、均线和不同级别的枢轴点综合分析输出交易参考, 输出要求格式如下：
+    结合以上历史交易数据的价格、成交量、均线以及枢轴点综合分析输出交易参考。
+
+    要求：
+    - 不参考市盈率。
+
+    格式如下：
 
     ### 价格参考
 
