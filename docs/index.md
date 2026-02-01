@@ -21,6 +21,7 @@ Papers:
 - [Learning to Generate Explainable Stock Predictions using Self-Reflective Large Language Models](https://arxiv.org/abs/2402.03659)
 - [TradingAgents: Multi-Agents LLM Financial Trading Framework](https://arxiv.org/abs/2412.20138)
 - [Kronos: A Foundation Model for the Language of Financial Markets](https://arxiv.org/abs/2508.02739)
+- [Automate Strategy Finding with LLM in Quant Investment](https://arxiv.org/abs/2409.06289)
 
 ## 免责声明
 
