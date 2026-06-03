@@ -63,8 +63,8 @@ import os
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-import akshare as ak
 import pandas as pd
+from futu import RET_OK, OpenQuoteContext
 
 from src.data import history_klines
 from src.util import remove_leading_spaces
@@ -111,19 +111,12 @@ def identify_stock_type(code: str) -> str:
 ```python
 if symbol is None:
     raise ValueError("symbol is required")
-
-try:
-    df_symbols = pd.read_csv(df_symbol_cache)
-except FileNotFoundError as e:
-    df_symbols = ak.stock_us_spot_em()
 ```
 
 ### 环境变量
 - 使用 `os.environ.get()` 进行配置
 - 提供合理的默认值
-```python
-source = os.environ.get("DATA_SOURCE", "akshare")
-```
+- 通过 `.env` 文件进行配置（从 `.env.example` 复制）
 
 ### 字符串格式化
 - 对简单插值使用 f-strings
@@ -163,4 +156,5 @@ df_symbol_cache = f".cache/us_symbols.csv"
 - 核心逻辑在 `src/` 目录中
 - 测试在 `test/` 目录中
 - 数据源在 `input/portfolios/` 中
+- 股票数据统一通过 Futu Open API 获取（需启动 OpenD 服务，默认 127.0.0.1:11111）
 - 通过 `.env` 文件进行配置（从 `.env.example` 复制）

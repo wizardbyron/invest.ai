@@ -1,12 +1,9 @@
-import os
-import akshare as ak
 import pandas as pd
-
 from dotenv import load_dotenv
 from futu import RET_OK, OpenQuoteContext, AuType, KLType
 from pandas import DataFrame
 
-from src.util import identify_stock_type, this_year_str, futu_symbol
+from src.util import this_year_str, futu_symbol
 
 load_dotenv()
 
@@ -98,74 +95,6 @@ def history_klines_futu(
     return ret_data
 
 
-def history_klines_akshare(
-        symbol: str,
-        period: str,
-        start_date: str,
-        end_date: str,
-        adjust_flag: str = 'qfq') -> DataFrame:
-    """从akshare获取历史 K 线
-
-    Args:
-        symbol (str): 股票代码
-        period (str, optional): K线周期: daily/weekly/monthly.
-        start_date (str, optional): 开始日期, 格式: yyyy-mm-dd.
-        end_date (str, optional): 结束日期, 格式: yyyy-mm-dd.
-        adjust_flag (str, optional): 取值: qfq(前复权), hfq(后复权), 为空则不复权.
-
-    Raises:
-        ValueError: 结果为空则会报错
-
-    Returns:
-        DataFrame: 返回 df
-    """
-    stock_type = identify_stock_type(symbol)
-    if stock_type == 'A股':
-        # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id21
-        klines = ak.stock_zh_a_hist(
-            symbol=symbol,
-            start_date=start_date.replace('-', ''),
-            end_date=end_date.replace('-', ''),
-            period=period,
-            adjust=adjust_flag)
-        klines['成交量'] *= 100
-
-    elif stock_type == 'A股ETF':
-        # 参考: https://akshare.akfamily.xyz/data/fund/fund_public.html#id10
-        klines = ak.fund_etf_hist_em(
-            symbol=symbol,
-            start_date=start_date.replace('-', ''),
-            end_date=end_date.replace('-', ''),
-            period=period,
-            adjust=adjust_flag)
-        klines['成交量'] *= 100
-
-    elif stock_type == '港股':
-        # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id66
-        klines = ak.stock_hk_hist(
-            symbol=symbol,
-            start_date=start_date,
-            end_date=end_date,
-            period=period,
-            adjust=adjust_flag)
-
-    else:
-        # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id56
-        klines = ak.stock_us_hist(
-            symbol=convert_us_symbol(symbol.upper()),
-            start_date=start_date,
-            end_date=end_date,
-            period=period,
-            adjust=adjust_flag)
-
-    if klines.empty:
-        raise ValueError("没有数据，请检查参数")
-    klines['日期'] = klines['日期'].astype(str)
-    klines['股票代码'] = symbol
-    klines['股票名称'] = get_stock_name(symbol)
-    return klines
-
-
 def history_klines(
         symbol: str,
         period: str,
@@ -173,47 +102,16 @@ def history_klines(
         end_date: str,
         adjust_flag: str = 'qfq') -> DataFrame:
 
-    source = os.environ.get("DATA_SOURCE", "akshare")
+    data = history_klines_futu(
+        symbol=symbol,
+        period=period,
+        start_date=start_date,
+        end_date=end_date,
+        adjust_flag=adjust_flag)
 
-    if source == "akshare":
-        data = history_klines_akshare(
-            symbol=symbol,
-            period=period,
-            start_date=start_date,
-            end_date=end_date,
-            adjust_flag=adjust_flag)
-    elif source == "futu":
-        data = history_klines_futu(
-            symbol=symbol,
-            period=period,
-            start_date=start_date,
-            end_date=end_date,
-            adjust_flag=adjust_flag)
-    else:
-        raise ValueError("请设置环境变量 DATA_SOURCE 为 akshare 或 futu")
-
-    query_info = f'[{source}]查询[{futu_symbol(symbol)}], 类型: {period},{start_date} to {end_date}, {len(data)} rows.'
+    query_info = f'[futu]查询[{futu_symbol(symbol)}], 类型: {period},{start_date} to {end_date}, {len(data)} rows.'
     print(query_info)
     return data
-
-
-def convert_us_symbol(symbol: str) -> str:
-    """美股代码转换
-
-    Args:
-        symbol (str): 美股代码
-
-    Returns:
-        str: 美股代码（带市场标记）
-    """
-    df_symbol_cache = f".cache/us_symbols.csv"
-    try:
-        df_symbols = pd.read_csv(df_symbol_cache)
-    except Exception as e:
-        df_symbols = ak.stock_us_spot_em()
-        df_symbols.to_csv(df_symbol_cache, index=False)
-    stock = df_symbols[df_symbols["代码"].str.endswith(f'.{symbol}')]
-    return stock['代码'].values[0]
 
 
 def cn_bond(term: str = '10y',  year: str = this_year_str()) -> DataFrame:
@@ -256,37 +154,16 @@ def get_stock_name(symbol: str) -> str:
     Returns:
         str: 股票名称
     """
-
-    stock_type = identify_stock_type(symbol)
-    if stock_type == 'A股':
-        # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id10
-        name = ak.stock_individual_info_em(symbol).loc[2]['value']
-    elif stock_type == 'A股ETF':
-        # 参考: https://akshare.akfamily.xyz/data/fund/fund_public.html#id1
-        df_symbol_cache = f".cache/zh_etf_symbols.csv"
-        try:
-            df_symbols = pd.read_csv(df_symbol_cache, dtype={"基金代码": str})
-        except FileNotFoundError as e:
-            df_symbols = ak.fund_name_em()
-            df_symbols.to_csv(df_symbol_cache, index=False)
-        name = df_symbols[df_symbols['基金代码'] == symbol]['基金简称'].values[0]
-    elif stock_type == '港股':
-        # 参考: https://akshare.akfamily.xyz/data/stock/stock.html#id65
-        df_symbol_cache = f".cache/hk_symbols.csv"
-        try:
-            df_symbols = pd.read_csv(df_symbol_cache, dtype={'代码': str})
-        except FileNotFoundError as e:
-            df_symbols = ak.stock_hk_spot_em()
-            df_symbols.to_csv(df_symbol_cache, index=False)
-        name = df_symbols[df_symbols['代码'] == symbol]['名称'].values[0]
-    else:  # 美股
-        df_symbol_cache = f".cache/us_symbols.csv"
-        try:
-            df_symbols = pd.read_csv(df_symbol_cache)
-        except FileNotFoundError as e:
-            df_symbols = ak.stock_us_spot_em()
-            df_symbols.to_csv(df_symbol_cache, index=False)
-        stock = df_symbols[df_symbols["代码"].str.endswith(f'.{symbol.upper()}')]
-        name = stock['名称'].values[0]
-
-    return name
+    quote_ctx = OpenQuoteContext(host='127.0.0.1', port=11111)
+    try:
+        futu_code = futu_symbol(symbol)
+        market = futu_code.split('.')[0]
+        for stock_type in ('STOCK', 'ETF'):
+            ret, data = quote_ctx.get_stock_basicinfo(market=market, stock_type=stock_type)
+            if ret == RET_OK:
+                row = data[data['code'] == futu_code]
+                if not row.empty:
+                    return row['name'].values[0]
+        raise ValueError(f"futu 无法获取 {symbol} 的名称")
+    finally:
+        quote_ctx.close()
